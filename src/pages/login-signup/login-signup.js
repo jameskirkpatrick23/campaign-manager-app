@@ -59,7 +59,7 @@ class NormalLoginForm extends React.Component {
           >
             Log in
           </Button>
-          Or <Link to={'/register'}>register now!</Link>
+          Or <Link to={'/signup'}>register now!</Link>
         </FormItem>
       </Form>
     );
