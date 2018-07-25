@@ -3,22 +3,26 @@ import firebase from '../firebase';
 import { withRouter, Link } from 'react-router-dom';
 
 class Login extends React.Component {
-  state = { email: '', password: '' };
+  state = { email: null, password: null };
   submitForm = e => {
     e.preventDefault();
 
-    if (this.state.email && this.state.password) {
+    if (!this.isButtonDisabled()) {
       firebase
         .auth()
-        .createUserWithEmailAndPassword(this.state.email, this.state.password)
+        .signInWithEmailAndPassword(this.state.email, this.state.password)
         .then(res => {
-          this.props.history.push('/main');
+          this.props.history.push('/home');
         })
         .catch(err => {
           alert(err);
         });
     }
   };
+
+  isButtonDisabled() {
+    return !this.state.email || !this.state.password;
+  }
 
   render() {
     return (
@@ -35,6 +39,7 @@ class Login extends React.Component {
                   type="email"
                   name="email"
                   placeholder="E-mail"
+                  autoComplete="username"
                   onChange={e => this.setState({ email: e.target.value })}
                 />
                 <input
@@ -42,10 +47,12 @@ class Login extends React.Component {
                   type="password"
                   name="password"
                   placeholder="Password"
+                  autoComplete="current-password"
                   onChange={e => this.setState({ password: e.target.value })}
                 />
                 <button
-                  className="login-box-submit-button"
+                  className="button"
+                  disabled={this.isButtonDisabled()}
                   type="submit"
                   name="login_submit"
                 >

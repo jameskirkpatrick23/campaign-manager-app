@@ -1,6 +1,7 @@
 @import 'stylesheets/foundation.css';
 @import 'stylesheets/registration.css';
 @import 'stylesheets/splash.css';
+@import 'stylesheets/components/column-expansion.css';
 
 .App {
   text-align: center;
