@@ -1,6 +1,6 @@
-import LoginSignup from './pages/login-signup/login-signup';
-import Splash from './pages/splash/';
-import Signup from './pages/login-signup/signup';
+import LoginSignup from './pages/login-signup';
+import Splash from './pages/splash';
+import Signup from './pages/register';
 
 export default [
   { key: 'Splash', name: 'Splash', path: '/', exact: true, component: Splash },
@@ -12,9 +12,9 @@ export default [
     component: LoginSignup
   },
   {
-    key: 'Sign Up',
-    name: 'Sign Up',
-    path: '/signup',
+    key: 'Register',
+    name: 'Register',
+    path: '/register',
     exact: false,
     component: Signup
   }

@@ -1,5 +1,6 @@
 @import 'stylesheets/foundation.css';
-@import 'stylesheets/index.css';
+@import 'stylesheets/registration.css';
+@import 'stylesheets/splash.css';
 
 .App {
   text-align: center;
