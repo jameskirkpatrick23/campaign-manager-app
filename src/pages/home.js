@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import ColumnExpander from '../components/column-expansion';
 import NPCImage from '../assets/npcImages.png';
+import CampaignImage from '../assets/campaign-image.jpg';
 import QuestsImage from '../assets/dnd-adventure-1.jpeg';
 import TownsImage from '../assets/Neverwinter_cityscape.jpg';
 
@@ -9,6 +9,11 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.mainColumns = {
+      Campaigns: {
+        route: '/campaigns',
+        backgroundImage: CampaignImage,
+        description: 'Manage your campaigns, and the players in them.'
+      },
       "NPC's": {
         route: '/npcs',
         backgroundImage: NPCImage,
@@ -36,8 +41,5 @@ class Home extends Component {
     );
   }
 }
-
-Home.defaultProps = {};
-Home.propTypes = {};
 
 export default Home;

@@ -30,7 +30,7 @@
 .expand-column-wrapper .expand-column-content {
   color: #fefefe;
   font-weight: bold;
-  opacity: 0.2;
+  opacity: 0;
   transition: all 0.5s ease-in-out;
 }
 
