@@ -1,5 +1,5 @@
 import React from 'react';
-import firebase from '../firebase';
+import { app } from '../firebase';
 import { withRouter, Link } from 'react-router-dom';
 
 class Login extends React.Component {
@@ -8,7 +8,7 @@ class Login extends React.Component {
     e.preventDefault();
 
     if (!this.isButtonDisabled()) {
-      firebase
+      app
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password)
         .then(res => {

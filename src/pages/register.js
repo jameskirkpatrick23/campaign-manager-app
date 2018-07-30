@@ -1,5 +1,5 @@
 import React from 'react';
-import firebase from '../firebase';
+import { app } from '../firebase';
 import { withRouter } from 'react-router-dom';
 
 class Signup extends React.Component {
@@ -7,7 +7,7 @@ class Signup extends React.Component {
   submitForm = e => {
     e.preventDefault();
     if (this.state.email && this.state.password) {
-      firebase
+      app
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(res => {

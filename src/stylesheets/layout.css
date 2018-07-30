@@ -103,9 +103,10 @@
 .app-dashboard-sidebar {
   background-color: #fefefe;
   height: 100%;
-  overflow-x: visible;
-  overflow-y: auto;
+  overflow-x: hidden;
   z-index: 1;
+  text-align: left;
+  overflow-y: hidden;
   transition: all 0.5s ease;
 }
 
@@ -141,7 +142,7 @@
 
 .app-dashboard-sidebar .fa.large {
   font-size: 1.5rem;
-  width: 40px;
+  width: 50px;
 }
 
 .reveal-for-medium .app-dashboard-open-sidebar {
@@ -180,14 +181,14 @@
     display: block;
   }
   .app-dashboard.shrink-medium .app-dashboard-sidebar {
-    width: 80px;
+    width: 60px;
   }
   .app-dashboard.shrink-medium .app-dashboard-sidebar .fa.large {
     width: auto;
   }
   .app-dashboard.shrink-medium .off-canvas-content {
-    margin-left: 80px;
-    width: calc(100% - 80px);
+    margin-left: 60px;
+    width: calc(100% - 60px);
   }
   .app-dashboard.shrink-medium .navigation {
     margin-top: 2rem;
@@ -225,14 +226,14 @@
     display: block;
   }
   .app-dashboard.shrink-large .app-dashboard-sidebar {
-    width: 80px;
+    width: 50px;
   }
   .app-dashboard.shrink-large .app-dashboard-sidebar .fa.large {
     width: auto;
   }
   .app-dashboard.shrink-large .off-canvas-content {
-    margin-left: 80px;
-    width: calc(100% - 80px);
+    margin-left: 50px;
+    width: calc(100% - 50px);
   }
   .app-dashboard.shrink-large .navigation {
     margin-top: 2rem;

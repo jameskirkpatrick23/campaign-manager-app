@@ -3,6 +3,11 @@
 @import 'stylesheets/splash.css';
 @import 'stylesheets/layout.css';
 @import 'stylesheets/components/column-expansion.css';
+@import 'stylesheets/components/hero.css';
+
+label {
+  text-align: left;
+}
 
 .App {
   text-align: center;
