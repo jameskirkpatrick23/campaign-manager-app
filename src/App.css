@@ -4,6 +4,7 @@
 @import 'stylesheets/layout.css';
 @import 'stylesheets/components/column-expansion.css';
 @import 'stylesheets/components/hero.css';
+@import 'stylesheets/components/campaign-render.css';
 
 label {
   text-align: left;

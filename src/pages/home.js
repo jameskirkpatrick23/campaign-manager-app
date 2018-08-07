@@ -9,23 +9,18 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.mainColumns = {
-      Campaigns: {
-        route: '/campaigns',
-        backgroundImage: CampaignImage,
-        description: 'Manage your campaigns, and the players in them.'
-      },
       "NPC's": {
-        route: '/npcs',
+        route: '/campaigns/1/npcs',
         backgroundImage: NPCImage,
         description: 'Manage the characters within your universe.'
       },
       Places: {
-        route: '/places',
+        route: '/campaigns/1/places',
         backgroundImage: TownsImage,
         description: 'Manage the towns within your universe.'
       },
       Quests: {
-        route: '/quests',
+        route: '/campaigns/1/quests',
         backgroundImage: QuestsImage,
         description:
           'Manage the quests your heroes undertake within your universe.'

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import database, { app } from '../firebase';
 
 class CampaignForm extends Component {
@@ -7,30 +6,40 @@ class CampaignForm extends Component {
     super(props);
     this.state = {
       name: '',
-      description: ''
+      description: '',
+      image: ''
     };
   }
 
   onSubmit = e => {
     e.preventDefault();
-    const { name, description } = this.state;
-    database
-      .collection('campaigns')
-      .add({
-        name,
-        creatorId: app.auth().currentUser.uid,
-        description
-      })
-      .then(function() {
-        console.log('Document successfully written!');
-      })
-      .catch(function(error) {
-        console.error('Error writing document: ', error);
+    const { name, description, image } = this.state;
+    const storageRef = app.storage().ref();
+    const imagesRef = storageRef.child(`campaigns/${image.name}`);
+
+    imagesRef.put(image).then(snapshot => {
+      snapshot.ref.getDownloadURL().then(url => {
+        database
+          .collection('campaigns')
+          .add({
+            name,
+            creatorId: app.auth().currentUser.uid,
+            description,
+            imageRef: url
+          })
+          .then(res => {
+            this.props.history.push('/campaigns');
+            console.log('Document successfully written!');
+          })
+          .catch(function(error) {
+            console.error('Error writing document: ', error);
+          });
       });
+    });
   };
 
   render() {
-    const { name, description } = this.state;
+    const { name, description, image } = this.state;
     return (
       <div>
         <form onSubmit={this.onSubmit}>
@@ -49,6 +58,18 @@ class CampaignForm extends Component {
               id="campaign-description"
               value={description}
               onChange={e => this.setState({ description: e.target.value })}
+            />
+          </label>
+          <label htmlFor="#campaign-file">
+            Main Image
+            <input
+              id="campaign-image"
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={e => {
+                e.preventDefault();
+                this.setState({ image: e.target.files[0] });
+              }}
             />
           </label>
           <button type="submit" className="button">

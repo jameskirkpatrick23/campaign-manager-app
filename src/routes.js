@@ -22,24 +22,31 @@ export default [
     component: Signup
   },
   {
+    key: 'Campaigns',
+    name: 'Campaigns',
+    path: '/campaigns',
+    exact: true,
+    component: CampaignPage
+  },
+  {
     key: 'Home',
     name: 'Home',
-    path: '/home',
+    path: '/campaigns/:campaign_id/home',
     exact: false,
     component: Home
   },
   {
-    key: 'Campaigns',
-    name: 'Campaigns',
-    path: '/campaigns',
-    exact: false,
-    component: CampaignPage
+    key: 'NPCs',
+    name: 'NPCs',
+    path: '/campaigns/:campaign_id/npcs',
+    exact: true,
+    component: Home
   },
   {
     key: 'Campaign Form',
     name: 'Campaign Form',
-    path: '/campaign-form',
-    exact: false,
+    path: '/campaigns/:action',
+    exact: true,
     component: CampaignForm
   }
 ];

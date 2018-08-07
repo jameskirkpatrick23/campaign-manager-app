@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Route, Link, withRouter } from 'react-router-dom';
+import { Route, Link, withRouter, Redirect } from 'react-router-dom';
 import routes from './routes';
 import { app } from './firebase';
 import Logo from './assets/Logo-Inverse.svg';
 import $ from 'jquery';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as LoginActions from './redux/actions/login';
 
 class Sidebar extends React.Component {
   collapseSidebar = e => {
@@ -54,7 +57,7 @@ class Sidebar extends React.Component {
         <div className="app-dashboard-sidebar-inner">
           <ul className="menu vertical">
             <li>
-              <Link to={'/home'} className="is-active">
+              <Link to={'/campaigns/1/home'} className="is-active">
                 <i className="large fa fa-home" />
                 <span className="app-dashboard-sidebar-text">Home</span>
               </Link>
@@ -66,19 +69,19 @@ class Sidebar extends React.Component {
               </Link>
             </li>
             <li>
-              <Link to={'/npcs'}>
+              <Link to={'/campaigns/1/npcs'}>
                 <i className="large fa fa-user-friends" />
                 <span className="app-dashboard-sidebar-text">NPC's</span>
               </Link>
             </li>
             <li>
-              <Link to={'/places'}>
+              <Link to={'/campaigns/1/places'}>
                 <i className="large fa fa-map-marked-alt" />
                 <span className="app-dashboard-sidebar-text">Places</span>
               </Link>
             </li>
             <li>
-              <Link to={'/quests'} className="is-active">
+              <Link to={'/campaigns/1/quests'} className="is-active">
                 <i className="large fa fa-hands-helping" />
                 <span className="app-dashboard-sidebar-text">Quests</span>
               </Link>
@@ -104,9 +107,9 @@ class App extends Component {
     };
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     app.auth().onAuthStateChanged(user => {
-      if (user) {
+      if (user && user.email) {
         this.setState({ isLoggedIn: true });
       } else {
         this.setState({ isLoggedIn: false });
@@ -115,10 +118,12 @@ class App extends Component {
   };
 
   signOut = e => {
+    e.preventDefault();
     app
       .auth()
       .signOut()
       .then(res => {
+        this.props.logOut();
         this.props.history.push('/login');
       })
       .catch(function(error) {
@@ -174,5 +179,17 @@ class App extends Component {
     );
   }
 }
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      logOut: LoginActions.logoutUser
+    },
+    dispatch
+  );
 
-export default withRouter(App);
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(App)
+);

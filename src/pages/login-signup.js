@@ -1,6 +1,9 @@
 import React from 'react';
 import { app } from '../firebase';
 import { withRouter, Link } from 'react-router-dom';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as LoginActions from '../redux/actions/login';
 
 class Login extends React.Component {
   state = { email: null, password: null };
@@ -12,7 +15,11 @@ class Login extends React.Component {
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password)
         .then(res => {
-          this.props.history.push('/home');
+          this.props.loginUser({
+            email: res.user.email,
+            displayName: res.user.displayName
+          });
+          this.props.history.push('/campaigns');
         })
         .catch(err => {
           alert(err);
@@ -86,4 +93,17 @@ class Login extends React.Component {
   }
 }
 
-export default withRouter(Login);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      loginUser: LoginActions.loginUser
+    },
+    dispatch
+  );
+
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(Login)
+);
