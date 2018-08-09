@@ -1,6 +1,5 @@
 import LoginSignup from './pages/login-signup';
 import Splash from './pages/splash';
-import Signup from './pages/register';
 import Home from './pages/home';
 import CampaignPage from './pages/campaigns';
 import CampaignForm from './forms/campaign-form';
@@ -13,13 +12,6 @@ export default [
     path: '/login',
     exact: false,
     component: LoginSignup
-  },
-  {
-    key: 'Register',
-    name: 'Register',
-    path: '/register',
-    exact: false,
-    component: Signup
   },
   {
     key: 'Campaigns',
@@ -45,7 +37,7 @@ export default [
   {
     key: 'Campaign Form',
     name: 'Campaign Form',
-    path: '/campaigns/:action',
+    path: '/campaigns/new',
     exact: true,
     component: CampaignForm
   }

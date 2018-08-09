@@ -3,44 +3,21 @@ import HeroImage from '../components/hero-image';
 import CampaignImage from '../assets/campaign-hero.jpeg';
 import { Link } from 'react-router-dom';
 import database, { app } from '../firebase';
+import { connect } from 'react-redux';
 
 class CampaignPage extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      campaigns: {}
-    };
-  }
-
-  componentDidMount() {
-    let campaignsRef = database.collection('campaigns');
-    if (app.auth().currentUser) {
-      campaignsRef
-        .where('creatorId', '==', app.auth().currentUser.uid)
-        .onSnapshot(snapshot => {
-          let updatedState = {};
-          snapshot.forEach(doc => {
-            updatedState[doc.id] = doc.data();
-          });
-          this.setState(
-            { campaigns: { ...this.state.campaigns, ...updatedState } },
-            () => {
-              console.warn('doc', this.state.campaigns);
-            }
-          );
-        });
-    }
   }
 
   renderCampaigns() {
-    const { campaigns } = this.state;
+    const { campaigns } = this.props;
     return Object.keys(campaigns).map((key, index) => {
       let currentCampaign = campaigns[key];
-      let isOdd = index % 2 === 1;
+      let isOdd = index % 2 !== 0;
       if (isOdd) {
         return (
-          <React.Fragment key={key}>
-            <hr />
+          <div key={key}>
             <div className="marketing-site-content-section-img">
               <img src={currentCampaign.imageRef} alt="" />
             </div>
@@ -51,17 +28,18 @@ class CampaignPage extends Component {
               <p className="marketing-site-content-section-block-subheader subheader">
                 {currentCampaign.description}
               </p>
-              <Link to={'/campaigns/1/home'} className="round button small">
-                learn more
+              <Link
+                to={`/campaigns/${key}/home`}
+                className="round button small"
+              >
+                Manage Campaign
               </Link>
             </div>
-            <hr />
-          </React.Fragment>
+          </div>
         );
       } else {
         return (
-          <React.Fragment key={key}>
-            <hr />
+          <div key={key}>
             <div className="marketing-site-content-section-block small-order-2 medium-order-1">
               <h3 className="marketing-site-content-section-block-header">
                 {currentCampaign.name}
@@ -69,15 +47,17 @@ class CampaignPage extends Component {
               <p className="marketing-site-content-section-block-subheader subheader">
                 {currentCampaign.description}
               </p>
-              <Link to={'/campaigns/1/home'} className="round button small">
-                learn more
+              <Link
+                to={`/campaigns/${key}/home`}
+                className="round button small"
+              >
+                Manage Campaign
               </Link>
             </div>
             <div className="marketing-site-content-section-img small-order-1 medium-order-2">
               <img src={currentCampaign.imageRef} alt="" />
             </div>
-            <hr />
-          </React.Fragment>
+          </div>
         );
       }
     });
@@ -89,7 +69,7 @@ class CampaignPage extends Component {
         <HeroImage backgroundImage={CampaignImage} header="Campaigns">
           <h5>The place where everything happens</h5>
           <button className="button">
-            <Link to={'/campaign-form'} style={{ color: '#fefefe' }}>
+            <Link to={'/campaigns/new'} style={{ color: '#fefefe' }}>
               Create a new campaign
             </Link>
           </button>
@@ -106,4 +86,11 @@ class CampaignPage extends Component {
 CampaignPage.defaultProps = {};
 CampaignPage.propTypes = {};
 
-export default CampaignPage;
+const mapStateToProps = state => ({
+  campaigns: state.campaigns.all
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(CampaignPage);

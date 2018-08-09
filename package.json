@@ -18,7 +18,9 @@
     "react-scripts": "1.1.4",
     "recompose": "^0.28.2",
     "redux": "^4.0.0",
-    "redux-firestore": "^0.5.7"
+    "redux-firestore": "^0.5.7",
+    "redux-persist": "^5.10.0",
+    "redux-thunk": "^2.3.0"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,json,css}": [

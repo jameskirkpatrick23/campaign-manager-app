@@ -1,5 +1,7 @@
 import constants from '../constants';
-export const loginUser = user => {
+import * as CampaignActions from '../actions/campaigns';
+export const loginUser = user => dispatch => {
+  dispatch(CampaignActions.setCampaignListener(user));
   return { type: constants.LOGIN_USER, user };
 };
 export const logoutUser = user => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import firebase from 'firebase';
 import { app } from '../firebase';
 import { withRouter, Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
@@ -6,86 +7,74 @@ import { connect } from 'react-redux';
 import * as LoginActions from '../redux/actions/login';
 
 class Login extends React.Component {
-  state = { email: null, password: null };
-  submitForm = e => {
-    e.preventDefault();
-
-    if (!this.isButtonDisabled()) {
-      app
-        .auth()
-        .signInWithEmailAndPassword(this.state.email, this.state.password)
-        .then(res => {
-          this.props.loginUser({
-            email: res.user.email,
-            displayName: res.user.displayName
-          });
-          this.props.history.push('/campaigns');
-        })
-        .catch(err => {
-          alert(err);
-        });
-    }
+  signInWithFacebook = () => {
+    const provider = new firebase.auth.FacebookAuthProvider();
+    provider.addScope('user_friends');
+    provider.addScope('user_photos');
+    provider.addScope('user_birthday');
+    provider.addScope('email');
+    app
+      .auth()
+      .signInWithPopup(provider)
+      .then(res => {
+        let user = res.user;
+        this.props.loginUser({ ...user });
+        this.props.history.push('/campaigns');
+        // ...
+      })
+      .catch(function(error) {
+        // Handle Errors here.
+        console.warn(error);
+        // var errorCode = error.code;
+        // var errorMessage = error.message;
+        // The email of the user's account used.
+        // var email = error.email;
+        // The app.auth.AuthCredential type that was used.
+        // var credential = error.credential;
+      });
   };
-
-  isButtonDisabled() {
-    return !this.state.email || !this.state.password;
-  }
-
+  signInWithGoogle = () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    app
+      .auth()
+      .signInWithPopup(provider)
+      .then(res => {
+        let user = res.user;
+        this.props.loginUser({ ...user });
+        this.props.history.push('/campaigns');
+        // ...
+      })
+      .catch(function(error) {
+        // Handle Errors here.
+        console.warn(error);
+        // var errorCode = error.code;
+        // var errorMessage = error.message;
+        // The email of the user's account used.
+        // var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        // var credential = error.credential;
+      });
+  };
   render() {
     return (
       <React.Fragment>
-        <div className="row collapse expanded">
-          <div className="small-12 medium-6 column small-order-1 medium-order-1 callout">
-            <div className="login-box-form-section">
-              <h1 className="login-box-title">
-                Login with your email and password
-              </h1>
-              <form onSubmit={this.submitForm}>
-                <input
-                  className="login-box-input"
-                  type="email"
-                  name="email"
-                  placeholder="E-mail"
-                  autoComplete="username"
-                  onChange={e => this.setState({ email: e.target.value })}
-                />
-                <input
-                  className="login-box-input"
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  autoComplete="current-password"
-                  onChange={e => this.setState({ password: e.target.value })}
-                />
-                <button
-                  className="button"
-                  disabled={this.isButtonDisabled()}
-                  type="submit"
-                  name="login_submit"
-                >
-                  Login
-                </button>
-              </form>
-              <span>
-                Don't have an account? <Link to={'/register'}>Sign Up</Link>
-              </span>
-            </div>
-          </div>
-          <div className="small-12 medium-6 column small-order-3 medium-order-3 login-box-social-section callout">
-            <div className="login-box-social-section-inner">
-              <span className="login-box-social-headline">
-                Sign in with your social network
-              </span>
-              <button className="login-box-social-button-facebook">
-                Log in with facebook
-              </button>
-              <button className="login-box-social-button-twitter">
-                Log in with Twitter
-              </button>
-              <button className="login-box-social-button-google">
-                Log in with Google+
-              </button>
-            </div>
+        <div className="small-12 medium-6 column small-order-3 medium-order-3 login-box-social-section callout">
+          <div className="login-box-social-section-inner">
+            <span className="login-box-social-headline">
+              Sign in with your social network
+            </span>
+            <button
+              className="login-box-social-button-facebook"
+              onClick={this.signInWithFacebook}
+            >
+              Log in with Facebook
+            </button>
+            <button
+              className="login-box-social-button-google"
+              onClick={this.signInWithGoogle}
+            >
+              Log in with Google
+            </button>
           </div>
         </div>
       </React.Fragment>
