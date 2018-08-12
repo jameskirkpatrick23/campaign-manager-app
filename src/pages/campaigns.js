@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import HeroImage from '../components/hero-image';
 import CampaignImage from '../assets/campaign-hero.jpeg';
 import { Link } from 'react-router-dom';
-import database, { app } from '../firebase';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import * as CampaignActions from '../redux/actions/campaigns';
 
 class CampaignPage extends Component {
-  constructor(props) {
-    super(props);
+  routeToCampaign(campaign, key) {
+    this.props.setCurrentCampaign({ ...campaign, id: key });
+    this.props.history.push(`/campaigns/${key}/home`);
   }
 
   renderCampaigns() {
@@ -17,47 +19,49 @@ class CampaignPage extends Component {
       let isOdd = index % 2 !== 0;
       if (isOdd) {
         return (
-          <div key={key}>
-            <div className="marketing-site-content-section-img">
-              <img src={currentCampaign.imageRef} alt="" />
+          <React.Fragment key={key}>
+            <div className="row align-middle align-justify">
+              <div className="columns small-6 padding-0">
+                <img
+                  src={currentCampaign.imageRef}
+                  alt=""
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div className="columns small-6">
+                <h3>{currentCampaign.name}</h3>
+                <p>{currentCampaign.description}</p>
+                <button
+                  onClick={() => this.routeToCampaign(campaigns[key], key)}
+                  className="round button small"
+                >
+                  Manage Campaign
+                </button>
+              </div>
             </div>
-            <div className="marketing-site-content-section-block">
-              <h3 className="marketing-site-content-section-block-header">
-                {currentCampaign.name}
-              </h3>
-              <p className="marketing-site-content-section-block-subheader subheader">
-                {currentCampaign.description}
-              </p>
-              <Link
-                to={`/campaigns/${key}/home`}
-                className="round button small"
-              >
-                Manage Campaign
-              </Link>
-            </div>
-          </div>
+            <hr />
+          </React.Fragment>
         );
       } else {
         return (
-          <div key={key}>
-            <div className="marketing-site-content-section-block small-order-2 medium-order-1">
-              <h3 className="marketing-site-content-section-block-header">
-                {currentCampaign.name}
-              </h3>
-              <p className="marketing-site-content-section-block-subheader subheader">
-                {currentCampaign.description}
-              </p>
-              <Link
-                to={`/campaigns/${key}/home`}
-                className="round button small"
-              >
-                Manage Campaign
-              </Link>
+          <React.Fragment key={key}>
+            <div className="row align-middle align-justify">
+              <div className="columns small-6">
+                <h3>{currentCampaign.name}</h3>
+                <p>{currentCampaign.description}</p>
+                <button
+                  onClick={() => this.routeToCampaign(campaigns[key], key)}
+                  className="round button small"
+                >
+                  Manage Campaign
+                </button>
+              </div>
+              <div className="columns small-6 padding-0">
+                <img src={currentCampaign.imageRef} alt="" />
+              </div>
             </div>
-            <div className="marketing-site-content-section-img small-order-1 medium-order-2">
-              <img src={currentCampaign.imageRef} alt="" />
-            </div>
-          </div>
+            <hr />
+          </React.Fragment>
         );
       }
     });
@@ -75,9 +79,8 @@ class CampaignPage extends Component {
           </button>
           <div className="marketing-site-content-section" />
         </HeroImage>
-        <div className="marketing-site-content-section">
-          {this.renderCampaigns()}
-        </div>
+        <hr />
+        {this.renderCampaigns()}
       </div>
     );
   }
@@ -90,7 +93,15 @@ const mapStateToProps = state => ({
   campaigns: state.campaigns.all
 });
 
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      setCurrentCampaign: CampaignActions.setCurrentCampaign
+    },
+    dispatch
+  );
+
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(CampaignPage);

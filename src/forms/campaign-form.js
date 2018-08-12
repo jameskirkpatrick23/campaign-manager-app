@@ -71,6 +71,7 @@ class CampaignForm extends Component {
                 this.setState({ image: e.target.files[0] });
               }}
             />
+            <img src={image} alt={image.name} />
           </label>
           <button type="submit" className="button">
             Submit

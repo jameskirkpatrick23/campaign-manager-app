@@ -1,12 +1,18 @@
 import React from 'react';
 import firebase from 'firebase';
 import { app } from '../firebase';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as LoginActions from '../redux/actions/login';
 
 class Login extends React.Component {
+  componentDidMount() {
+    if (this.props.isLoggedIn) {
+      this.props.history.push('/campaigns');
+    }
+  }
+
   signInWithFacebook = () => {
     const provider = new firebase.auth.FacebookAuthProvider();
     provider.addScope('user_friends');
@@ -18,7 +24,7 @@ class Login extends React.Component {
       .signInWithPopup(provider)
       .then(res => {
         let user = res.user;
-        this.props.loginUser({ ...user });
+        this.props.loginUser({ ...user, signinType: 'Facebook' });
         this.props.history.push('/campaigns');
         // ...
       })
@@ -33,6 +39,7 @@ class Login extends React.Component {
         // var credential = error.credential;
       });
   };
+
   signInWithGoogle = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     app
@@ -40,7 +47,7 @@ class Login extends React.Component {
       .signInWithPopup(provider)
       .then(res => {
         let user = res.user;
-        this.props.loginUser({ ...user });
+        this.props.loginUser({ ...user, signinType: 'Google' });
         this.props.history.push('/campaigns');
         // ...
       })
@@ -82,6 +89,10 @@ class Login extends React.Component {
   }
 }
 
+const mapStateToProps = state => ({
+  isLoggedIn: state.login.isLoggedIn
+});
+
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
@@ -92,7 +103,7 @@ const mapDispatchToProps = dispatch =>
 
 export default withRouter(
   connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
   )(Login)
 );
