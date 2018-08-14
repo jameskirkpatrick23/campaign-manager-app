@@ -16,6 +16,7 @@
     "react-redux-firebase": "^2.1.7",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
+    "react-widgets": "^4.4.4",
     "recompose": "^0.28.2",
     "redux": "^4.0.0",
     "redux-firestore": "^0.5.7",

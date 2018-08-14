@@ -12,7 +12,8 @@ import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web and AsyncStorage for react-native
 import { createStore, applyMiddleware, compose } from 'redux';
 import RootReducer from './redux/reducers/index';
-
+import jQuery from 'jquery';
+window.jQuery = jQuery;
 const persistConfig = {
   key: 'root',
   storage,
