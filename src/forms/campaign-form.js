@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import database, { app } from '../firebase';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { createCampaign } from '../redux/actions/campaigns';
 
 class CampaignForm extends Component {
   constructor(props) {
@@ -14,28 +16,19 @@ class CampaignForm extends Component {
   onSubmit = e => {
     e.preventDefault();
     const { name, description, image } = this.state;
-    const storageRef = app.storage().ref();
-    const imagesRef = storageRef.child(`campaigns/${image.name}`);
-
-    imagesRef.put(image).then(snapshot => {
-      snapshot.ref.getDownloadURL().then(url => {
-        database
-          .collection('campaigns')
-          .add({
-            name,
-            creatorId: app.auth().currentUser.uid,
-            description,
-            imageRef: url
-          })
-          .then(res => {
-            this.props.history.push('/campaigns');
-            console.log('Document successfully written!');
-          })
-          .catch(function(error) {
-            console.error('Error writing document: ', error);
-          });
+    this.props
+      .createCampaign({
+        name,
+        description,
+        image
+      })
+      .then(res => {
+        this.props.history.push('/campaigns');
+        console.log('Document successfully written!');
+      })
+      .catch(function(error) {
+        console.error('Error writing document: ', error);
       });
-    });
   };
 
   render() {
@@ -85,4 +78,15 @@ class CampaignForm extends Component {
 CampaignForm.defaultProps = {};
 CampaignForm.propTypes = {};
 
-export default CampaignForm;
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      createCampaign
+    },
+    dispatch
+  );
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(CampaignForm);

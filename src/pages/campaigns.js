@@ -7,6 +7,8 @@ import { connect } from 'react-redux';
 import * as CampaignActions from '../redux/actions/campaigns';
 
 class CampaignPage extends Component {
+  componentWillMount() {}
+
   routeToCampaign(campaign, key) {
     this.props.setCurrentCampaign({ ...campaign, id: key });
     this.props.history.push(`/campaigns/${key}/home`);

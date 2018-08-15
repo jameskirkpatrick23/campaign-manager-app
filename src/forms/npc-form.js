@@ -22,9 +22,9 @@ class NPCForm extends Component {
       attachedFiles: []
     };
     this.coreValues = [
-      'Authenticity',
-      'Achievement',
-      'Adventure',
+      // 'Authenticity',
+      // 'Achievement',
+      // 'Adventure',
       'Authority',
       'Autonomy',
       'Balance',
@@ -243,6 +243,8 @@ class NPCForm extends Component {
 
   onSubmit() {}
 
+  createCollection() {}
+
   render() {
     const {
       name,
@@ -262,6 +264,12 @@ class NPCForm extends Component {
     } = this.state;
     return (
       <div>
+        <button
+          className="button"
+          onClick={this.createCollection('coreValues')}
+        >
+          Create Values
+        </button>
         <form onSubmit={this.onSubmit}>
           <label htmlFor="#npc-quirks">
             Quirks

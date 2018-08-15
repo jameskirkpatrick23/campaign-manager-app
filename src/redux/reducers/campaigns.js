@@ -13,6 +13,10 @@ export default function CampaignReducer(state = initialState, action) {
       return Object.assign({}, state, {
         currentCampaign: action.campaign
       });
+    case constants.SET_CAMPAIGN_LIST:
+      return Object.assign({}, state, {
+        all: action.campaigns
+      });
     default:
       return state;
   }

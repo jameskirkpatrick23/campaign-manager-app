@@ -7,8 +7,17 @@ import Logo from './assets/Logo-Inverse.svg';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as LoginActions from './redux/actions/login';
+import * as CampaignActions from './redux/actions/campaigns';
 
 class App extends Component {
+  componentWillMount() {
+    if (this.props.isLoggedIn) {
+      this.props.fetchCampaigns(this.props.currentUser).then(() => {
+        this.props.setCampaignListener(this.props.currentUser);
+      });
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (!nextProps.isLoggedIn && this.props.isLoggedIn) {
       this.signOut();
@@ -75,13 +84,17 @@ class App extends Component {
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      logOut: LoginActions.logoutUser
+      logOut: LoginActions.logoutUser,
+      setCampaignListener: CampaignActions.setCampaignListener,
+      fetchCampaigns: CampaignActions.fetchCampaigns
     },
     dispatch
   );
 
 const mapStateToProps = state => ({
-  isLoggedIn: state.login.isLoggedIn
+  isLoggedIn: state.login.isLoggedIn,
+  currentUser: state.login.user,
+  currentCampaign: state.campaigns.currentCampaign
 });
 
 export default withRouter(
