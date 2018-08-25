@@ -12,17 +12,17 @@ class Home extends Component {
     super(props);
     this.mainColumns = {
       "NPC's": {
-        route: `/campaigns/${props.currentCampaign.id}/npcs`,
+        route: `/campaigns/${props.currentCampaign.id}/home/npcs`,
         backgroundImage: NPCImage,
         description: 'Manage the characters within your universe.'
       },
       Places: {
-        route: `/campaigns/${props.currentCampaign.id}/places`,
+        route: `/campaigns/${props.currentCampaign.id}/home/places`,
         backgroundImage: TownsImage,
         description: 'Manage the towns within your universe.'
       },
       Quests: {
-        route: `/campaigns/${props.currentCampaign.id}/quests`,
+        route: `/campaigns/${props.currentCampaign.id}/home/quests`,
         backgroundImage: QuestsImage,
         description:
           'Manage the quests your heroes undertake within your universe.'

@@ -20,7 +20,7 @@ class NPCPage extends Component {
             <h4>{npc.name}</h4>
             <div>{npc.description}</div>
           </div>
-          <Link to={`/campaigns/${currentCampaign.id}/npcs/${npc.id}`}>
+          <Link to={`/campaigns/${currentCampaign.id}/home/npcs/${npc.id}`}>
             See More
           </Link>
         </div>
@@ -35,7 +35,7 @@ class NPCPage extends Component {
       <div>
         <Link
           className="button round"
-          to={`/campaigns/${currentCampaign.id}/npcs/new`}
+          to={`/campaigns/${currentCampaign.id}/home/npcs/new`}
         >
           Create a new NPC
         </Link>

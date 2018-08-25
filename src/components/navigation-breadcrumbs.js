@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import Route from 'route-parser';
+import { connect } from 'react-redux';
 
 const getPathTokens = pathname => {
   const paths = ['/'];
@@ -14,57 +15,96 @@ const getPathTokens = pathname => {
   return paths;
 };
 
-function getRouteMatch(routes, path) {
+const getRouteMatch = (routes, path) => {
   let foundKeys = [];
   Object.keys(routes).map(key => {
     let route = new Route(routes[key].path);
     if (route.match(path)) {
-      foundKeys.push(routes[key]);
+      foundKeys.push({ ...routes[key], foundMatch: route.match(path) });
     }
   });
   return foundKeys[0];
-}
+};
 
-function getBreadcrumbs({ routes, match, location }) {
+const getBreadcrumbs = ({ routes, match, location }) => {
   const pathTokens = getPathTokens(location.pathname);
-  return pathTokens.map((path, i) => {
+  let returnArray = [];
+  pathTokens.forEach((path, i) => {
     const routeMatch = getRouteMatch(routes, path);
     if (routeMatch) {
       const routeValue = routes[routeMatch.path];
-      return { ...routeValue, path };
-    } else {
-      return { displayName: null, path: null };
+      returnArray.push({
+        ...routeValue,
+        path,
+        matchingPath: routeMatch.foundMatch
+      });
     }
   });
-}
+  return returnArray;
+};
 
-function Breadcrumbs({ routes, match, location }) {
-  const breadcrumbs = getBreadcrumbs({ routes, match, location });
-  return (
-    <nav aria-label="You are here:" role="navigation">
-      <ul className="breadcrumbs">
-        {breadcrumbs.map((breadcrumb, i) => {
-          if (breadcrumb.path && breadcrumb.name) {
-            if (i === breadcrumbs.length - 1) {
-              return (
-                <li key={breadcrumb.path}>
-                  <span>{breadcrumb.name}</span>
-                </li>
-              );
+class Breadcrumbs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.formatNameForBreadcrumb = this.formatNameForBreadcrumb.bind(this);
+  }
+
+  formatNameForBreadcrumb = breadcrumb => {
+    if (breadcrumb.hasCustomName) {
+      if (breadcrumb.customName.constructor === Object) {
+        let collection = breadcrumb.customName.collection;
+        let pathIdentifier = breadcrumb.customName.pathIdentifier;
+        let usedId = breadcrumb.matchingPath[pathIdentifier];
+        return this.props[`${collection}`][usedId].name;
+      } else {
+        return breadcrumb.customName;
+      }
+    }
+    return breadcrumb.name;
+  };
+
+  render = () => {
+    const { routes, match, location } = this.props;
+    const breadcrumbs = getBreadcrumbs({ routes, match, location });
+    return (
+      <nav aria-label="You are here:" role="navigation">
+        <ul className="breadcrumbs">
+          {breadcrumbs.map((breadcrumb, i) => {
+            if (breadcrumb.path && breadcrumb.name) {
+              let name = this.formatNameForBreadcrumb(breadcrumb);
+              if (i === breadcrumbs.length - 1) {
+                return (
+                  <li key={breadcrumb.path}>
+                    <span>{name}</span>
+                  </li>
+                );
+              } else {
+                return (
+                  <li key={breadcrumb.path}>
+                    <Link to={breadcrumb.path}>{name}</Link>
+                  </li>
+                );
+              }
             } else {
-              return (
-                <li key={breadcrumb.path}>
-                  <Link to={breadcrumb.path}>{breadcrumb.name}</Link>
-                </li>
-              );
+              return null;
             }
-          } else {
-            return null;
-          }
-        })}
-      </ul>
-    </nav>
-  );
+          })}
+        </ul>
+      </nav>
+    );
+  };
 }
+const mapStateToProps = state => ({
+  user: state.login.user,
+  campaigns: state.campaigns.all,
+  npcs: state.npcs.all,
+  quests: state.quests.all,
+  places: state.places.all
+});
 
-export default withRouter(Breadcrumbs);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    null
+  )(Breadcrumbs)
+);

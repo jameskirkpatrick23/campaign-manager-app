@@ -12,6 +12,8 @@ export default {
     name: 'Splash',
     path: '/',
     exact: true,
+    customName: 'Home',
+    hasCustomName: true,
     component: Splash
   },
   '/login': {
@@ -30,7 +32,7 @@ export default {
   },
   '/campaigns/new': {
     key: 'Campaign Form',
-    name: 'Campaign Form',
+    name: 'New Campaign',
     path: '/campaigns/new',
     exact: true,
     component: CampaignForm
@@ -38,35 +40,37 @@ export default {
   '/campaigns/:campaign_id/home': {
     key: 'Home',
     name: 'Home',
+    hasCustomName: true,
+    customName: { collection: 'campaigns', pathIdentifier: 'campaign_id' },
     path: '/campaigns/:campaign_id/home',
-    exact: false,
+    exact: true,
     component: Home
   },
-  '/campaigns/:campaign_id/places': {
+  '/campaigns/:campaign_id/home/places': {
     key: 'Places',
     name: 'Places',
-    path: '/campaigns/:campaign_id/places',
+    path: '/campaigns/:campaign_id/home/places',
     exact: true,
     component: Home
   },
-  '/campaigns/:campaign_id/places/new': {
+  '/campaigns/:campaign_id/home/places/new': {
     key: 'Place Form',
     name: 'Place Form',
-    path: '/campaigns/:campaign_id/places/new',
+    path: '/campaigns/:campaign_id/home/places/new',
     exact: true,
     component: Home
   },
-  '/campaigns/:campaign_id/npcs': {
+  '/campaigns/:campaign_id/home/npcs': {
     key: 'NPCs',
     name: 'NPCs',
-    path: '/campaigns/:campaign_id/npcs',
+    path: '/campaigns/:campaign_id/home/npcs',
     exact: true,
     component: NPCPage
   },
-  '/campaigns/:campaign_id/npcs/new': {
+  '/campaigns/:campaign_id/home/npcs/new': {
     key: 'NPC Form',
-    name: 'NPC Form',
-    path: '/campaigns/:campaign_id/npcs/new',
+    name: 'New NPC',
+    path: '/campaigns/:campaign_id/home/npcs/new',
     exact: true,
     component: NPCForm
   }
