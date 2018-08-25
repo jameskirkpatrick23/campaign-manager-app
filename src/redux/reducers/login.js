@@ -1,16 +1,16 @@
-import constants from '../constants';
+import * as constants from '../constants';
 const initialState = {
   user: {},
   isLoggedIn: false
 };
 export default function LoginReducer(state = initialState, action) {
   switch (action.type) {
-    case constants.LOGIN_USER:
+    case constants.Login.LOGIN_USER:
       return Object.assign({}, state, {
         user: action.user,
         isLoggedIn: true
       });
-    case constants.LOGOUT_USER:
+    case constants.Login.LOGOUT_USER:
       return Object.assign({}, state, {
         user: {},
         isLoggedIn: false

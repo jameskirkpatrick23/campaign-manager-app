@@ -8,6 +8,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as LoginActions from './redux/actions/login';
 import * as CampaignActions from './redux/actions/campaigns';
+import Breadcrumbs from './components/navigation-breadcrumbs';
 
 class App extends Component {
   componentWillMount() {
@@ -73,7 +74,10 @@ class App extends Component {
               className="app-dashboard-body-content off-canvas-content"
               data-off-canvas-content
             >
-              {routes.map(route => <Route {...route} />)}
+              <Breadcrumbs routes={routes} />
+              {Object.keys(routes).map(route => (
+                <Route {...routes[route]} key={route} />
+              ))}
             </div>
           </div>
         </div>

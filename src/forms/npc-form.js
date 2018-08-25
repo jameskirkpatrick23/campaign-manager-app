@@ -22,9 +22,9 @@ class NPCForm extends Component {
       attachedFiles: []
     };
     this.coreValues = [
-      // 'Authenticity',
-      // 'Achievement',
-      // 'Adventure',
+      'Authenticity',
+      'Achievement',
+      'Adventure',
       'Authority',
       'Autonomy',
       'Balance',

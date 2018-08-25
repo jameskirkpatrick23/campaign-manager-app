@@ -1,4 +1,4 @@
-import constants from '../constants';
+import * as constants from '../constants';
 import * as CampaignActions from '../actions/campaigns';
 export const loginUser = user => dispatch => {
   let scopedUserFields = {
@@ -10,8 +10,8 @@ export const loginUser = user => dispatch => {
     signinType: user.signinType
   };
   dispatch(CampaignActions.setCampaignListener(scopedUserFields));
-  return dispatch({ type: constants.LOGIN_USER, user: scopedUserFields });
+  return dispatch({ type: constants.Login.LOGIN_USER, user: scopedUserFields });
 };
 export const logoutUser = _user => {
-  return { type: constants.LOGOUT_USER };
+  return { type: constants.Login.LOGOUT_USER };
 };

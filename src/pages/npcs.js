@@ -18,7 +18,7 @@ class NPCPage extends Component {
           <img src={npc.avatar} alt={`${npc.name} Avatar`} />
           <div className="card-section">
             <h4>{npc.name}</h4>
-            <text>{npc.description}</text>
+            <div>{npc.description}</div>
           </div>
           <Link to={`/campaigns/${currentCampaign.id}/npcs/${npc.id}`}>
             See More
@@ -39,7 +39,7 @@ class NPCPage extends Component {
         >
           Create a new NPC
         </Link>
-        <text>I am the text!</text>
+        <div>I am the text!</div>
         {this.renderNpcs()}
       </div>
     );
