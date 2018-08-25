@@ -42,6 +42,20 @@ export default {
     exact: false,
     component: Home
   },
+  '/campaigns/:campaign_id/places': {
+    key: 'Places',
+    name: 'Places',
+    path: '/campaigns/:campaign_id/places',
+    exact: true,
+    component: Home
+  },
+  '/campaigns/:campaign_id/places/new': {
+    key: 'Place Form',
+    name: 'Place Form',
+    path: '/campaigns/:campaign_id/places/new',
+    exact: true,
+    component: Home
+  },
   '/campaigns/:campaign_id/npcs': {
     key: 'NPCs',
     name: 'NPCs',
