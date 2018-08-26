@@ -2,8 +2,9 @@ import * as constants from '../constants';
 
 const initialState = {
   all: {},
-  types: []
+  types: {}
 };
+
 export default function PlaceReducer(state = initialState, action) {
   switch (action.type) {
     case constants.Place.UPDATE_PLACE_LIST:
@@ -14,6 +15,8 @@ export default function PlaceReducer(state = initialState, action) {
       return Object.assign({}, state, {
         types: action.types
       });
+    case constants.Login.LOGOUT_USER:
+      return initialState;
     default:
       return state;
   }

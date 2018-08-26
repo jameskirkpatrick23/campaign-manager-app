@@ -3,6 +3,8 @@ import Splash from './pages/splash';
 import Home from './pages/home';
 import CampaignPage from './pages/campaigns';
 import CampaignForm from './forms/campaign-form';
+import PlacesPage from './pages/places';
+import PlacesForm from './forms/places-form';
 import NPCPage from './pages/npcs';
 import NPCForm from './forms/npc-form';
 
@@ -51,14 +53,14 @@ export default {
     name: 'Places',
     path: '/campaigns/:campaign_id/home/places',
     exact: true,
-    component: Home
+    component: PlacesPage
   },
   '/campaigns/:campaign_id/home/places/new': {
     key: 'Place Form',
     name: 'Place Form',
     path: '/campaigns/:campaign_id/home/places/new',
     exact: true,
-    component: Home
+    component: PlacesForm
   },
   '/campaigns/:campaign_id/home/npcs': {
     key: 'NPCs',

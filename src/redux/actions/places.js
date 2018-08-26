@@ -5,7 +5,7 @@ import database, { app } from '../../firebase';
 
 export const updatePlaceTypesList = type => (dispatch, getState) => {
   const updatedState = { ...getState().places.types };
-  updatedState[type.id] = { ...type };
+  updatedState[type.id] = type;
   dispatch({ type: constants.Place.UPDATE_PLACE_TYPES, types: updatedState });
 };
 
@@ -17,7 +17,8 @@ export const createPlaceType = typeName => (dispatch, getState) => {
         name: typeName
       })
       .then(res => {
-        dispatch(updatePlaceTypesList(res));
+        // console.log(res)
+        // dispatch(updatePlaceTypesList(res));
         resolve(res);
       })
       .catch(function(error) {

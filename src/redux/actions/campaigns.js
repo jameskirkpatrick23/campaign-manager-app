@@ -13,7 +13,7 @@ const setListenerFor = (ref, callback, dispatch) => {
   });
 };
 
-const setListeners = campaignId => (dispatch, getState) => {
+export const setListeners = campaignId => (dispatch, getState) => {
   let npcRef = database.collection(`campaigns/${campaignId}/npcs`);
   dispatch({ type: constants.Npc.SET_NPCS_LISTENER, id: campaignId });
   setListenerFor(npcRef, NPCActions.updateNPCsList, dispatch);

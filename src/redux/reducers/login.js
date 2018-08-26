@@ -11,10 +11,7 @@ export default function LoginReducer(state = initialState, action) {
         isLoggedIn: true
       });
     case constants.Login.LOGOUT_USER:
-      return Object.assign({}, state, {
-        user: {},
-        isLoggedIn: false
-      });
+      return initialState;
     default:
       return state;
   }

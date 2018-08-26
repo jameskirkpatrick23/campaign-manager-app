@@ -55,7 +55,12 @@ class Breadcrumbs extends React.Component {
         let collection = breadcrumb.customName.collection;
         let pathIdentifier = breadcrumb.customName.pathIdentifier;
         let usedId = breadcrumb.matchingPath[pathIdentifier];
-        return this.props[`${collection}`][usedId].name;
+        if (
+          this.props[`${collection}`] &&
+          this.props[`${collection}`][usedId]
+        ) {
+          return this.props[`${collection}`][usedId].name;
+        } else return breadcrumb.name;
       } else {
         return breadcrumb.customName;
       }

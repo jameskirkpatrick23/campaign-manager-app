@@ -17,6 +17,8 @@ export default function CampaignReducer(state = initialState, action) {
       return Object.assign({}, state, {
         all: action.campaigns
       });
+    case constants.Login.LOGOUT_USER:
+      return initialState;
     default:
       return state;
   }

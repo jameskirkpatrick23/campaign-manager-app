@@ -17,6 +17,9 @@ class App extends Component {
         this.props.setCampaignListener(this.props.currentUser);
       });
     }
+    if (this.props.currentCampaign && this.props.currentCampaign.id) {
+      this.props.setCampaignListeners(this.props.currentCampaign.id);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -90,6 +93,7 @@ const mapDispatchToProps = dispatch =>
     {
       logOut: LoginActions.logoutUser,
       setCampaignListener: CampaignActions.setCampaignListener,
+      setCampaignListeners: CampaignActions.setListeners,
       fetchCampaigns: CampaignActions.fetchCampaigns
     },
     dispatch

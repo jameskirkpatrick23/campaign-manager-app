@@ -8,6 +8,8 @@ export default function QuestReducer(state = initialState, action) {
       return Object.assign({}, state, {
         all: action.quests
       });
+    case constants.Login.LOGOUT_USER:
+      return initialState;
     default:
       return state;
   }

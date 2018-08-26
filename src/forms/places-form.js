@@ -3,35 +3,31 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as PlaceActions from '../redux/actions/places';
+import { Multiselect } from 'react-widgets';
 
 class PlacesForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
-    this.placeTypes = [];
   }
 
-  componentDidMount() {
-    this.placeTypes = [...this.props.placeTypes];
-  }
-
-  onSubmit(e) {
+  onSubmit = e => {
     e.preventDefault();
-  }
+  };
 
-  createPlaceTag(typeName) {
-    this.placeTypes.push(typeName);
+  createPlaceTag = typeName => {
     this.props.createPlaceType(typeName);
-  }
+  };
 
-  render() {
+  render = () => {
     return (
       <div>
         <form onSubmit={this.onSubmit}>
           <label htmlFor="#npc-quirks">
             Type
             <Multiselect
-              data={this.placeTypes}
+              data={Object.keys(this.props.placeTypes).map(
+                key => this.props.placeTypes[key].name
+              )}
               allowCreate={'onFilter'}
               onCreate={this.createPlaceTag}
               caseSensitive={false}
@@ -42,14 +38,14 @@ class PlacesForm extends Component {
         </form>
       </div>
     );
-  }
+  };
 }
 
 PlacesForm.defaultProps = {
-  placeTypes: []
+  placeTypes: {}
 };
 PlacesForm.propTypes = {
-  placeTypes: PropTypes.arrayOf(PropTypes.string)
+  placeTypes: PropTypes.shape({})
 };
 
 const mapStateToProps = state => ({

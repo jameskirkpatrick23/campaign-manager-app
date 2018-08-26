@@ -8,6 +8,8 @@ export default function NPCReducer(state = initialState, action) {
       return Object.assign({}, state, {
         all: action.npcs
       });
+    case constants.Login.LOGOUT_USER:
+      return initialState;
     default:
       return state;
   }
