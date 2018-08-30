@@ -1,6 +1,7 @@
 import * as constants from '../constants';
 import database, { app } from '../../firebase';
 import * as PlacesActions from './places';
+import * as TagActions from './tags';
 import * as NPCActions from './npcs';
 import * as QuestActions from './quests';
 import campaigns from '../../pages/campaigns';
@@ -25,6 +26,11 @@ export const setListeners = campaignId => (dispatch, getState) => {
   );
   dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER, id: campaignId });
   setListenerFor(placeTypesRef, PlacesActions.updatePlaceTypesList, dispatch);
+  let tagsRef = database.collection(
+    `users/${getState().login.user.uid}/tags`
+  );
+  dispatch({ type: constants.Tag.SET_TAGS_LISTENER, id: campaignId });
+  setListenerFor(tagsRef, TagActions.updateTagList, dispatch);
   let questsRef = database.collection(`campaigns/${campaignId}/quests`);
   dispatch({ type: constants.Quest.SET_QUESTS_LISTENER, id: campaignId });
   setListenerFor(questsRef, QuestActions.updateQuestsList, dispatch);
