@@ -4,6 +4,7 @@ import Home from './pages/home';
 import CampaignPage from './pages/campaigns';
 import CampaignForm from './forms/campaign-form';
 import PlacesPage from './pages/places';
+import PlaceDetails from './pages/place-details';
 import PlacesForm from './forms/places-form';
 import NPCPage from './pages/npcs';
 import NPCForm from './forms/npc-form';
@@ -57,10 +58,19 @@ export default {
   },
   '/campaigns/:campaign_id/home/places/new': {
     key: 'Place Form',
-    name: 'Place Form',
+    name: 'New Place',
     path: '/campaigns/:campaign_id/home/places/new',
     exact: true,
     component: PlacesForm
+  },
+  '/campaigns/:campaign_id/home/places/:place_id': {
+    key: 'Place Show',
+    name: 'Place Show',
+    hasCustomName: true,
+    customName: { collection: 'places', pathIdentifier: 'place_id' },
+    path: '/campaigns/:campaign_id/home/places/:place_id',
+    exact: true,
+    component: PlaceDetails
   },
   '/campaigns/:campaign_id/home/npcs': {
     key: 'NPCs',

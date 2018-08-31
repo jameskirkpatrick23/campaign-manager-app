@@ -6,7 +6,7 @@ import database, { app } from '../../firebase';
 export const updateTagList = tag => (dispatch, getState) => {
   const updatedState = { ...getState().tags.tags };
   updatedState[tag.id] = tag;
-  dispatch({ tag: constants.Tag.UPDATE_TAG_LiST, tags: updatedState });
+  dispatch({ type: constants.Tag.UPDATE_TAG_LIST, tags: updatedState });
 };
 
 export const createTag = tagName => (dispatch, getState) => {

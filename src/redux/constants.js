@@ -26,11 +26,15 @@ export const Quest = {
   SET_QUESTS_LISTENER: 'SET_QUESTS_LISTENER'
 };
 
+export const Event = {
+  UPDATE_EVENT_LIST: 'UPDATE_EVENT_LIST',
+  SET_EVENTS_LISTENER: 'SET_EVENTS_LISTENER'
+};
+
 export const Npc = {
   UPDATE_NPC_LIST: 'UPDATE_NPC_LIST',
   SET_NPCS_LISTENER: 'SET_NPCS_LISTENER'
 };
-
 
 export const Tag = {
   UPDATE_TAG_LIST: 'UPDATE_TAG_LIST',

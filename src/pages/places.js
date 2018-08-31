@@ -15,15 +15,28 @@ class Places extends Component {
     return Object.keys(places).map(key => {
       const place = places[key];
       return (
-        <div className="card" key={key}>
-          <Carousel images={place.images} />
-          <div className="card-section">
-            <h4>{place.name}</h4>
-            <div>{place.description}</div>
+        <div className="columns small-6 medium-4 large-3">
+          <div className="card" key={key}>
+            {place.images.length && (
+              <img
+                className="thumbnail"
+                src={
+                  place.images[0].downloadUrl ||
+                  require('../assets/placeholder-location.png')
+                }
+                alt=""
+              />
+            )}
+            <div className="card-section">
+              <h4>{place.name}</h4>
+              <div>{place.description}</div>
+            </div>
+            <Link
+              to={`/campaigns/${currentCampaign.id}/home/places/${place.id}`}
+            >
+              See More
+            </Link>
           </div>
-          <Link to={`/campaigns/${currentCampaign.id}/home/places/${place.id}`}>
-            See More
-          </Link>
         </div>
       );
     });
@@ -40,7 +53,10 @@ class Places extends Component {
           Create a New Place
         </Link>
         <div>I am the text!</div>
-        {this.renderPlaces()}
+        <div className="row">
+          {this.renderPlaces()}
+          <div className="columns small-6" />
+        </div>
       </div>
     );
   }

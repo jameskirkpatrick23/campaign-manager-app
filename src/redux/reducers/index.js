@@ -5,6 +5,7 @@ import QuestReducer from './quests';
 import NPCReducer from './npcs';
 import PlaceReducer from './places';
 import TagReducer from './tag';
+import EventReducer from './events';
 
 export default combineReducers({
   login: LoginReducer,
@@ -12,5 +13,6 @@ export default combineReducers({
   quests: QuestReducer,
   npcs: NPCReducer,
   places: PlaceReducer,
-  tags: TagReducer
+  tags: TagReducer,
+  events: EventReducer
 });

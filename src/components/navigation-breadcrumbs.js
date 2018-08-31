@@ -17,7 +17,7 @@ const getPathTokens = pathname => {
 
 const getRouteMatch = (routes, path) => {
   let foundKeys = [];
-  Object.keys(routes).map(key => {
+  Object.keys(routes).forEach(key => {
     let route = new Route(routes[key].path);
     if (route.match(path)) {
       foundKeys.push({ ...routes[key], foundMatch: route.match(path) });

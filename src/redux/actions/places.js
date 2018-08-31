@@ -85,38 +85,101 @@ export const deletePlace = place => (dispatch, getState) => {
   });
 };
 
-export const createPlace = placeData => (dispatch, getState) => {
+const generatePromiseArray = (collection, uid, type) => {
   const storageRef = app.storage().ref();
+
+  return Object.keys(collection).map(key => {
+    return new Promise((resolve, reject) => {
+      const currentUpload = collection[key];
+      const uploadRef = storageRef.child(
+        `places/${uid}/${type}/${currentUpload.name}`
+      );
+      uploadRef
+        .put(currentUpload)
+        .then(snapshot => {
+          snapshot.ref
+            .getDownloadURL()
+            .then(url => {
+              resolve({ downloadUrl: url, fileName: currentUpload.name });
+            })
+            .catch(err => reject(err));
+        })
+        .catch(err => reject(err));
+    });
+  });
+};
+
+export const createPlace = placeData => (dispatch, getState) => {
+  const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;
-  const imagesRef = storageRef.child(
-    `places/${getState().login.user.uid}/${placeData.image.name}`
+
+  //take each uploaded image and each attached file. loop through them and make a promise for each.
+  //run a promise.all with that promise array, and upload each to the specific storage ref
+  //when that completes then get the download URLs for each thing
+  //attach those urls to the place you are about to save
+  //then finally save the place
+
+  const imagePromiseArray = generatePromiseArray(
+    placeData.images,
+    userUid,
+    'images'
+  );
+  const attachedFilePromiseArray = generatePromiseArray(
+    placeData.attachedFiles,
+    userUid,
+    'files'
   );
   dispatch({ type: constants.Place.CREATING_PLACE, data: placeData });
   return new Promise((resolve, reject) => {
-    imagesRef.put(placeData.image).then(snapshot => {
-      snapshot.ref.getDownloadURL().then(url => {
-        database
-          .collection('places')
-          .add({
-            name: placeData.name,
-            type: placeData.type,
-            npcIds: placeData.npcIds,
-            questIds: placeData.questIds,
-            placeIds: placeData.placeIds,
-            history: placeData.history,
-            campaignIds: [currentCampaign.id],
-            description: placeData.description,
-            creatorId: getState().login.user.uid,
-            imageRef: url
+    return Promise.all(imagePromiseArray)
+      .then(resolvedImages => {
+        const uploadedImages = resolvedImages;
+        Promise.all(attachedFilePromiseArray)
+          .then(resolvedFiles => {
+            const uploadedFiles = resolvedFiles;
+            new Promise(() => {
+              database
+                .collection(`campaigns/${currentCampaign.id}/places`)
+                .add({
+                  name: placeData.name,
+                  type: placeData.type,
+                  location: placeData.location,
+                  history: placeData.history,
+                  insideDescription: placeData.insideDescription,
+                  outsideDescription: placeData.outsideDescription,
+                  tagIds: placeData.tagIds,
+                  npcIds: placeData.npcIds,
+                  questIds: placeData.questIds,
+                  placeIds: placeData.placeIds,
+                  eventIds: placeData.eventIds,
+                  campaignIds: [currentCampaign.id],
+                  images: uploadedImages,
+                  attachedFiles: uploadedFiles,
+                  creatorId: userUid
+                })
+                .then(res => {
+                  resolve(res);
+                })
+                .catch(function(error) {
+                  reject('Error writing document: ', error);
+                });
+            }).catch(err => {
+              console.error(
+                'Something went wrong while trying upload files:',
+                err
+              );
+            });
           })
-          .then(res => {
-            resolve(res);
-          })
-          .catch(function(error) {
-            reject('Error writing document: ', error);
+          .catch(err => {
+            console.error(
+              'Something went wrong while trying upload images:',
+              err
+            );
           });
+      })
+      .catch(err => {
+        console.error('Something went wrong while trying upload images:', err);
       });
-    });
   });
 };
 
