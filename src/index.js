@@ -1,3 +1,5 @@
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap-theme.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
@@ -14,6 +16,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import RootReducer from './redux/reducers/index';
 import jQuery from 'jquery';
 window.jQuery = jQuery;
+
 const persistConfig = {
   key: 'root',
   storage,

@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import * as LoginActions from './redux/actions/login';
 import * as CampaignActions from './redux/actions/campaigns';
 import Breadcrumbs from './components/navigation-breadcrumbs';
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
 class App extends Component {
   componentWillMount() {
@@ -46,43 +47,29 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <div id="app-dashboard" className="app-dashboard shrink-medium">
-          <div className="row expanded app-dashboard-top-nav-bar">
-            <div className="columns medium-2">
+        <Navbar inverse style={{ borderRadius: 0 }}>
+          <Navbar.Header>
+            <Navbar.Brand>
               <Link to={'/'} className="app-dashboard-logo">
-                <img src={Logo} alt="" />
+                <img width={150} height={150} src={Logo} alt="" />
               </Link>
-            </div>
-            <div className="columns show-for-medium">
-              <div className="app-dashboard-search-bar-container">
-                <i className="app-dashboard-search-icon fa fa-search" />
-                <input
-                  className="app-dashboard-search"
-                  type="search"
-                  placeholder="Search"
-                />
-              </div>
-            </div>
-            {this.props.isLoggedIn &&
-              !this.props.location.pathname.match('/login') && (
-                <div className="columns shrink app-dashboard-top-bar-actions">
-                  <button className="button hollow" onClick={this.signOut}>
-                    Logout
-                  </button>
-                </div>
-              )}
-          </div>
-          <div className="app-dashboard-body off-canvas-wrapper">
-            <div
-              className="app-dashboard-body-content off-canvas-content"
-              data-off-canvas-content
-            >
-              <Breadcrumbs routes={routes} />
-              {Object.keys(routes).map(route => (
-                <Route {...routes[route]} key={route} />
-              ))}
-            </div>
-          </div>
+            </Navbar.Brand>
+            <Navbar.Toggle />
+          </Navbar.Header>
+          <Navbar.Collapse>
+            <Nav pullRight>
+              {this.props.isLoggedIn &&
+                !this.props.location.pathname.match('/login') && (
+                  <NavItem onClick={this.signOut}>Logout</NavItem>
+                )}
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
+        <div className="container">
+          <Breadcrumbs routes={routes} />
+          {Object.keys(routes).map(route => (
+            <Route {...routes[route]} key={route} />
+          ))}
         </div>
       </div>
     );
