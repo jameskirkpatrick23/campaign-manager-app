@@ -4,7 +4,6 @@ import * as PlacesActions from './places';
 import * as TagActions from './tags';
 import * as NPCActions from './npcs';
 import * as QuestActions from './quests';
-import campaigns from '../../pages/campaigns';
 
 const setListenerFor = (ref, callback, dispatch) => {
   ref.onSnapshot(snapshot => {
@@ -26,9 +25,7 @@ export const setListeners = campaignId => (dispatch, getState) => {
   );
   dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER, id: campaignId });
   setListenerFor(placeTypesRef, PlacesActions.updatePlaceTypesList, dispatch);
-  let tagsRef = database.collection(
-    `users/${getState().login.user.uid}/tags`
-  );
+  let tagsRef = database.collection(`users/${getState().login.user.uid}/tags`);
   dispatch({ type: constants.Tag.SET_TAGS_LISTENER, id: campaignId });
   setListenerFor(tagsRef, TagActions.updateTagList, dispatch);
   let questsRef = database.collection(`campaigns/${campaignId}/quests`);
@@ -138,7 +135,12 @@ export const createCampaign = campaignData => (dispatch, getState) => {
             name: campaignData.name,
             creatorId: getState().login.user.uid,
             description: campaignData.description,
-            imageRef: url
+            images: {
+              '0': {
+                downloadUrl: url,
+                fileName: campaignData.image.name
+              }
+            }
           })
           .then(res => {
             resolve(res);

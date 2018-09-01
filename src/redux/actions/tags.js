@@ -1,5 +1,5 @@
 import * as constants from '../constants';
-import database, { app } from '../../firebase';
+import database from '../../firebase';
 
 //<editor-fold Tags>
 

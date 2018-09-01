@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import 'react-widgets/dist/css/react-widgets.css';
 import { Multiselect, DropdownList } from 'react-widgets';
 
@@ -252,15 +251,11 @@ class NPCForm extends Component {
       personality,
       height,
       weight,
-      alignment,
       clothing,
       avatar,
-      race,
       gender,
       attachedFiles,
-      occupation,
-      values,
-      tags
+      occupation
     } = this.state;
     return (
       <div>

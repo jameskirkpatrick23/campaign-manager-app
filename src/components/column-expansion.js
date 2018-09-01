@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 class ColumnExpander extends Component {
   render() {
@@ -12,7 +13,8 @@ class ColumnExpander extends Component {
             <div
               className="column"
               style={{
-                backgroundImage: 'url(' + columns[colKey].backgroundImage + ')'
+                backgroundImage: 'url(' + columns[colKey].backgroundImage + ')',
+                height: '75vh'
               }}
               key={colKey}
             >
@@ -22,14 +24,14 @@ class ColumnExpander extends Component {
                   <p>{columns[colKey].description}</p>
                 </div>
                 <div className="columns">
-                  <button
-                    className="button"
+                  <Button
+                    bsStyle="primary"
                     onClick={() => {
                       this.props.history.push(columns[colKey].route);
                     }}
                   >
                     Explore
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

@@ -72,7 +72,7 @@ class Breadcrumbs extends React.Component {
     const { routes, match, location } = this.props;
     const breadcrumbs = getBreadcrumbs({ routes, match, location });
     return (
-      <nav aria-label="You are here:" role="navigation">
+      <nav aria-label="You are here:">
         <ul className="breadcrumbs">
           {breadcrumbs.map((breadcrumb, i) => {
             if (breadcrumb.path && breadcrumb.name) {

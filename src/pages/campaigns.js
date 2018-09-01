@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import HeroImage from '../components/hero-image';
 import CampaignImage from '../assets/campaign-hero.jpeg';
-import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Row, Col, Grid, Button } from 'react-bootstrap';
@@ -32,7 +30,7 @@ class CampaignPage extends Component {
                 />
               </Col>
               <Col xs={8}>
-                <h1>{currentCampaign.name}</h1>
+                <h2>{currentCampaign.name}</h2>
                 <p>{currentCampaign.description}</p>
                 <Button
                   onClick={() => this.routeToCampaign(campaigns[key], key)}
@@ -50,7 +48,7 @@ class CampaignPage extends Component {
           <React.Fragment key={key}>
             <Row>
               <Col xs={8}>
-                <h1>{currentCampaign.name}</h1>
+                <h2>{currentCampaign.name}</h2>
                 <p>{currentCampaign.description}</p>
                 <Button
                   onClick={() => this.routeToCampaign(campaigns[key], key)}
@@ -60,11 +58,7 @@ class CampaignPage extends Component {
                 </Button>
               </Col>
               <Col xs={4}>
-                <img
-                  // style={{width: 200, height: 200}}
-                  src={currentCampaign.imageRef}
-                  alt=""
-                />
+                <img src={currentCampaign.images[0].downloadUrl} alt="" />
               </Col>
             </Row>
             <hr />
