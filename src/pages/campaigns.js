@@ -4,6 +4,7 @@ import CampaignImage from '../assets/campaign-hero.jpeg';
 import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Row, Col, Grid, Button } from 'react-bootstrap';
 import * as CampaignActions from '../redux/actions/campaigns';
 
 class CampaignPage extends Component {
@@ -22,46 +23,50 @@ class CampaignPage extends Component {
       if (isOdd) {
         return (
           <React.Fragment key={key}>
-            <div className="row align-middle align-justify">
-              <div className="columns small-6 padding-0">
+            <Row>
+              <Col xs={4}>
                 <img
                   src={currentCampaign.imageRef}
+                  // style={{width: 200, height: 200}}
                   alt=""
-                  style={{ width: '100%' }}
                 />
-              </div>
-              <div className="columns small-6">
-                <h3>{currentCampaign.name}</h3>
+              </Col>
+              <Col xs={8}>
+                <h1>{currentCampaign.name}</h1>
                 <p>{currentCampaign.description}</p>
-                <button
+                <Button
                   onClick={() => this.routeToCampaign(campaigns[key], key)}
-                  className="round button small"
+                  bsStyle={'primary'}
                 >
                   Manage Campaign
-                </button>
-              </div>
-            </div>
+                </Button>
+              </Col>
+            </Row>
             <hr />
           </React.Fragment>
         );
       } else {
         return (
           <React.Fragment key={key}>
-            <div className="row align-middle align-justify">
-              <div className="columns small-6">
-                <h3>{currentCampaign.name}</h3>
+            <Row>
+              <Col xs={8}>
+                <h1>{currentCampaign.name}</h1>
                 <p>{currentCampaign.description}</p>
-                <button
+                <Button
                   onClick={() => this.routeToCampaign(campaigns[key], key)}
-                  className="round button small"
+                  bsStyle={'primary'}
                 >
                   Manage Campaign
-                </button>
-              </div>
-              <div className="columns small-6 padding-0">
-                <img src={currentCampaign.imageRef} alt="" />
-              </div>
-            </div>
+                </Button>
+              </Col>
+              <Col xs={4}>
+                <img
+                  // style={{width: 200, height: 200}}
+                  src={currentCampaign.imageRef}
+                  alt=""
+                />
+              </Col>
+            </Row>
             <hr />
           </React.Fragment>
         );
@@ -71,19 +76,30 @@ class CampaignPage extends Component {
 
   render() {
     return (
-      <div>
-        <HeroImage backgroundImage={CampaignImage} header="Campaigns">
-          <h5>The place where everything happens</h5>
-          <button className="button">
-            <Link to={'/campaigns/new'} style={{ color: '#fefefe' }}>
+      <Grid>
+        <Row
+          style={{
+            backgroundImage: 'url(' + CampaignImage + ')',
+            backgroundPosition: 'center',
+            padding: 10
+          }}
+        >
+          <Col xs={8}>
+            <h1 style={{ color: 'white' }}>Campaigns</h1>
+          </Col>
+          <Col xs={3} style={{ marginTop: 20 }}>
+            <Button
+              bsStyle="primary"
+              block
+              onClick={() => this.props.history.push('/campaigns/new')}
+            >
               Create a new campaign
-            </Link>
-          </button>
-          <div className="marketing-site-content-section" />
-        </HeroImage>
+            </Button>
+          </Col>
+        </Row>
         <hr />
         {this.renderCampaigns()}
-      </div>
+      </Grid>
     );
   }
 }

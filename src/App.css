@@ -43,3 +43,7 @@ label {
     transform: rotate(360deg);
   }
 }
+
+.clickable {
+  cursor: pointer;
+}
