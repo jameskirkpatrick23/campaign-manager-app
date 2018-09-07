@@ -155,7 +155,31 @@ export const createPlace = placeData => (dispatch, getState) => {
                   campaignIds: [currentCampaign.id],
                   images: uploadedImages,
                   attachedFiles: uploadedFiles,
-                  creatorId: userUid
+                  creatorId: userUid,
+                  tiles: {
+                    numCols: 1,
+                    floors: 1,
+                    numRows: 1,
+                    tiles: {
+                      0: {
+                        coordinate: {
+                          row: 1,
+                          col: 1,
+                          floor: 1
+                        },
+                        image: {
+                          fileName: '',
+                          downloadUrl: ''
+                        },
+                        legend: '',
+                        skillChecks: '',
+                        loot: '',
+                        description: '',
+                        objectiveIds: [], //select from quests you added prior
+                        npcIds: [] //select from the npcs you added prior
+                      }
+                    }
+                  }
                 })
                 .then(res => {
                   resolve(res);
