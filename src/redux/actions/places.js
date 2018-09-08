@@ -12,13 +12,14 @@ export const updatePlaceTypesList = type => (dispatch, getState) => {
 export const createPlaceType = typeName => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     database
-      .collection(`users/${getState().login.user.uid}/placeTypes`)
+      .collection(`placeTypes`)
       .add({
-        name: typeName
+        name: typeName,
+        creatorId: getState().login.user.uid,
+        collaboratorIds: []
       })
       .then(res => {
-        // console.log(res)
-        // dispatch(updatePlaceTypesList(res));
+        dispatch({ type: 'CREATED_PLACE_TYPE', typeName });
         resolve(res);
       })
       .catch(function(error) {
@@ -67,10 +68,9 @@ const removePlaceFromList = placeId => (dispatch, getState) => {
 
 export const deletePlace = place => (dispatch, getState) => {
   dispatch({ type: constants.Place.DELETING_PLACE, id: place.id });
-  const currentCampaign = getState().campaigns.currentCampaign;
   return new Promise((resolve, reject) => {
     database
-      .collection(`/campaigns/${currentCampaign.id}/places`)
+      .collection(`places`)
       .doc(`${place.id}`)
       .delete()
       .then(res => {
@@ -139,7 +139,7 @@ export const createPlace = placeData => (dispatch, getState) => {
             const uploadedFiles = resolvedFiles;
             new Promise(() => {
               database
-                .collection(`campaigns/${currentCampaign.id}/places`)
+                .collection(`places`)
                 .add({
                   name: placeData.name,
                   type: placeData.type,
@@ -151,35 +151,13 @@ export const createPlace = placeData => (dispatch, getState) => {
                   npcIds: placeData.npcIds,
                   questIds: placeData.questIds,
                   placeIds: placeData.placeIds,
+                  floorIds: [],
                   eventIds: placeData.eventIds,
                   campaignIds: [currentCampaign.id],
                   images: uploadedImages,
                   attachedFiles: uploadedFiles,
                   creatorId: userUid,
-                  tiles: {
-                    numCols: 1,
-                    floors: 1,
-                    numRows: 1,
-                    tiles: {
-                      0: {
-                        coordinate: {
-                          row: 1,
-                          col: 1,
-                          floor: 1
-                        },
-                        image: {
-                          fileName: '',
-                          downloadUrl: ''
-                        },
-                        legend: '',
-                        skillChecks: '',
-                        loot: '',
-                        description: '',
-                        objectiveIds: [], //select from quests you added prior
-                        npcIds: [] //select from the npcs you added prior
-                      }
-                    }
-                  }
+                  collaboratorIds: []
                 })
                 .then(res => {
                   resolve(res);

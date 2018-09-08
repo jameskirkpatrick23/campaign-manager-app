@@ -30,6 +30,7 @@ class PlaceDetails extends Component {
     this.findRelatedObjects = this.findRelatedObjects.bind(this);
     this.renderLocationHistory = this.renderLocationHistory.bind(this);
     this.renderImages = this.renderImages.bind(this);
+    this.renderFloors = this.renderFloors.bind(this);
     // this.renderTileModifier = this.renderTileModifier.bind(this);
   }
 
@@ -293,6 +294,7 @@ class PlaceDetails extends Component {
 
   render() {
     const { place } = this.state;
+    if (!place) return null;
     return (
       <Grid>
         <Row>
@@ -311,7 +313,7 @@ class PlaceDetails extends Component {
                       <Tab.Content animation>
                         {this.renderImages()}
                         {this.renderLocationHistory()}
-                        {/*{this.renderFloors()}*/}
+                        {this.renderFloors()}
                       </Tab.Content>
                     </Col>
                   </Row>

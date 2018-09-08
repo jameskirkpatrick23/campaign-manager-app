@@ -12,9 +12,11 @@ export const updateTagList = tag => (dispatch, getState) => {
 export const createTag = tagName => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     database
-      .collection(`users/${getState().login.user.uid}/tags`)
+      .collection(`tags`)
       .add({
-        name: tagName
+        name: tagName,
+        creatorId: getState().login.user.uid,
+        collaboratorIds: []
       })
       .then(res => {
         resolve(res);

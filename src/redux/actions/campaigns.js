@@ -14,22 +14,30 @@ const setListenerFor = (ref, callback, dispatch) => {
 };
 
 export const setListeners = campaignId => (dispatch, getState) => {
-  let npcRef = database.collection(`campaigns/${campaignId}/npcs`);
-  dispatch({ type: constants.Npc.SET_NPCS_LISTENER, id: campaignId });
+  let npcRef = database
+    .collection(`npcs`)
+    .where('creatorId', '==', getState().login.user.uid);
+  dispatch({ type: constants.Npc.SET_NPCS_LISTENER });
   setListenerFor(npcRef, NPCActions.updateNPCsList, dispatch);
-  let placesRef = database.collection(`campaigns/${campaignId}/places`);
-  dispatch({ type: constants.Place.SET_PLACES_LISTENER, id: campaignId });
+  let placesRef = database
+    .collection(`places`)
+    .where('creatorId', '==', getState().login.user.uid);
+  dispatch({ type: constants.Place.SET_PLACES_LISTENER });
   setListenerFor(placesRef, PlacesActions.updatePlacesList, dispatch);
-  let placeTypesRef = database.collection(
-    `users/${getState().login.user.uid}/placeTypes`
-  );
-  dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER, id: campaignId });
+  let placeTypesRef = database
+    .collection('placeTypes')
+    .where('creatorId', '==', getState().login.user.uid);
+  dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER });
   setListenerFor(placeTypesRef, PlacesActions.updatePlaceTypesList, dispatch);
-  let tagsRef = database.collection(`users/${getState().login.user.uid}/tags`);
-  dispatch({ type: constants.Tag.SET_TAGS_LISTENER, id: campaignId });
+  let tagsRef = database
+    .collection('tags')
+    .where('creatorId', '==', getState().login.user.uid);
+  dispatch({ type: constants.Tag.SET_TAGS_LISTENER });
   setListenerFor(tagsRef, TagActions.updateTagList, dispatch);
-  let questsRef = database.collection(`campaigns/${campaignId}/quests`);
-  dispatch({ type: constants.Quest.SET_QUESTS_LISTENER, id: campaignId });
+  let questsRef = database
+    .collection(`quests`)
+    .where('creatorId', '==', getState().login.user.uid);
+  dispatch({ type: constants.Quest.SET_QUESTS_LISTENER });
   setListenerFor(questsRef, QuestActions.updateQuestsList, dispatch);
 };
 
@@ -134,6 +142,7 @@ export const createCampaign = campaignData => (dispatch, getState) => {
           .add({
             name: campaignData.name,
             creatorId: getState().login.user.uid,
+            collaboratorIds: [],
             description: campaignData.description,
             images: {
               '0': {

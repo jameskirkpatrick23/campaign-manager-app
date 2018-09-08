@@ -3,27 +3,34 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Spinner from '../components/spinner';
-import * as TagActions from '../redux/actions/tags';
-import * as PlaceActions from '../redux/actions/places';
+import * as FloorActions from '../redux/actions/floors';
 import { Row, Col, Button } from 'react-bootstrap';
 import { DropdownList } from 'react-widgets';
 
 class FloorForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      isSubmitting: false
+    };
     this.onSubmit = this.onSubmit.bind(this);
     this.options = [1, 2, 3, 4, 5, 6];
   }
 
-  onSubmit = () => {};
+  onSubmit = placeId => {
+    this.setState({ isSubmitting: true }, () => {
+      this.props.createFloor({ ...this.state, placeId }).then(() => {
+        this.setState({ isSubmitting: false });
+      });
+    });
+  };
 
   render() {
     return (
       <div>
         <Spinner show={this.state.isSubmitting} />
-        <form onSubmit={this.onSubmit}>
-          {/*<editor-fold Name and Types>*/}
+        <form onSubmit={() => this.onSubmit(this.props.placeId)}>
+          {/*<editor-fold Name and Desc>*/}
           <Row>
             <Col xs={6}>
               <label htmlFor="#floor-name">
@@ -51,6 +58,8 @@ class FloorForm extends Component {
               </label>
             </Col>
           </Row>
+          {/*</ editor-fold>*/}
+          {/*<editor-fold Row and Col>*/}
           <Row>
             <Col xs={6}>
               <label htmlFor="#floor-numRows">
@@ -64,7 +73,20 @@ class FloorForm extends Component {
                 />
               </label>
             </Col>
+            <Col xs={6}>
+              <label htmlFor="#floor-numCols">
+                Columns
+                <DropdownList
+                  id="floor-numCols"
+                  data={this.options}
+                  value={this.state.numCols}
+                  placeholder="How many rows of tiles are needed for this floor?"
+                  onChange={dataItem => this.setState({ numCols: dataItem })}
+                />
+              </label>
+            </Col>
           </Row>
+          {/*</ editor-fold>*/}
           <Row>
             <Col xs={6}>
               <Button bsStyle="primary" type="submit">
@@ -98,9 +120,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      createPlaceType: PlaceActions.createPlaceType,
-      createTag: TagActions.createTag,
-      createPlace: PlaceActions.createPlace
+      createFloor: FloorActions.createFloor
     },
     dispatch
   );

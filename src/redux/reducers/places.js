@@ -2,8 +2,7 @@ import * as constants from '../constants';
 
 const initialState = {
   all: {},
-  types: {},
-  floors: {}
+  types: {}
 };
 
 export default function PlaceReducer(state = initialState, action) {

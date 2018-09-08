@@ -8,13 +8,34 @@ class Floors extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedFloors: props.place.floors,
+      selectedFloors: {},
       floorFormOpen: false
     };
     this.renderFloor = this.renderFloor.bind(this);
     this.showFloorForm = this.showFloorForm.bind(this);
     this.hideFloorForm = this.hideFloorForm.bind(this);
+    this.setSelectedFloors = this.setSelectedFloors.bind(this);
   }
+
+  setSelectedFloors = props => {
+    const { place, floors } = props;
+    const selectedFloors = {};
+    place.floorIds &&
+      place.floorIds.map(floorId => {
+        selectedFloors[floorId] = floors[floorId];
+      });
+    this.setState({ selectedFloors });
+  };
+
+  componentDidMount = () => {
+    this.setSelectedFloors(this.props);
+  };
+
+  componentWillReceiveProps = nextProps => {
+    if (this.props.place.floorIds !== nextProps.place.floorIds) {
+      this.setSelectedFloors(nextProps);
+    }
+  };
 
   showFloorForm = () => {
     this.setState({ floorFormOpen: true });
@@ -48,7 +69,8 @@ class Floors extends Component {
 
   render() {
     const { place } = this.props;
-    const { floors } = place;
+    const { selectedFloors } = this.state;
+    const hasFloors = Object.keys(selectedFloors).length;
     return (
       <Row>
         <Col xs={12}>
@@ -58,12 +80,11 @@ class Floors extends Component {
             </Col>
             {this.renderFloorForm()}
           </Row>
-          {!floors.length && (
-            <p>{place.name} does not have a layout, click here to create one</p>
+          {!hasFloors && (
+            <p>{place.name} does not have a layout, please create one</p>
           )}
-
-          {floors.length &&
-            floors.map(floor => {
+          {hasFloors &&
+            Object.keys(selectedFloors).map(floor => {
               return this.renderFloor(floor);
             })}
         </Col>
@@ -78,7 +99,8 @@ Floors.defaultProps = {
 Floors.propTypes = {};
 
 const mapStateToProps = state => ({
-  currentCampaign: state.campaigns.currentCampaign
+  currentCampaign: state.campaigns.currentCampaign,
+  floors: state.floors.all
 });
 
 export default connect(

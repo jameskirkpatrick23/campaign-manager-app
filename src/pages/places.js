@@ -55,6 +55,7 @@ class Places extends Component {
         <Row key={placeKey} className="margin-bottom-1">
           <Col xs={12}>
             <Panel
+              defaultExpanded
               id={`Place-Panel-${formattedPlaces[placeKey].name}`}
               eventKey={`place-panel-${index}`}
               bsStyle="primary"
@@ -128,7 +129,7 @@ class Places extends Component {
         </Row>
         <Row>
           <Col xs={12}>
-            <PanelGroup accordion id="place-panel-group">
+            <PanelGroup id="place-panel-group">
               {this.renderPlaceTypes()}
             </PanelGroup>
           </Col>
