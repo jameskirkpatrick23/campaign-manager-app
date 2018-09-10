@@ -4,6 +4,7 @@ import * as PlacesActions from './places';
 import * as TagActions from './tags';
 import * as NPCActions from './npcs';
 import * as QuestActions from './quests';
+import * as FloorActions from './floors';
 
 const setListenerFor = (ref, callback, dispatch) => {
   ref.onSnapshot(snapshot => {
@@ -24,6 +25,11 @@ export const setListeners = campaignId => (dispatch, getState) => {
     .where('creatorId', '==', getState().login.user.uid);
   dispatch({ type: constants.Place.SET_PLACES_LISTENER });
   setListenerFor(placesRef, PlacesActions.updatePlacesList, dispatch);
+  let floorsRef = database
+    .collection(`floors`)
+    .where('creatorId', '==', getState().login.user.uid);
+  dispatch({ type: constants.Floor.SET_FLOORS_LISTENER });
+  setListenerFor(floorsRef, FloorActions.updateFloorsList, dispatch);
   let placeTypesRef = database
     .collection('placeTypes')
     .where('creatorId', '==', getState().login.user.uid);

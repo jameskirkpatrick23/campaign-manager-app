@@ -1,6 +1,6 @@
 import * as constants from '../constants';
 import database, { app } from '../../firebase';
-
+import firebase from 'firebase';
 //<editor-fold Types>
 
 export const updatePlaceTypesList = type => (dispatch, getState) => {
@@ -85,6 +85,24 @@ export const deletePlace = place => (dispatch, getState) => {
   });
 };
 
+export const updatePlaceFloors = (placeId, floorId, dispatch) => {
+  return new Promise((resolve, reject) => {
+    database
+      .collection('places')
+      .doc(placeId)
+      .update({
+        floorIds: firebase.firestore.FieldValue.arrayUnion(floorId)
+      })
+      .then(res => {
+        dispatch({ type: constants.Place.UPDATE_PLACE, placeId });
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+};
+
 const generatePromiseArray = (collection, uid, type) => {
   const storageRef = app.storage().ref();
 
@@ -162,7 +180,7 @@ export const createPlace = placeData => (dispatch, getState) => {
                 .then(res => {
                   resolve(res);
                 })
-                .catch(function(error) {
+                .catch(error => {
                   reject('Error writing document: ', error);
                 });
             }).catch(err => {

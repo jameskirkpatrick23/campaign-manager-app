@@ -46,6 +46,12 @@ class PlaceDetails extends Component {
   };
 
   componentWillReceiveProps = nextProps => {
+    if (this.props.places !== nextProps.places) {
+      const placeId = nextProps.match.params.place_id;
+      this.setState({ place: nextProps.places[placeId] }, () => {
+        this.findRelatedObjects(nextProps);
+      });
+    }
     this.findRelatedObjects(nextProps);
   };
 
@@ -156,7 +162,7 @@ class PlaceDetails extends Component {
         <NavItem eventKey="location-history">
           <Glyphicon glyph="book" />
         </NavItem>
-        <NavItem eventKey="tiles">
+        <NavItem eventKey="floors">
           <Glyphicon glyph="th-large" />
         </NavItem>
         <NavItem eventKey="notes">
@@ -166,130 +172,13 @@ class PlaceDetails extends Component {
     );
   };
 
-  // getTileSize = (columns) => {
-  //   let numColumns = 12;
-  //   switch(columns) {
-  //     case 1:
-  //       numColumns = 12;
-  //       break;
-  //     case 2:
-  //       numColumns = 6;
-  //       break;
-  //     case 3:
-  //       numColumns = 4;
-  //       break;
-  //     case 4:
-  //       numColumns = 3;
-  //       break;
-  //     case 5:
-  //     case 6:
-  //       numColumns = 2;
-  //       break;
-  //     default:
-  //       numColumns = 1;
-  //       break;
-  //   }
-  //   return numColumns;
-  // };
-  //
-  // renderTileRowCols = (floorNumber) => {
-  //   const { place, numCols, numRows } = this.state;
-  //   const cols = Array.from(Array(numCols).keys());
-  //   const rows = Array.from(Array(numRows).keys());
-  //   return rows.map(rowNumber => {
-  //     return <Row key={`floor-${floorNumber}-row-${rowNumber}`}>
-  //       {cols.map(colNumber => {
-  //         return <Col key={`floor-${floorNumber}-row-${rowNumber}-col-${colNumber}`} xs={this.getTileSize(cols.length)}>
-  //           <div style={{height: 75, width: 75, margin: 10, backgroundColor: 'grey'}} />
-  //         </Col>
-  //       })}
-  //     </Row>
-  //   })
-  // };
-  //
-  // renderTiles = () => {
-  //   const { numFloors } = this.state;
-  //   const floors = Array.from(Array(numFloors).keys());
-  //
-  //   return floors.map(floorNumber => {
-  //     return <PanelGroup
-  //       accordion
-  //       id="floorPanel"
-  //       defaultActiveKey="floor-1"
-  //       key={`floor-${floorNumber}`}
-  //     >
-  //       <Panel
-  //         id={'place-panel-location'}
-  //         bsStyle="warning"
-  //         eventKey={`floor-${floorNumber + 1}`}
-  //       >
-  //         <Panel.Heading>
-  //           <Panel.Toggle style={{ textDecoration: 'none' }}>
-  //             <Panel.Title componentClass="h3">Floor {floorNumber + 1}</Panel.Title>
-  //           </Panel.Toggle>
-  //         </Panel.Heading>
-  //         <Panel.Collapse>
-  //           <Panel.Body>
-  //             {this.renderTileRowCols()}
-  //           </Panel.Body>
-  //         </Panel.Collapse>
-  //       </Panel>
-  //     </PanelGroup>
-  //   });
-  // };
-  //
-  // renderTileModifier = () => {
-  //   const options = [1,2,3,4,5,6];
-  //   return <Tab.Pane eventKey="tiles">
-  //     <Row>
-  //       <Col xs={4}>
-  //         <FormGroup>
-  //           <ControlLabel>Number of Floors</ControlLabel>
-  //           <DropdownList
-  //             id="num-floors"
-  //             data={options}
-  //             value={this.state.numFloors}
-  //             placeholder="Number of Floors"
-  //             onChange={dataItem => this.setState({ numFloors: dataItem })}
-  //           />
-  //         </FormGroup>
-  //       </Col>
-  //       <Col xs={4}>
-  //         <FormGroup>
-  //           <ControlLabel>Number of Rows</ControlLabel>
-  //           <DropdownList
-  //             id="num-rows"
-  //             data={options}
-  //             value={this.state.numRows}
-  //             placeholder="Number of Rows"
-  //             onChange={dataItem => this.setState({ numRows: dataItem })}
-  //           />
-  //         </FormGroup>
-  //       </Col>
-  //       <Col xs={4}>
-  //         <FormGroup>
-  //           <ControlLabel>Number of Columns</ControlLabel>
-  //           <DropdownList
-  //             id="num-cols"
-  //             data={options}
-  //             value={this.state.numCols}
-  //             placeholder="Number of Columns"
-  //             onChange={dataItem => this.setState({ numCols: dataItem })}
-  //           />
-  //         </FormGroup>
-  //       </Col>
-  //     </Row>
-  //     <Row>
-  //       <Col xs={12}>
-  //         {this.renderTiles()}
-  //       </Col>
-  //     </Row>
-  //   </Tab.Pane>
-  // };
-
   renderFloors = () => {
     const { place } = this.state;
-    return <Floors place={place} />;
+    return (
+      <Tab.Pane eventKey="floors">
+        <Floors place={place} />
+      </Tab.Pane>
+    );
   };
 
   render() {

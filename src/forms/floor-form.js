@@ -11,17 +11,26 @@ class FloorForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isSubmitting: false
+      isSubmitting: false,
+      name: '',
+      description: '',
+      numRows: 1,
+      numCols: 1
     };
     this.onSubmit = this.onSubmit.bind(this);
     this.options = [1, 2, 3, 4, 5, 6];
   }
 
-  onSubmit = placeId => {
+  onSubmit = () => {
     this.setState({ isSubmitting: true }, () => {
-      this.props.createFloor({ ...this.state, placeId }).then(() => {
-        this.setState({ isSubmitting: false });
-      });
+      this.props
+        .createFloor({ ...this.state, placeId: this.props.placeId })
+        .then(() => {
+          this.setState({ isSubmitting: false }, this.props.onCancel);
+        })
+        .catch(err => {
+          console.error(err);
+        });
     });
   };
 
@@ -32,7 +41,7 @@ class FloorForm extends Component {
         <form onSubmit={() => this.onSubmit(this.props.placeId)}>
           {/*<editor-fold Name and Desc>*/}
           <Row>
-            <Col xs={6}>
+            <Col xs={12} md={6}>
               <label htmlFor="#floor-name">
                 Name
                 <input
@@ -45,7 +54,7 @@ class FloorForm extends Component {
                 />
               </label>
             </Col>
-            <Col xs={6}>
+            <Col xs={12} md={6}>
               <label htmlFor="#floor-description">
                 Description
                 <textarea
@@ -53,6 +62,7 @@ class FloorForm extends Component {
                   placeholder="What do characters see, smell, and feel when arriving on this floor?"
                   value={this.state.description}
                   required
+                  rows={3}
                   onChange={e => this.setState({ description: e.target.value })}
                 />
               </label>
@@ -60,8 +70,8 @@ class FloorForm extends Component {
           </Row>
           {/*</ editor-fold>*/}
           {/*<editor-fold Row and Col>*/}
-          <Row>
-            <Col xs={6}>
+          <Row className="margin-bottom-2">
+            <Col xs={12} md={6}>
               <label htmlFor="#floor-numRows">
                 Rows
                 <DropdownList
@@ -73,7 +83,7 @@ class FloorForm extends Component {
                 />
               </label>
             </Col>
-            <Col xs={6}>
+            <Col xs={12} md={6}>
               <label htmlFor="#floor-numCols">
                 Columns
                 <DropdownList
@@ -89,18 +99,12 @@ class FloorForm extends Component {
           {/*</ editor-fold>*/}
           <Row>
             <Col xs={6}>
-              <Button bsStyle="primary" type="submit">
+              <Button bsStyle="primary" onClick={e => this.onSubmit()}>
                 Submit
               </Button>
             </Col>
             <Col xs={6}>
-              <Button
-                onClick={() => {
-                  this.props.history.goBack();
-                }}
-              >
-                Cancel
-              </Button>
+              <Button onClick={this.props.onCancel}>Cancel</Button>
             </Col>
           </Row>
         </form>
@@ -109,8 +113,13 @@ class FloorForm extends Component {
   }
 }
 
-FloorForm.defaultProps = {};
-FloorForm.propTypes = {};
+FloorForm.defaultProps = {
+  onCancel: () => {}
+};
+FloorForm.propTypes = {
+  onCancel: PropTypes.func,
+  placeId: PropTypes.string.isRequired
+};
 
 const mapStateToProps = state => ({
   places: state.places.all,

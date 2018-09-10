@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^3.3.7",
-    "firebase": "^5.2.0",
+    "firebase": "^5.4.1",
     "form-serialize": "^0.7.2",
     "husky": "^0.14.3",
     "jquery": "^3.3.1",
