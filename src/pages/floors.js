@@ -10,7 +10,8 @@ class Floors extends Component {
     super(props);
     this.state = {
       selectedFloors: {},
-      floorFormOpen: false
+      floorFormOpen: false,
+      tileFormOpen: false
     };
     this.renderFloor = this.renderFloor.bind(this);
     this.showFloorForm = this.showFloorForm.bind(this);
@@ -73,7 +74,11 @@ class Floors extends Component {
     return numColumns;
   };
 
-  openTileForm = (row, col) => {
+  openTileForm = () => {
+    this.setState({ tileFormOpen: true });
+  };
+
+  renderTileForm = (floor, row, col) => {
     return (
       <Modal
         show={this.state.tileFormOpen}
@@ -82,13 +87,14 @@ class Floors extends Component {
         aria-labelledby="floor-modal-title-lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="floor-modal-title-lg">
-            Create a new Floor
-          </Modal.Title>
+          <Modal.Title id="floor-modal-title-lg">Modify the tile</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <TileForm
-            tileId={null}
+            tile={floor.tiles[`${row}${col}`]}
+            floor={floor}
+            row={row}
+            col={col}
             onCancel={() => this.setState({ tileFormOpen: false })}
           />
         </Modal.Body>
@@ -109,7 +115,9 @@ class Floors extends Component {
                 xs={this.getTileSize(cols.length)}
                 onClick={() => this.setState({ tileFormOpen: true })}
               >
+                {this.renderTileForm(floor, rowNumber, colNumber)}
                 <img
+                  onClick={() => this.openTileForm()}
                   style={{
                     height: 75,
                     width: 75,

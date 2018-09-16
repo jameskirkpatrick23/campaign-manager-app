@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import Spinner from '../components/spinner';
 import * as FloorActions from '../redux/actions/floors';
 import { Row, Col, Button } from 'react-bootstrap';
-import { DropdownList } from 'react-widgets';
+import { DropdownList, Multiselect } from 'react-widgets';
 
 class FloorForm extends Component {
   constructor(props) {
@@ -31,6 +31,17 @@ class FloorForm extends Component {
         .catch(err => {
           console.error(err);
         });
+    });
+  };
+
+  getQuests = () => {
+    const { places, quests, placeId } = this.props;
+    const place = places[placeId];
+    return place.questIds.map(questId => {
+      return {
+        name: quests[questId].name,
+        value: questId
+      };
     });
   };
 
@@ -96,10 +107,30 @@ class FloorForm extends Component {
               </label>
             </Col>
           </Row>
+          <Row className="margin-bottom-2">
+            <Col xs={12} md={6}>
+              <label htmlFor="#objectives">
+                Quest Objectives
+                <Multiselect
+                  id="objectives"
+                  data={this.getQuests()}
+                  value={this.state.questIds}
+                  textField="name"
+                  valueField="value"
+                  allowCreate={false}
+                  placeholder="What quests have objectives on this floor?"
+                  caseSensitive={false}
+                  onChange={dataItems => this.setState({ questIds: dataItems })}
+                  minLength={3}
+                  filter="contains"
+                />
+              </label>
+            </Col>
+          </Row>
           {/*</ editor-fold>*/}
           <Row>
             <Col xs={6}>
-              <Button bsStyle="primary" onClick={e => this.onSubmit()}>
+              <Button bsStyle="primary" onClick={this.onSubmit}>
                 Submit
               </Button>
             </Col>
@@ -123,6 +154,7 @@ FloorForm.propTypes = {
 
 const mapStateToProps = state => ({
   places: state.places.all,
+  quests: state.quests.all,
   currentCampaignId: state.campaigns.currentCampaign.id
 });
 

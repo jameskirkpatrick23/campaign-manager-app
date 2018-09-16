@@ -18,8 +18,9 @@ export const createFloor = floorData => (dispatch, getState) => {
         cols: floorData.numCols,
         rows: floorData.numRows,
         description: floorData.description,
+        questIds: [],
         name: floorData.name,
-        tileIds: [],
+        tiles: {}, //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
         creatorId: userUid,
         collaboratorIds: []
       })
