@@ -11,12 +11,10 @@ import {
   Tab,
   NavItem,
   Nav,
-  FormGroup,
-  ControlLabel,
   Glyphicon
 } from 'react-bootstrap';
-import { DropdownList } from 'react-widgets';
 import Floors from './floors';
+import Notes from './notes';
 
 class PlaceDetails extends Component {
   constructor(props) {
@@ -31,14 +29,13 @@ class PlaceDetails extends Component {
     this.renderLocationHistory = this.renderLocationHistory.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderFloors = this.renderFloors.bind(this);
-    // this.renderTileModifier = this.renderTileModifier.bind(this);
   }
 
   findRelatedObjects = () => {
     return false;
   };
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     const placeId = this.props.match.params.place_id;
     this.setState({ place: this.props.places[placeId] }, () => {
       this.findRelatedObjects(this.props);
@@ -181,6 +178,15 @@ class PlaceDetails extends Component {
     );
   };
 
+  renderNotes = () => {
+    const { place } = this.state;
+    return (
+      <Tab.Pane eventKey="notes">
+        <Notes noteIds={place.noteIds} typeId={place.id} type="place" />
+      </Tab.Pane>
+    );
+  };
+
   render() {
     const { place } = this.state;
     if (!place) return null;
@@ -203,6 +209,7 @@ class PlaceDetails extends Component {
                         {this.renderImages()}
                         {this.renderLocationHistory()}
                         {this.renderFloors()}
+                        {this.renderNotes()}
                       </Tab.Content>
                     </Col>
                   </Row>

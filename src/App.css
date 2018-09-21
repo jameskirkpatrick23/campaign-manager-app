@@ -11,8 +11,12 @@ label {
   text-align: left;
 }
 
-.App {
-  text-align: center;
+.truncate {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block; /* for links */
 }
 
 .App-logo {

@@ -1,6 +1,7 @@
 import * as constants from '../constants';
-import database from '../../firebase';
+import database, { app } from '../../firebase';
 import * as PlaceActions from './places';
+import firebase from 'firebase';
 
 export const updateFloorsList = floor => (dispatch, getState) => {
   const updatedState = { ...getState().floors.all };
@@ -10,6 +11,12 @@ export const updateFloorsList = floor => (dispatch, getState) => {
 
 export const createFloor = floorData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
+  const tiles = {};
+  for (let i = 0; i < floorData.numRows; i++) {
+    for (let j = 0; j < floorData.numCols; j++) {
+      tiles[`${i}${j}`] = {};
+    }
+  }
   return new Promise((resolve, reject) => {
     database
       .collection(`floors`)
@@ -19,8 +26,9 @@ export const createFloor = floorData => (dispatch, getState) => {
         rows: floorData.numRows,
         description: floorData.description,
         questIds: [],
+        createdAt: firebase.firestore.Timestamp.now(),
         name: floorData.name,
-        tiles: {}, //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
+        tiles, //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
         creatorId: userUid,
         collaboratorIds: []
       })
@@ -34,8 +42,69 @@ export const createFloor = floorData => (dispatch, getState) => {
           });
       })
       .catch(error => {
-        console.error('how do i fix thisssss');
         reject('Error writing document: ', error);
+      });
+  });
+};
+
+const uploadImage = (file, uid, floorId) => {
+  const storageRef = app.storage().ref();
+
+  return new Promise((resolve, reject) => {
+    const currentUpload = file;
+    const uploadRef = storageRef.child(
+      `${uid}/tiles/${floorId}/${currentUpload.name}`
+    );
+    uploadRef
+      .put(currentUpload)
+      .then(snapshot => {
+        snapshot.ref
+          .getDownloadURL()
+          .then(url => {
+            resolve({ downloadUrl: url, fileName: currentUpload.name });
+          })
+          .catch(err => reject(err));
+      })
+      .catch(err => reject(err));
+  });
+};
+
+export const createTile = tileData => (dispatch, getState) => {
+  const floorCopy = { ...getState().floors[tileData.floorId] };
+  const tileCopy = { ...floorCopy.tiles };
+  const tileDataCopy = { ...tileData };
+  delete tileDataCopy.selectedFile;
+  delete tileDataCopy.selectedFileUrl;
+
+  return new Promise((resolve, reject) => {
+    uploadImage(
+      tileData.selectedFile,
+      getState().login.user.uid,
+      tileData.floorId
+    )
+      .then(imageInformation => {
+        tileCopy[tileData.id] = {
+          ...tileCopy[tileData.id],
+          ...imageInformation,
+          ...tileDataCopy
+        };
+
+        database
+          .collection('floors')
+          .doc(tileData.floorId)
+          .update({
+            ...floorCopy,
+            tiles: { ...tileCopy }
+          })
+          .then(res => {
+            resolve(res);
+          })
+          .catch(error => {
+            reject('Error writing document: ', error);
+          });
+      })
+      .catch(err => {
+        reject('Error writing document: ', err);
       });
   });
 };

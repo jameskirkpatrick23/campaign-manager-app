@@ -110,7 +110,7 @@ const generatePromiseArray = (collection, uid, type) => {
     return new Promise((resolve, reject) => {
       const currentUpload = collection[key];
       const uploadRef = storageRef.child(
-        `places/${uid}/${type}/${currentUpload.name}`
+        `${uid}/places/${type}/${currentUpload.name}`
       );
       uploadRef
         .put(currentUpload)
@@ -169,7 +169,9 @@ export const createPlace = placeData => (dispatch, getState) => {
                   npcIds: placeData.npcIds,
                   questIds: placeData.questIds,
                   placeIds: placeData.placeIds,
+                  createdAt: firebase.firestore.Timestamp.now(),
                   floorIds: [],
+                  noteIds: [],
                   eventIds: placeData.eventIds,
                   campaignIds: [currentCampaign.id],
                   images: uploadedImages,
@@ -199,6 +201,21 @@ export const createPlace = placeData => (dispatch, getState) => {
       })
       .catch(err => {
         console.error('Something went wrong while trying upload images:', err);
+      });
+  });
+};
+
+export const updatePlaceNotes = (noteId, placeId) => {
+  return new Promise((resolve, reject) => {
+    database
+      .collection(`places`)
+      .doc(placeId)
+      .update({ noteIds: firebase.firestore.FieldValue.arrayUnion(noteId) })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
       });
   });
 };

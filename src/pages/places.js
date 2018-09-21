@@ -19,6 +19,7 @@ class Places extends Component {
       }
     };
     this.formatPlacesByType = this.formatPlacesByType.bind(this);
+    this.getPlaceImage = this.getPlaceImage.bind(this);
   }
 
   formatPlacesByType(props) {
@@ -79,6 +80,13 @@ class Places extends Component {
     });
   }
 
+  getPlaceImage = place => {
+    if (place.images.length) {
+      return place.images[0].downloadUrl;
+    }
+    return require('../assets/placeholder-location.png');
+  };
+
   renderPlaces(places) {
     const { currentCampaign } = this.props;
     if (!places)
@@ -102,12 +110,7 @@ class Places extends Component {
               <Panel.Title componentClass="h3">{place.name}</Panel.Title>
             </Panel.Heading>
             <Panel.Body className="padding-0">
-              <Image
-                src={
-                  place.images[0].downloadUrl ||
-                  require('../assets/placeholder-location.png')
-                }
-              />
+              <Image src={this.getPlaceImage(place)} />
             </Panel.Body>
           </Panel>
         </Col>

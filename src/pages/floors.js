@@ -11,13 +11,17 @@ class Floors extends Component {
     this.state = {
       selectedFloors: {},
       floorFormOpen: false,
-      tileFormOpen: false
+      tileFormOpen: false,
+      selectedFloor: { tiles: {} },
+      selectedRow: 1,
+      selectedCol: 1
     };
     this.renderFloor = this.renderFloor.bind(this);
     this.showFloorForm = this.showFloorForm.bind(this);
     this.hideFloorForm = this.hideFloorForm.bind(this);
     this.renderTileRowCols = this.renderTileRowCols.bind(this);
     this.setSelectedFloors = this.setSelectedFloors.bind(this);
+    this.renderTileModal = this.renderTileModal.bind(this);
   }
 
   setSelectedFloors = props => {
@@ -48,40 +52,25 @@ class Floors extends Component {
     this.setState({ floorFormOpen: false });
   };
 
-  getTileSize = columns => {
-    let numColumns = 12;
-    switch (columns) {
-      case 1:
-        numColumns = 12;
-        break;
-      case 2:
-        numColumns = 6;
-        break;
-      case 3:
-        numColumns = 4;
-        break;
-      case 4:
-        numColumns = 3;
-        break;
-      case 5:
-      case 6:
-        numColumns = 2;
-        break;
-      default:
-        numColumns = 1;
-        break;
-    }
-    return numColumns;
+  openTileForm = (floor, rowNumber, colNumber) => {
+    this.setState({
+      tileFormOpen: true,
+      selectedFloor: floor,
+      selectedRow: rowNumber,
+      selectedCol: colNumber
+    });
   };
 
-  openTileForm = () => {
-    this.setState({ tileFormOpen: true });
-  };
-
-  renderTileForm = (floor, row, col) => {
+  renderTileModal = () => {
+    const {
+      selectedFloor,
+      selectedRow,
+      tileFormOpen,
+      selectedCol
+    } = this.state;
     return (
       <Modal
-        show={this.state.tileFormOpen}
+        show={tileFormOpen}
         onHide={() => this.setState({ tileFormOpen: false })}
         bsSize="lg"
         aria-labelledby="floor-modal-title-lg"
@@ -91,11 +80,11 @@ class Floors extends Component {
         </Modal.Header>
         <Modal.Body>
           <TileForm
-            tile={floor.tiles[`${row}${col}`]}
-            floor={floor}
-            row={row}
-            col={col}
-            onCancel={() => this.setState({ tileFormOpen: false })}
+            tile={selectedFloor.tiles[`${selectedRow}${selectedCol}`]}
+            floor={selectedFloor}
+            row={selectedRow}
+            col={selectedCol}
+            onClose={() => this.setState({ tileFormOpen: false })}
           />
         </Modal.Body>
       </Modal>
@@ -103,25 +92,24 @@ class Floors extends Component {
   };
 
   renderTileRowCols = floor => {
-    const cols = Array.from(Array(floor.numRows).keys());
-    const rows = Array.from(Array(floor.numCols).keys());
+    const cols = Array.from(Array(floor.rows).keys());
+    const rows = Array.from(Array(floor.cols).keys());
     return rows.map(rowNumber => {
       return (
         <Row key={`floor-${floor.name}-row-${rowNumber}`}>
           {cols.map(colNumber => {
             return (
               <Col
+                className="margin-vertical-1"
                 key={`floor-${floor.name}-row-${rowNumber}-col-${colNumber}`}
-                xs={this.getTileSize(cols.length)}
+                xs={2}
                 onClick={() => this.setState({ tileFormOpen: true })}
               >
-                {this.renderTileForm(floor, rowNumber, colNumber)}
-                <img
-                  onClick={() => this.openTileForm()}
+                <div
+                  onClick={() => this.openTileForm(floor, rowNumber, colNumber)}
                   style={{
-                    height: 75,
-                    width: 75,
-                    margin: 10,
+                    height: 100,
+                    width: '100%',
                     backgroundColor: 'grey'
                   }}
                   src=""
@@ -190,6 +178,7 @@ class Floors extends Component {
             <Col xs={4} xsOffset={8}>
               <Button onClick={this.showFloorForm}>Create</Button>
             </Col>
+            {this.renderTileModal()}
             {this.renderFloorForm()}
           </Row>
           {!hasFloors && (

@@ -7,6 +7,7 @@ import PlaceReducer from './places';
 import TagReducer from './tag';
 import EventReducer from './events';
 import FloorReducer from './floors';
+import NoteReducer from './notes';
 
 export default combineReducers({
   login: LoginReducer,
@@ -16,5 +17,6 @@ export default combineReducers({
   places: PlaceReducer,
   tags: TagReducer,
   events: EventReducer,
-  floors: FloorReducer
+  floors: FloorReducer,
+  notes: NoteReducer
 });

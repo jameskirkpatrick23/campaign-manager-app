@@ -1,5 +1,6 @@
 import * as constants from '../constants';
 import database from '../../firebase';
+import firebase from 'firebase';
 
 //<editor-fold Tags>
 
@@ -15,6 +16,7 @@ export const createTag = tagName => (dispatch, getState) => {
       .collection(`tags`)
       .add({
         name: tagName,
+        createdAt: firebase.firestore.Timestamp.now(),
         creatorId: getState().login.user.uid,
         collaboratorIds: []
       })

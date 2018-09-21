@@ -6,12 +6,17 @@ import { Row, Col, Grid, Button } from 'react-bootstrap';
 import * as CampaignActions from '../redux/actions/campaigns';
 
 class CampaignPage extends Component {
-  componentWillMount() {}
-
-  routeToCampaign(campaign, key) {
+  routeToCampaign = (campaign, key) => {
     this.props.setCurrentCampaign({ ...campaign, id: key });
     this.props.history.push(`/campaigns/${key}/home`);
-  }
+  };
+
+  getCampaignImage = currentCampaign => {
+    if (currentCampaign.images.length) {
+      return currentCampaign.images[0].downloadUrl;
+    }
+    return require('../assets/placeholder-location.png');
+  };
 
   renderCampaigns() {
     const { campaigns } = this.props;
@@ -24,7 +29,7 @@ class CampaignPage extends Component {
             <Row>
               <Col xs={4}>
                 <img
-                  src={currentCampaign.imageRef}
+                  src={this.getCampaignImage(currentCampaign)}
                   // style={{width: 200, height: 200}}
                   alt=""
                 />
@@ -58,7 +63,7 @@ class CampaignPage extends Component {
                 </Button>
               </Col>
               <Col xs={4}>
-                <img src={currentCampaign.images[0].downloadUrl} alt="" />
+                <img src={this.getCampaignImage(currentCampaign)} alt="" />
               </Col>
             </Row>
             <hr />

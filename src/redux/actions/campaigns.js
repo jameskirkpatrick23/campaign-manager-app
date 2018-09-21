@@ -5,6 +5,8 @@ import * as TagActions from './tags';
 import * as NPCActions from './npcs';
 import * as QuestActions from './quests';
 import * as FloorActions from './floors';
+import * as NoteActions from './notes';
+import firebase from 'firebase';
 
 const setListenerFor = (ref, callback, dispatch) => {
   ref.onSnapshot(snapshot => {
@@ -14,37 +16,37 @@ const setListenerFor = (ref, callback, dispatch) => {
   });
 };
 
-export const setListeners = campaignId => (dispatch, getState) => {
-  let npcRef = database
-    .collection(`npcs`)
-    .where('creatorId', '==', getState().login.user.uid);
+export const setListeners = () => (dispatch, getState) => {
+  const userUid = getState().login.user.uid;
+  let npcRef = database.collection(`npcs`).where('creatorId', '==', userUid);
   dispatch({ type: constants.Npc.SET_NPCS_LISTENER });
   setListenerFor(npcRef, NPCActions.updateNPCsList, dispatch);
   let placesRef = database
     .collection(`places`)
-    .where('creatorId', '==', getState().login.user.uid);
+    .where('creatorId', '==', userUid);
   dispatch({ type: constants.Place.SET_PLACES_LISTENER });
   setListenerFor(placesRef, PlacesActions.updatePlacesList, dispatch);
   let floorsRef = database
     .collection(`floors`)
-    .where('creatorId', '==', getState().login.user.uid);
+    .where('creatorId', '==', userUid);
   dispatch({ type: constants.Floor.SET_FLOORS_LISTENER });
   setListenerFor(floorsRef, FloorActions.updateFloorsList, dispatch);
   let placeTypesRef = database
     .collection('placeTypes')
-    .where('creatorId', '==', getState().login.user.uid);
+    .where('creatorId', '==', userUid);
   dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER });
   setListenerFor(placeTypesRef, PlacesActions.updatePlaceTypesList, dispatch);
-  let tagsRef = database
-    .collection('tags')
-    .where('creatorId', '==', getState().login.user.uid);
+  let tagsRef = database.collection('tags').where('creatorId', '==', userUid);
   dispatch({ type: constants.Tag.SET_TAGS_LISTENER });
   setListenerFor(tagsRef, TagActions.updateTagList, dispatch);
   let questsRef = database
     .collection(`quests`)
-    .where('creatorId', '==', getState().login.user.uid);
+    .where('creatorId', '==', userUid);
   dispatch({ type: constants.Quest.SET_QUESTS_LISTENER });
   setListenerFor(questsRef, QuestActions.updateQuestsList, dispatch);
+  let notesRef = database.collection(`notes`).where('creatorId', '==', userUid);
+  dispatch({ type: constants.Note.SET_NOTES_LISTENER });
+  setListenerFor(notesRef, NoteActions.updateNotesList, dispatch);
 };
 
 export const setCurrentCampaign = campaign => dispatch => {
@@ -137,7 +139,7 @@ export const deleteCampaign = campaign => dispatch => {
 export const createCampaign = campaignData => (dispatch, getState) => {
   const storageRef = app.storage().ref();
   const imagesRef = storageRef.child(
-    `campaigns/${getState().login.user.uid}/${campaignData.image.name}`
+    `${getState().login.user.uid}/campaigns/${campaignData.image.name}`
   );
   dispatch({ type: constants.Campaign.CREATING_CAMPAIGN, data: campaignData });
   return new Promise((resolve, reject) => {
@@ -149,6 +151,7 @@ export const createCampaign = campaignData => (dispatch, getState) => {
             name: campaignData.name,
             creatorId: getState().login.user.uid,
             collaboratorIds: [],
+            createdAt: firebase.firestore.Timestamp.now(),
             description: campaignData.description,
             images: {
               '0': {
