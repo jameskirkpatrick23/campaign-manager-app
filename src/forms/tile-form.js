@@ -30,7 +30,7 @@ class TileForm extends Component {
     this.props
       .createTile({ ...this.state, ...data })
       .then(res => {
-        console.log('made it!', res);
+        this.props.onClose(res);
       })
       .catch(err => {
         console.error('oh god no', err);

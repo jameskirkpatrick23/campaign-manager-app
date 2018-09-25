@@ -82,6 +82,9 @@ class Notes extends Component {
                   onClick={() => this.showNote(foundNote)}
                 >
                   <span className="truncate">{foundNote.description}</span>
+                  <span>
+                    Created: {new Date(foundNote.createdAt).toLocaleString()}
+                  </span>
                 </ListGroupItem>
               );
             })}

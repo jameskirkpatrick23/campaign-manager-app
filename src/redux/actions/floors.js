@@ -70,11 +70,7 @@ const uploadImage = (file, uid, floorId) => {
 };
 
 export const createTile = tileData => (dispatch, getState) => {
-  const floorCopy = { ...getState().floors[tileData.floorId] };
-  const tileCopy = { ...floorCopy.tiles };
-  const tileDataCopy = { ...tileData };
-  delete tileDataCopy.selectedFile;
-  delete tileDataCopy.selectedFileUrl;
+  const floorCopy = { ...getState().floors.all[tileData.floorId] };
 
   return new Promise((resolve, reject) => {
     uploadImage(
@@ -83,8 +79,12 @@ export const createTile = tileData => (dispatch, getState) => {
       tileData.floorId
     )
       .then(imageInformation => {
-        tileCopy[tileData.id] = {
-          ...tileCopy[tileData.id],
+        const tileDataCopy = { ...tileData };
+        delete tileDataCopy.selectedFile;
+        delete tileDataCopy.selectedFileUrl;
+
+        floorCopy.tiles[tileDataCopy.id] = {
+          ...floorCopy.tiles[tileDataCopy.id],
           ...imageInformation,
           ...tileDataCopy
         };
@@ -92,10 +92,7 @@ export const createTile = tileData => (dispatch, getState) => {
         database
           .collection('floors')
           .doc(tileData.floorId)
-          .update({
-            ...floorCopy,
-            tiles: { ...tileCopy }
-          })
+          .update({ ...floorCopy })
           .then(res => {
             resolve(res);
           })

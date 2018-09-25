@@ -5,7 +5,7 @@ import firebase from 'firebase';
 
 export const updateNotesList = note => (dispatch, getState) => {
   const updatedState = { ...getState().notes.all };
-  updatedState[note.id] = note;
+  updatedState[note.id] = { ...note, createdAt: note.createdAt.toDate() };
   dispatch({ type: constants.Note.UPDATE_NOTE_LIST, notes: updatedState });
 };
 

@@ -91,6 +91,34 @@ class Floors extends Component {
     );
   };
 
+  conditionallyRenderTileOrImage(floor, row, col) {
+    const foundTile = floor.tiles[`${row}${col}`];
+    if (foundTile && foundTile.downloadUrl) {
+      return (
+        <img
+          src={foundTile.downloadUrl}
+          alt={foundTile.fileName}
+          onClick={() => this.openTileForm(floor, row, col)}
+          style={{
+            height: 100,
+            width: '100%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <div
+          onClick={() => this.openTileForm(floor, row, col)}
+          style={{
+            height: 100,
+            width: '100%',
+            backgroundColor: 'grey'
+          }}
+        />
+      );
+    }
+  }
+
   renderTileRowCols = floor => {
     const cols = Array.from(Array(floor.rows).keys());
     const rows = Array.from(Array(floor.cols).keys());
@@ -105,15 +133,11 @@ class Floors extends Component {
                 xs={2}
                 onClick={() => this.setState({ tileFormOpen: true })}
               >
-                <div
-                  onClick={() => this.openTileForm(floor, rowNumber, colNumber)}
-                  style={{
-                    height: 100,
-                    width: '100%',
-                    backgroundColor: 'grey'
-                  }}
-                  src=""
-                />
+                {this.conditionallyRenderTileOrImage(
+                  floor,
+                  rowNumber,
+                  colNumber
+                )}
               </Col>
             );
           })}
