@@ -43,9 +43,13 @@ class PlaceDetails extends Component {
   };
 
   componentWillReceiveProps = nextProps => {
-    if (this.props.places !== nextProps.places) {
-      const placeId = nextProps.match.params.place_id;
-      this.setState({ place: nextProps.places[placeId] }, () => {
+    const placeId = nextProps.match.params.place_id;
+    const foundPlace = nextProps.places[placeId];
+    if (
+      this.props.places !== nextProps.places ||
+      foundPlace !== this.props.places[placeId]
+    ) {
+      this.setState({ place: foundPlace }, () => {
         this.findRelatedObjects(nextProps);
       });
     }

@@ -220,4 +220,19 @@ export const updatePlaceNotes = (noteId, placeId) => {
   });
 };
 
+export const removePlaceNotes = (placeId, noteId) => {
+  return new Promise((resolve, reject) => {
+    database
+      .collection(`places`)
+      .doc(placeId)
+      .update({ noteIds: firebase.firestore.FieldValue.arrayRemove(noteId) })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+};
+
 //</editor-fold>

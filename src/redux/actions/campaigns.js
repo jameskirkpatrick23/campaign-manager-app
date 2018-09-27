@@ -127,7 +127,6 @@ export const deleteCampaign = campaign => dispatch => {
       .then(res => {
         dispatch(removeCampaignFromList(campaign.id));
         resolve(res);
-        console.log('Campaign deleted successfully');
       })
       .catch(err => {
         console.error('Something went wrong while trying to delete:', err);

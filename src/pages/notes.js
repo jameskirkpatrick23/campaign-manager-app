@@ -5,16 +5,21 @@ import {
   ListGroupItem,
   Button,
   Modal,
+  Row,
+  Col,
   Glyphicon
 } from 'react-bootstrap';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import NoteForm from '../forms/note-form';
+import * as NoteActions from '../redux/actions/notes';
 
 class Notes extends Component {
   constructor(props) {
     super(props);
     this.state = {
       showNoteForm: false,
+      showDeleteNoteForm: false,
       showNote: false,
       note: {},
       formAction: null
@@ -24,41 +29,86 @@ class Notes extends Component {
     this.hideNoteForm = this.hideNoteForm.bind(this);
     this.showNote = this.showNote.bind(this);
     this.hideNote = this.hideNote.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
     this.renderNoteForm = this.renderNoteForm.bind(this);
+    this.renderDeleteNoteForm = this.renderDeleteNoteForm.bind(this);
+    this.hideDeleteNoteForm = this.hideDeleteNoteForm.bind(this);
     this.renderNoteModal = this.renderNoteModal.bind(this);
   }
 
-  showCreateNoteForm() {
+  showCreateNoteForm = () => {
     this.setState({ showNoteForm: true, note: {}, formAction: 'create' });
-  }
+  };
 
-  showUpdateNoteForm(note) {
+  showUpdateNoteForm = note => {
     this.setState({
       showNote: false,
       showNoteForm: true,
       note,
       formAction: 'update'
     });
-  }
+  };
 
-  hideNoteForm() {
+  hideNoteForm = () => {
     this.setState({
       showNoteForm: false,
-      selectedNote: null,
       formAction: 'create',
       note: {}
     });
-  }
+  };
 
-  showNote(note) {
-    this.setState({ showNote: true, note });
-  }
+  showDeleteNoteForm = note => {
+    this.setState({
+      showDeleteNoteForm: true,
+      showNote: false,
+      showNoteForm: false,
+      note
+    });
+  };
 
-  hideNote() {
-    this.setState({ showNote: false, note: {} });
-  }
+  hideDeleteNoteForm = () => {
+    this.setState({
+      showDeleteNoteForm: false,
+      note: {}
+    });
+  };
 
-  renderNoteForm() {
+  confirmDelete = note => {
+    const { deleteNote } = this.props;
+    deleteNote(note);
+    this.hideDeleteNoteForm();
+  };
+
+  renderDeleteNoteForm = () => {
+    const { showDeleteNoteForm, note } = this.state;
+    return (
+      <Modal show={showDeleteNoteForm} onHide={this.hideDeleteNoteForm}>
+        <Modal.Header closeButton>
+          <Modal.Title id="delete-note-form-lg">Delete Note</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col xs={12}>
+              <p>Are you sure you wish to delete this note?</p>
+              <p>Doing so will remove it from all searches.</p>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={6}>
+              <Button bsStyle="danger" onClick={() => this.confirmDelete(note)}>
+                Delete
+              </Button>
+            </Col>
+            <Col xs={6}>
+              <Button onClick={this.hideDeleteNoteForm}>Cancel</Button>
+            </Col>
+          </Row>
+        </Modal.Body>
+      </Modal>
+    );
+  };
+
+  renderNoteForm = () => {
     const { type, typeId } = this.props;
     const { showNoteForm, note, formAction } = this.state;
     return (
@@ -79,9 +129,17 @@ class Notes extends Component {
         </Modal.Body>
       </Modal>
     );
-  }
+  };
 
-  renderNoteModal() {
+  showNote = note => {
+    this.setState({ showNote: true, note });
+  };
+
+  hideNote = () => {
+    this.setState({ showNote: false, note: {} });
+  };
+
+  renderNoteModal = () => {
     const { showNote, note } = this.state;
     return (
       <Modal show={showNote} onHide={this.hideNote}>
@@ -98,6 +156,16 @@ class Notes extends Component {
                 onClick={() => this.showUpdateNoteForm(note)}
               />
             </Button>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="danger"
+            >
+              <Glyphicon
+                glyph="trash"
+                onClick={() => this.showDeleteNoteForm(note)}
+              />
+            </Button>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -105,9 +173,9 @@ class Notes extends Component {
         </Modal.Body>
       </Modal>
     );
-  }
+  };
 
-  render() {
+  render = () => {
     const { noteIds, notes } = this.props;
     return (
       <div>
@@ -133,10 +201,11 @@ class Notes extends Component {
           </ListGroup>
         )}
         {this.renderNoteModal()}
+        {this.renderDeleteNoteForm()}
         {this.renderNoteForm()}
       </div>
     );
-  }
+  };
 }
 
 Notes.defaultProps = {
@@ -149,13 +218,21 @@ Notes.propTypes = {
   typeId: PropTypes.string.isRequired
 };
 
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      deleteNote: NoteActions.deleteNote
+    },
+    dispatch
+  );
+
 const mapStateToProps = state => ({
   notes: state.notes.all
 });
 
 const NotesContainer = connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(Notes);
 
 export default NotesContainer;

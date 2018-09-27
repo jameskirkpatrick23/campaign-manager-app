@@ -19,7 +19,27 @@ const updateNoteParent = completedNote => {
   }
 };
 
+const removeNoteFromParent = (parentId, type, noteId) => {
+  switch (type) {
+    case 'place':
+      PlaceActions.removePlaceNotes(parentId, noteId);
+      return;
+    default:
+      return true;
+  }
+};
+
+const removeNoteFromList = noteId => (dispatch, getState) => {
+  const updatedState = { ...getState().notes.all };
+  delete updatedState[noteId];
+  dispatch({
+    type: constants.Note.UPDATE_NOTE_LIST,
+    notes: updatedState
+  });
+};
+
 export const createNote = noteData => (dispatch, getState) => {
+  dispatch({ type: constants.Note.CREATING_NOTE, note: noteData });
   return new Promise((resolve, reject) => {
     database
       .collection(`notes`)
@@ -43,6 +63,7 @@ export const createNote = noteData => (dispatch, getState) => {
 };
 
 export const updateNote = noteData => (dispatch, getState) => {
+  dispatch({ type: constants.Note.UPDATING_NOTE, note: noteData });
   return new Promise((resolve, reject) => {
     database
       .collection('notes')
@@ -54,6 +75,28 @@ export const updateNote = noteData => (dispatch, getState) => {
       })
       .then(res => {
         resolve(res);
+      })
+      .catch(error => {
+        reject('Error writing document: ', error);
+      });
+  });
+};
+
+export const deleteNote = note => (dispatch, getState) => {
+  dispatch({ type: constants.Note.DELETING_NOTE, note });
+
+  const foundNote = { ...note }; //we want a copy because we are going to delete the redux stores
+  return new Promise((resolve, reject) => {
+    database
+      .collection('notes')
+      .doc(foundNote.id)
+      .delete()
+      .then(res => {
+        resolve(res);
+        dispatch(
+          removeNoteFromParent(foundNote.typeId, foundNote.type, foundNote.id)
+        );
+        dispatch(removeNoteFromList(foundNote.id));
       })
       .catch(error => {
         reject('Error writing document: ', error);
