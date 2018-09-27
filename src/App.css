@@ -11,6 +11,10 @@ label {
   text-align: left;
 }
 
+.vert-text-top {
+  vertical-align: text-top;
+}
+
 .truncate {
   width: 100%;
   white-space: nowrap;

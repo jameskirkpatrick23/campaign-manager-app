@@ -28,12 +28,32 @@ export const createNote = noteData => (dispatch, getState) => {
         description: noteData.description,
         creatorId: getState().login.user.uid,
         createdAt: firebase.firestore.Timestamp.now(),
+        updatedAt: firebase.firestore.Timestamp.now(),
         type: noteData.type,
         typeId: noteData.typeId
       })
       .then(res => {
         resolve(res);
         updateNoteParent({ ...noteData, id: res.id });
+      })
+      .catch(error => {
+        reject('Error writing document: ', error);
+      });
+  });
+};
+
+export const updateNote = noteData => (dispatch, getState) => {
+  return new Promise((resolve, reject) => {
+    database
+      .collection('notes')
+      .doc(noteData.noteId)
+      .update({
+        title: noteData.title,
+        description: noteData.description,
+        updatedAt: firebase.firestore.Timestamp.now()
+      })
+      .then(res => {
+        resolve(res);
       })
       .catch(error => {
         reject('Error writing document: ', error);

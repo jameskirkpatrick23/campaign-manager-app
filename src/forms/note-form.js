@@ -24,20 +24,44 @@ class NoteForm extends Component {
     this.getValidationState = this.getValidationState.bind(this);
   }
 
+  componentWillMount() {
+    const { note } = this.props;
+    this.setState({
+      title: note.title || '',
+      description: note.description || ''
+    });
+  }
+
   onSubmit = e => {
     e.preventDefault();
-    this.props
-      .createNote({
-        ...this.state,
-        type: this.props.type,
-        typeId: this.props.typeId
-      })
-      .then(() => {
-        this.props.onClose();
-      })
-      .catch(err => {
-        alert(err);
-      });
+    if (this.props.formAction === 'create') {
+      this.props
+        .createNote({
+          ...this.state,
+          type: this.props.type,
+          typeId: this.props.typeId
+        })
+        .then(() => {
+          this.props.onClose();
+        })
+        .catch(err => {
+          alert(err);
+        });
+    } else {
+      this.props
+        .updateNote({
+          ...this.state,
+          noteId: this.props.note.id,
+          type: this.props.type,
+          typeId: this.props.typeId
+        })
+        .then(() => {
+          this.props.onClose();
+        })
+        .catch(err => {
+          alert(err);
+        });
+    }
   };
 
   getValidationState = formKey => {
@@ -101,12 +125,19 @@ class NoteForm extends Component {
 }
 
 NoteForm.defaultProps = {};
-NoteForm.propTypes = {};
+
+NoteForm.propTypes = {
+  note: PropTypes.shape({}),
+  type: PropTypes.string,
+  typeId: PropTypes.string,
+  formAction: PropTypes.string.isRequired
+};
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      createNote: NoteActions.createNote
+      createNote: NoteActions.createNote,
+      updateNote: NoteActions.updateNote
     },
     dispatch
   );

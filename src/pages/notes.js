@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ListGroup, ListGroupItem, Button, Modal } from 'react-bootstrap';
+import {
+  ListGroup,
+  ListGroupItem,
+  Button,
+  Modal,
+  Glyphicon
+} from 'react-bootstrap';
 import { connect } from 'react-redux';
 import NoteForm from '../forms/note-form';
 
@@ -10,9 +16,11 @@ class Notes extends Component {
     this.state = {
       showNoteForm: false,
       showNote: false,
-      note: {}
+      note: {},
+      formAction: null
     };
-    this.showNoteForm = this.showNoteForm.bind(this);
+    this.showCreateNoteForm = this.showCreateNoteForm.bind(this);
+    this.showUpdateNoteForm = this.showUpdateNoteForm.bind(this);
     this.hideNoteForm = this.hideNoteForm.bind(this);
     this.showNote = this.showNote.bind(this);
     this.hideNote = this.hideNote.bind(this);
@@ -20,12 +28,26 @@ class Notes extends Component {
     this.renderNoteModal = this.renderNoteModal.bind(this);
   }
 
-  showNoteForm() {
-    this.setState({ showNoteForm: true });
+  showCreateNoteForm() {
+    this.setState({ showNoteForm: true, note: {}, formAction: 'create' });
+  }
+
+  showUpdateNoteForm(note) {
+    this.setState({
+      showNote: false,
+      showNoteForm: true,
+      note,
+      formAction: 'update'
+    });
   }
 
   hideNoteForm() {
-    this.setState({ showNoteForm: false });
+    this.setState({
+      showNoteForm: false,
+      selectedNote: null,
+      formAction: 'create',
+      note: {}
+    });
   }
 
   showNote(note) {
@@ -38,14 +60,22 @@ class Notes extends Component {
 
   renderNoteForm() {
     const { type, typeId } = this.props;
-    const { showNoteForm } = this.state;
+    const { showNoteForm, note, formAction } = this.state;
     return (
       <Modal show={showNoteForm} onHide={this.hideNoteForm}>
         <Modal.Header closeButton>
-          <Modal.Title id="note-form-lg">Create Note</Modal.Title>
+          <Modal.Title id="note-form-lg">
+            {formAction === 'update' ? 'Update' : 'Create'} Note
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <NoteForm typeId={typeId} type={type} onClose={this.hideNoteForm} />
+          <NoteForm
+            typeId={typeId}
+            type={type}
+            onClose={this.hideNoteForm}
+            note={note}
+            formAction={formAction}
+          />
         </Modal.Body>
       </Modal>
     );
@@ -56,7 +86,19 @@ class Notes extends Component {
     return (
       <Modal show={showNote} onHide={this.hideNote}>
         <Modal.Header closeButton>
-          <Modal.Title id="note-title-lg">{note.title}</Modal.Title>
+          <Modal.Title id="note-title-lg">
+            <span>{note.title}</span>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="warning"
+            >
+              <Glyphicon
+                glyph="pencil"
+                onClick={() => this.showUpdateNoteForm(note)}
+              />
+            </Button>
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>{note.description}</p>
@@ -69,7 +111,7 @@ class Notes extends Component {
     const { noteIds, notes } = this.props;
     return (
       <div>
-        <Button onClick={this.showNoteForm}>Create Note</Button>
+        <Button onClick={this.showCreateNoteForm}>Create Note</Button>
         {!noteIds.length && <p>You don't have any notes, please create one</p>}
         {!!noteIds.length && (
           <ListGroup>
