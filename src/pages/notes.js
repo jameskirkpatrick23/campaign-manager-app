@@ -179,7 +179,9 @@ class Notes extends Component {
     const { noteIds, notes } = this.props;
     return (
       <div>
-        <Button onClick={this.showCreateNoteForm}>Create Note</Button>
+        <Button onClick={this.showCreateNoteForm} className="margin-bottom-1">
+          Create Note
+        </Button>
         {!noteIds.length && <p>You don't have any notes, please create one</p>}
         {!!noteIds.length && (
           <ListGroup>

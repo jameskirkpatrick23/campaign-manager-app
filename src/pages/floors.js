@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Button, Modal, Panel } from 'react-bootstrap';
+import { Row, Col, Button, Modal, Panel, Glyphicon } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import FloorForm from '../forms/floor-form';
 import TileForm from '../forms/tile-form';
@@ -10,6 +10,7 @@ class Floors extends Component {
     super(props);
     this.state = {
       selectedFloors: {},
+      floor: {},
       floorFormOpen: false,
       tileFormOpen: false,
       selectedFloor: { tiles: {} },
@@ -39,17 +40,20 @@ class Floors extends Component {
   };
 
   componentWillReceiveProps = nextProps => {
-    if (this.props.place.floorIds !== nextProps.place.floorIds) {
+    if (
+      this.props.place.floorIds !== nextProps.place.floorIds ||
+      this.props.floors !== nextProps.floors
+    ) {
       this.setSelectedFloors(nextProps);
     }
   };
 
-  showFloorForm = () => {
-    this.setState({ floorFormOpen: true });
+  showFloorForm = floor => {
+    this.setState({ floorFormOpen: true, floor });
   };
 
   hideFloorForm = () => {
-    this.setState({ floorFormOpen: false });
+    this.setState({ floorFormOpen: false, floor: {} });
   };
 
   openTileForm = (floor, rowNumber, colNumber) => {
@@ -120,8 +124,8 @@ class Floors extends Component {
   }
 
   renderTileRowCols = floor => {
-    const cols = Array.from(Array(floor.rows).keys());
-    const rows = Array.from(Array(floor.cols).keys());
+    const rows = Array.from(Array(floor.rows).keys());
+    const cols = Array.from(Array(floor.cols).keys());
     return rows.map(rowNumber => {
       return (
         <Row key={`floor-${floor.name}-row-${rowNumber}`}>
@@ -152,13 +156,36 @@ class Floors extends Component {
         <Panel bsStyle="warning" defaultExpanded={false}>
           <Panel.Heading>
             <Panel.Toggle style={{ textDecoration: 'none' }}>
-              <Panel.Title componentClass="h3">{floor.name}</Panel.Title>
+              <Panel.Title componentClass="h3">
+                <span>
+                  {floor.name}
+                  <Button
+                    className="margin-left-1 vert-text-top"
+                    bsSize="small"
+                    bsStyle="warning"
+                  >
+                    <Glyphicon
+                      glyph="pencil"
+                      onClick={() => this.showFloorForm(floor)}
+                    />
+                  </Button>
+                  <Button
+                    className="margin-left-1 vert-text-top"
+                    bsSize="small"
+                    bsStyle="danger"
+                  >
+                    <Glyphicon glyph="trash" onClick={() => {}} />
+                  </Button>
+                </span>
+              </Panel.Title>
             </Panel.Toggle>
           </Panel.Heading>
           <Panel.Collapse>
             <Panel.Body>
               <Row className="margin-bottom-1">
-                <Col xs={12}>{floor.description}</Col>
+                <Col xs={12}>
+                  <p>{floor.description}</p>
+                </Col>
               </Row>
               <Row className="margin-bottom-1">
                 <Col xs={12}>{this.renderTileRowCols(floor)}</Col>
@@ -172,9 +199,11 @@ class Floors extends Component {
 
   renderFloorForm = () => {
     const { place } = this.props;
+    const { floor, floorFormOpen } = this.state;
+    const action = Object.keys(floor).length ? 'edit' : 'create';
     return (
       <Modal
-        show={this.state.floorFormOpen}
+        show={floorFormOpen}
         onHide={this.hideFloorForm}
         bsSize="lg"
         aria-labelledby="floor-modal-title-lg"
@@ -185,7 +214,12 @@ class Floors extends Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <FloorForm placeId={place.id} onCancel={this.hideFloorForm} />
+          <FloorForm
+            placeId={place.id}
+            onCancel={this.hideFloorForm}
+            formAction={action}
+            floor={floor}
+          />
         </Modal.Body>
       </Modal>
     );
@@ -198,13 +232,14 @@ class Floors extends Component {
     return (
       <Row>
         <Col xs={12}>
-          <Row>
-            <Col xs={4} xsOffset={8}>
-              <Button onClick={this.showFloorForm}>Create</Button>
-            </Col>
-            {this.renderTileModal()}
-            {this.renderFloorForm()}
-          </Row>
+          <Button
+            onClick={() => this.showFloorForm({})}
+            className="margin-bottom-1"
+          >
+            Create Floor
+          </Button>
+          {this.renderTileModal()}
+          {this.renderFloorForm()}
           {!hasFloors && (
             <p>{place.name} does not have a layout, please create one</p>
           )}

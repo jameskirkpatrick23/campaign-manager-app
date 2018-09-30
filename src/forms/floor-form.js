@@ -21,16 +21,43 @@ class FloorForm extends Component {
     this.options = [1, 2, 3, 4, 5, 6];
   }
 
+  componentWillMount() {
+    const { floor } = this.props;
+    this.setState({
+      name: floor.name || '',
+      description: floor.description || '',
+      numRows: floor.rows || 1,
+      numCols: floor.cols || 1
+    });
+  }
+
   onSubmit = () => {
+    const {
+      createFloor,
+      updateFloor,
+      placeId,
+      onCancel,
+      formAction,
+      floor
+    } = this.props;
     this.setState({ isSubmitting: true }, () => {
-      this.props
-        .createFloor({ ...this.state, placeId: this.props.placeId })
-        .then(() => {
-          this.setState({ isSubmitting: false }, this.props.onCancel);
-        })
-        .catch(err => {
-          console.error(err);
-        });
+      if (formAction === 'create') {
+        createFloor({ ...this.state, placeId: placeId })
+          .then(() => {
+            this.setState({ isSubmitting: false }, onCancel);
+          })
+          .catch(err => {
+            console.error(err);
+          });
+      } else {
+        updateFloor({ ...this.state, placeId: placeId, floorId: floor.id })
+          .then(() => {
+            this.setState({ isSubmitting: false }, onCancel);
+          })
+          .catch(err => {
+            console.error(err);
+          });
+      }
     });
   };
 
@@ -148,6 +175,8 @@ FloorForm.defaultProps = {
   onCancel: () => {}
 };
 FloorForm.propTypes = {
+  formAction: PropTypes.string.isRequired,
+  floor: PropTypes.shape({}),
   onCancel: PropTypes.func,
   placeId: PropTypes.string.isRequired
 };
@@ -161,7 +190,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      createFloor: FloorActions.createFloor
+      createFloor: FloorActions.createFloor,
+      updateFloor: FloorActions.updateFloor
     },
     dispatch
   );
