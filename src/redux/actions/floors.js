@@ -9,6 +9,24 @@ export const updateFloorsList = floor => (dispatch, getState) => {
   dispatch({ type: constants.Floor.UPDATE_FLOOR_LIST, floors: updatedState });
 };
 
+export const updateTiles = (floor, newTiles) => (dispatch, getState) => {
+  return new Promise((resolve, reject) => {
+    database
+      .collection(`floors`)
+      .doc(floor.id)
+      .update({
+        updatedAt: firebase.firestore.Timestamp.now(),
+        tiles: newTiles //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
+      })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(error => {
+        reject('Error writing document: ', error);
+      });
+  });
+};
+
 export const updateFloor = floorData => (dispatch, getState) => {
   const currentFloorCopy = getState().floors.all[floorData.floorId];
   const tiles = { ...currentFloorCopy.tiles };

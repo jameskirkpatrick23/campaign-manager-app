@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Button, Modal, Panel, Glyphicon } from 'react-bootstrap';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as FloorActions from '../redux/actions/floors';
 import FloorForm from '../forms/floor-form';
+import Spinner from '../components/spinner';
 import TileForm from '../forms/tile-form';
 
 class Floors extends Component {
@@ -12,6 +15,9 @@ class Floors extends Component {
       selectedFloors: {},
       floor: {},
       floorFormOpen: false,
+      isReorderingTiles: false,
+      swappingFromTile: {},
+      submittingTileUpdateForm: false,
       tileFormOpen: false,
       selectedFloor: { tiles: {} },
       selectedRow: 1,
@@ -23,6 +29,8 @@ class Floors extends Component {
     this.renderTileRowCols = this.renderTileRowCols.bind(this);
     this.setSelectedFloors = this.setSelectedFloors.bind(this);
     this.renderTileModal = this.renderTileModal.bind(this);
+    this.openTileForm = this.openTileForm.bind(this);
+    this.handleTileSwap = this.handleTileSwap.bind(this);
   }
 
   setSelectedFloors = props => {
@@ -48,7 +56,9 @@ class Floors extends Component {
     }
   };
 
-  showFloorForm = floor => {
+  showFloorForm = (e, floor) => {
+    e.preventDefault();
+    e.stopPropagation();
     this.setState({ floorFormOpen: true, floor });
   };
 
@@ -95,14 +105,57 @@ class Floors extends Component {
     );
   };
 
-  conditionallyRenderTileOrImage(floor, row, col) {
+  handleTileSwap = tileInfo => {
+    if (
+      !Object.keys(this.state.swappingFromTile).length &&
+      this.state[`isReordering${tileInfo.floor.id}Tiles`]
+    ) {
+      this.setState({ swappingFromTile: { ...tileInfo } });
+    } else {
+      const { row, col, floor } = this.state.swappingFromTile;
+      const self = this;
+      if (floor.id === tileInfo.floor.id) {
+        const currentTileArrangement = { ...tileInfo.floor.tiles };
+        //set the new tile to the old tile you are swapping from
+        currentTileArrangement[`${tileInfo.row}${tileInfo.col}`] =
+          floor.tiles[`${row}${col}`];
+        //now set the old index to the swapping to tile
+        currentTileArrangement[`${row}${col}`] =
+          floor.tiles[`${tileInfo.row}${tileInfo.col}`] || {};
+        this.setState({ submittingTileUpdateForm: true }, () => {
+          self.props
+            .updateTiles(floor, currentTileArrangement)
+            .then(res => {
+              self.setState({
+                swappingFromTile: {},
+                submittingTileUpdateForm: false
+              });
+            })
+            .catch(err => {
+              console.error('Error when writing doc', err);
+            });
+        });
+      }
+    }
+  };
+
+  handleTileClick = (floor, row, col) => {
+    if (!this.state[`isReordering${floor.id}Tiles`]) {
+      this.openTileForm(floor, row, col);
+    } else {
+      this.handleTileSwap({ floor, row, col });
+    }
+  };
+
+  conditionallyRenderTileOrImage = (floor, row, col) => {
     const foundTile = floor.tiles[`${row}${col}`];
     if (foundTile && foundTile.downloadUrl) {
       return (
         <img
           src={foundTile.downloadUrl}
           alt={foundTile.fileName}
-          onClick={() => this.openTileForm(floor, row, col)}
+          id={`tile-${row}-${col}`}
+          onClick={() => this.handleTileClick(floor, row, col)}
           style={{
             height: 100,
             width: '100%'
@@ -112,7 +165,8 @@ class Floors extends Component {
     } else {
       return (
         <div
-          onClick={() => this.openTileForm(floor, row, col)}
+          id={`tile-${row}-${col}`}
+          onClick={() => this.handleTileClick(floor, row, col)}
           style={{
             height: 100,
             width: '100%',
@@ -121,7 +175,7 @@ class Floors extends Component {
         />
       );
     }
-  }
+  };
 
   renderTileRowCols = floor => {
     const rows = Array.from(Array(floor.rows).keys());
@@ -135,7 +189,6 @@ class Floors extends Component {
                 className="margin-vertical-1"
                 key={`floor-${floor.name}-row-${rowNumber}-col-${colNumber}`}
                 xs={2}
-                onClick={() => this.setState({ tileFormOpen: true })}
               >
                 {this.conditionallyRenderTileOrImage(
                   floor,
@@ -150,6 +203,43 @@ class Floors extends Component {
     });
   };
 
+  toggleTileRearrange = (e, floor) => {
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({
+      [`isReordering${floor.id}Tiles`]: !this.state[
+        `isReordering${floor.id}Tiles`
+      ],
+      swappingFromTile: {}
+    });
+  };
+
+  renderReorderInstructions = floor => {
+    if (this.state[`isReordering${floor.id}Tiles`]) {
+      return (
+        <Row className="bg-info">
+          <Col xs={10}>
+            <p>
+              To reorder your tiles, please click the tile you wish to move
+              first, then the tile you wish to switch it's position with
+            </p>
+          </Col>
+          <Col xs={2}>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsStyle="danger"
+              onClick={() =>
+                this.setState({ [`isReordering${floor.id}Tiles`]: false })
+              }
+            >
+              Cancel
+            </Button>
+          </Col>
+        </Row>
+      );
+    }
+  };
+
   renderFloor = floor => {
     return (
       <div key={floor.id}>
@@ -157,31 +247,37 @@ class Floors extends Component {
           <Panel.Heading>
             <Panel.Toggle style={{ textDecoration: 'none' }}>
               <Panel.Title componentClass="h3">
-                <span>
-                  {floor.name}
-                  <Button
-                    className="margin-left-1 vert-text-top"
-                    bsSize="small"
-                    bsStyle="warning"
-                  >
-                    <Glyphicon
-                      glyph="pencil"
-                      onClick={() => this.showFloorForm(floor)}
-                    />
-                  </Button>
-                  <Button
-                    className="margin-left-1 vert-text-top"
-                    bsSize="small"
-                    bsStyle="danger"
-                  >
-                    <Glyphicon glyph="trash" onClick={() => {}} />
-                  </Button>
-                </span>
+                {floor.name}
+                <Button
+                  className="margin-left-1 vert-text-top"
+                  bsSize="small"
+                  bsStyle="info"
+                  onClick={e => this.toggleTileRearrange(e, floor)}
+                >
+                  <Glyphicon glyph="th-large" />
+                </Button>
+                <Button
+                  className="margin-left-1 vert-text-top"
+                  bsSize="small"
+                  bsStyle="warning"
+                  onClick={e => this.showFloorForm(e, floor)}
+                >
+                  <Glyphicon glyph="pencil" />
+                </Button>
+                <Button
+                  className="margin-left-1 vert-text-top"
+                  bsSize="small"
+                  bsStyle="danger"
+                  onClick={() => {}}
+                >
+                  <Glyphicon glyph="trash" />
+                </Button>
               </Panel.Title>
             </Panel.Toggle>
           </Panel.Heading>
           <Panel.Collapse>
             <Panel.Body>
+              {this.renderReorderInstructions(floor)}
               <Row className="margin-bottom-1">
                 <Col xs={12}>
                   <p>{floor.description}</p>
@@ -227,7 +323,7 @@ class Floors extends Component {
 
   render() {
     const { place } = this.props;
-    const { selectedFloors } = this.state;
+    const { selectedFloors, submittingTileUpdateForm } = this.state;
     const hasFloors = Object.keys(selectedFloors).length;
     return (
       <Row>
@@ -238,6 +334,7 @@ class Floors extends Component {
           >
             Create Floor
           </Button>
+          <Spinner show={submittingTileUpdateForm} />
           {this.renderTileModal()}
           {this.renderFloorForm()}
           {!hasFloors && (
@@ -256,14 +353,25 @@ class Floors extends Component {
 Floors.defaultProps = {
   floorIds: []
 };
-Floors.propTypes = {};
+
+Floors.propTypes = {
+  floorIds: PropTypes.arrayOf(PropTypes.string)
+};
 
 const mapStateToProps = state => ({
   currentCampaign: state.campaigns.currentCampaign,
   floors: state.floors.all
 });
 
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      updateTiles: FloorActions.updateTiles
+    },
+    dispatch
+  );
+
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(Floors);
