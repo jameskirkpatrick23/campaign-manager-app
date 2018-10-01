@@ -127,6 +127,8 @@ const generatePromiseArray = (collection, uid, type) => {
   });
 };
 
+export const updatePlace = placeData => (dispatch, getState) => {};
+
 export const createPlace = placeData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;

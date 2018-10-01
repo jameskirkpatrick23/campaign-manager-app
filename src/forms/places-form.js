@@ -33,6 +33,11 @@ class PlacesForm extends Component {
     this.createTag = this.createTag.bind(this);
   }
 
+  componentWillMount() {
+    const { place } = this.props;
+    this.setState({ ...place });
+  }
+
   formatData(formattedData, stateKeys) {
     stateKeys.forEach(stateKey => {
       formattedData[`${stateKey}Ids`] = Object.keys(
@@ -45,14 +50,22 @@ class PlacesForm extends Component {
     e.preventDefault();
     const formattedData = { ...this.state };
     this.formatData(formattedData, ['npc', 'place', 'event', 'quest', 'tag']);
-
     this.setState({ isSubmitting: true }, () => {
-      this.props
-        .createPlace(formattedData)
-        .then(res => {
-          this.props.history.goBack();
-        })
-        .catch(err => alert(`Something went wrong: ${err}`));
+      if (this.props.formAction === 'create') {
+        this.props
+          .createPlace(formattedData)
+          .then(res => {
+            this.props.history.goBack();
+          })
+          .catch(err => alert(`Something went wrong: ${err}`));
+      } else {
+        this.props
+          .updatePlace(formattedData)
+          .then(res => {
+            this.props.onClose();
+          })
+          .catch(err => alert(`Something went wrong: ${err}`));
+      }
     });
   };
 
@@ -357,8 +370,16 @@ class PlacesForm extends Component {
   };
 }
 
-PlacesForm.defaultProps = {};
-PlacesForm.propTypes = {};
+PlacesForm.defaultProps = {
+  formAction: 'create',
+  place: {},
+  onClose: () => {}
+};
+PlacesForm.propTypes = {
+  formAction: PropTypes.string,
+  place: PropTypes.shape({}),
+  onClose: PropTypes.func
+};
 
 const mapStateToProps = state => ({
   events: state.events.all,
@@ -375,7 +396,8 @@ const mapDispatchToProps = dispatch =>
     {
       createPlaceType: PlaceActions.createPlaceType,
       createTag: TagActions.createTag,
-      createPlace: PlaceActions.createPlace
+      createPlace: PlaceActions.createPlace,
+      updatePlace: PlaceActions.updatePlace
     },
     dispatch
   );

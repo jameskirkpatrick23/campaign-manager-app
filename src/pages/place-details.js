@@ -10,10 +10,13 @@ import {
   Image,
   Tab,
   NavItem,
+  Modal,
   Nav,
+  Button,
   Glyphicon
 } from 'react-bootstrap';
 import Floors from './floors';
+import PlaceForm from '../forms/places-form';
 import Notes from './notes';
 
 class PlaceDetails extends Component {
@@ -23,7 +26,8 @@ class PlaceDetails extends Component {
       place: {},
       numRows: 1,
       numCols: 1,
-      numFloors: 1
+      numFloors: 1,
+      placeFormOpen: false
     };
     this.findRelatedObjects = this.findRelatedObjects.bind(this);
     this.renderLocationHistory = this.renderLocationHistory.bind(this);
@@ -135,6 +139,36 @@ class PlaceDetails extends Component {
     );
   };
 
+  hideFloorForm = () => {
+    this.setState({ placeFormOpen: false });
+  };
+
+  showPlaceForm = () => {
+    this.setState({ placeFormOpen: true });
+  };
+
+  renderPlaceForm = e => {
+    return (
+      <Modal
+        show={this.state.placeFormOpen}
+        onHide={this.hideFloorForm}
+        bsSize="lg"
+        aria-labelledby="floor-modal-title-lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="floor-modal-title-lg">Edit Place</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <PlaceForm
+            place={this.state.place}
+            onCancel={this.hideFloorForm}
+            formAction={'edit'}
+          />
+        </Modal.Body>
+      </Modal>
+    );
+  };
+
   renderImages = () => {
     const { place } = this.state;
 
@@ -196,11 +230,30 @@ class PlaceDetails extends Component {
     if (!place) return null;
     return (
       <Grid>
+        {this.renderPlaceForm()}
         <Row>
           <Col xs={12}>
             <Panel bsStyle="info">
               <Panel.Heading>
-                <Panel.Title componentClass="h3">{place.name}</Panel.Title>
+                <Panel.Title componentClass="h3">
+                  {place.name}
+                  <Button
+                    className="margin-left-1 vert-text-top"
+                    bsSize="small"
+                    bsStyle="warning"
+                    onClick={e => this.showPlaceForm(e)}
+                  >
+                    <Glyphicon glyph="pencil" />
+                  </Button>
+                  <Button
+                    className="margin-left-1 vert-text-top"
+                    bsSize="small"
+                    bsStyle="danger"
+                    onClick={() => {}}
+                  >
+                    <Glyphicon glyph="trash" />
+                  </Button>
+                </Panel.Title>
               </Panel.Heading>
               <Tab.Container id="place-tabs" defaultActiveKey="images">
                 <Panel.Body>
