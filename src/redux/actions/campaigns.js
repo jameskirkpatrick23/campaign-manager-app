@@ -144,6 +144,7 @@ export const createCampaign = campaignData => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     imagesRef.put(campaignData.image).then(snapshot => {
       snapshot.ref.getDownloadURL().then(url => {
+        const ref = `${Date.now()}`;
         database
           .collection('campaigns')
           .add({
@@ -155,7 +156,8 @@ export const createCampaign = campaignData => (dispatch, getState) => {
             images: {
               '0': {
                 downloadUrl: url,
-                fileName: campaignData.image.name
+                fileName: campaignData.image.name,
+                storageRef: `${getState().login.user.uid}/campaigns/${ref}`
               }
             }
           })

@@ -105,20 +105,22 @@ export const updatePlaceFloors = (placeId, floorId, dispatch) => {
 
 const generatePromiseArray = (collection, uid, type) => {
   const storageRef = app.storage().ref();
-
   return Object.keys(collection).map(key => {
     return new Promise((resolve, reject) => {
+      const ref = `${Date.now()}`;
       const currentUpload = collection[key];
-      const uploadRef = storageRef.child(
-        `${uid}/places/${type}/${currentUpload.name}`
-      );
+      const uploadRef = storageRef.child(`${uid}/places/${type}/${ref}`);
       uploadRef
         .put(currentUpload)
         .then(snapshot => {
           snapshot.ref
             .getDownloadURL()
             .then(url => {
-              resolve({ downloadUrl: url, fileName: currentUpload.name });
+              resolve({
+                downloadUrl: url,
+                fileName: currentUpload.name,
+                storageRef: `${uid}/places/${type}/${ref}`
+              });
             })
             .catch(err => reject(err));
         })
@@ -127,26 +129,177 @@ const generatePromiseArray = (collection, uid, type) => {
   });
 };
 
+const generateDeletePromiseArray = (deleteKeys, currentArray) => {
+  const storageRef = app.storage().ref();
+  const promiseArray = [];
+  for (let i = 0; i < deleteKeys.length; i++) {
+    const newPromise = new Promise((resolve, reject) => {
+      const uploadRef = storageRef.child(
+        currentArray[parseInt(deleteKeys[i], 10)].storageRef
+      );
+      uploadRef
+        .delete()
+        .then(() => {
+          resolve();
+        })
+        .catch(err => reject(err));
+    });
+    promiseArray.push(newPromise);
+  }
+  return promiseArray;
+};
+
+// const generateArrays = (options) => {
+//   const newImagePromiseArray = generatePromiseArray(
+//     options.placeData.newImages,
+//     options.userUid,
+//     'images'
+//   );
+//
+//   const newAttachedFilePromiseArray = generatePromiseArray(
+//     options.placeData.newAttachedFiles,
+//     options.userUid,
+//     'files'
+//   );
+//
+//   const deleteImagePromiseArray = generateDeletePromiseArray(
+//     options.placeData.deleteImageIndexes,
+//     options.currentPlace.images,
+//     options.userUid,
+//     'images',
+//     options.updatedImageArray,
+//   );
+//
+//   const deleteAttachedFilePromiseArray = generateDeletePromiseArray(
+//     options.placeData.deleteFileIndexes,
+//     options.currentPlace.attachedFiles,
+//     options.userUid,
+//     'files',
+//     options.updatedFileArray,
+//   );
+//
+//   return {newImagePromiseArray, newAttachedFilePromiseArray, deleteAttachedFilePromiseArray, deleteImagePromiseArray}
+// };
+
+export const editPlace = placeData => (dispatch, getState) => {
+  const userUid = getState().login.user.uid;
+  const currentPlace = getState().places.all[placeData.placeId];
+
+  // i know we need to attach these at a bare minimum
+
+  const {
+    deleteimagesKeys,
+    deleteattachedFilesKeys,
+    newImages,
+    newAttachedFiles,
+    images,
+    attachedFiles
+  } = placeData;
+
+  const deleteImageArray = generateDeletePromiseArray(
+    deleteimagesKeys,
+    currentPlace.images
+  );
+  const deleteAttachedArray = generateDeletePromiseArray(
+    deleteattachedFilesKeys,
+    currentPlace.images
+  );
+  const newImagePromiseArray = generatePromiseArray(
+    newImages,
+    userUid,
+    'images'
+  );
+  const newAttachedFilePromiseArray = generatePromiseArray(
+    newAttachedFiles,
+    userUid,
+    'attachedFiles'
+  );
+
+  let currentImages = Object.keys(images).map(key => images[key]);
+  let currentAttachedFiles = Object.keys(attachedFiles).map(
+    key => attachedFiles[key]
+  );
+  dispatch({ type: constants.Place.UPDATE_PLACE, data: placeData });
+
+  return new Promise((resolve, reject) => {
+    // make all the new images
+    return Promise.all(newImagePromiseArray)
+      .then(resolvedImages => {
+        Promise.all(newAttachedFilePromiseArray)
+          .then(resolvedFiles => {
+            Promise.all([...deleteImageArray, ...deleteAttachedArray])
+              .then(() => {
+                currentImages = currentImages.concat(resolvedImages);
+                currentAttachedFiles = currentAttachedFiles.concat(
+                  resolvedFiles
+                );
+                new Promise(() => {
+                  database
+                    .collection(`places`)
+                    .doc(placeData.placeId)
+                    .update({
+                      name: placeData.name,
+                      type: placeData.type,
+                      location: placeData.location,
+                      history: placeData.history,
+                      insideDescription: placeData.insideDescription,
+                      outsideDescription: placeData.outsideDescription,
+                      tagIds: placeData.tagIds,
+                      npcIds: placeData.npcIds,
+                      questIds: placeData.questIds,
+                      placeIds: placeData.placeIds,
+                      updatedAt: firebase.firestore.Timestamp.now(),
+                      floorIds: placeData.floorIds,
+                      noteIds: placeData.noteIds,
+                      eventIds: placeData.eventIds,
+                      images: currentImages,
+                      attachedFiles: currentAttachedFiles
+                    })
+                    .then(res => {
+                      resolve(res);
+                    })
+                    .catch(error => {
+                      reject('Error writing document: ', error);
+                    });
+                }).catch(err => {
+                  reject(err);
+                });
+              })
+              .catch(err => {
+                console.error(
+                  'Something went wrong while trying upload files:',
+                  err
+                );
+              });
+          })
+          .catch(err => {
+            console.error(
+              'Something went wrong while trying upload images:',
+              err
+            );
+          });
+      })
+      .catch(err => {
+        console.error('Something went wrong while trying upload images:', err);
+      });
+  });
+};
+
 export const createPlace = placeData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;
 
-  //take each uploaded image and each attached file. loop through them and make a promise for each.
-  //run a promise.all with that promise array, and upload each to the specific storage ref
-  //when that completes then get the download URLs for each thing
-  //attach those urls to the place you are about to save
-  //then finally save the place
-
   const imagePromiseArray = generatePromiseArray(
-    placeData.images,
+    placeData.newImages,
     userUid,
     'images'
   );
   const attachedFilePromiseArray = generatePromiseArray(
-    placeData.attachedFiles,
+    placeData.newAttachedFiles,
     userUid,
     'files'
   );
+
   dispatch({ type: constants.Place.CREATING_PLACE, data: placeData });
   return new Promise((resolve, reject) => {
     return Promise.all(imagePromiseArray)
@@ -170,6 +323,7 @@ export const createPlace = placeData => (dispatch, getState) => {
                   questIds: placeData.questIds,
                   placeIds: placeData.placeIds,
                   createdAt: firebase.firestore.Timestamp.now(),
+                  updatedAt: firebase.firestore.Timestamp.now(),
                   floorIds: [],
                   noteIds: [],
                   eventIds: placeData.eventIds,

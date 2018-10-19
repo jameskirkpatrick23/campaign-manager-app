@@ -11,9 +11,12 @@ import {
   Tab,
   NavItem,
   Nav,
-  Glyphicon
+  Glyphicon,
+  Modal,
+  Button
 } from 'react-bootstrap';
 import Floors from './floors';
+import PlaceForm from '../forms/places-form';
 import Notes from './notes';
 
 class PlaceDetails extends Component {
@@ -23,7 +26,8 @@ class PlaceDetails extends Component {
       place: {},
       numRows: 1,
       numCols: 1,
-      numFloors: 1
+      numFloors: 1,
+      placeFormOpen: false
     };
     this.findRelatedObjects = this.findRelatedObjects.bind(this);
     this.renderLocationHistory = this.renderLocationHistory.bind(this);
@@ -191,16 +195,60 @@ class PlaceDetails extends Component {
     );
   };
 
+  renderPlaceForm = () => {
+    const { place } = this.state;
+    return (
+      <Modal
+        show={this.state.placeFormOpen}
+        onHide={this.hidePlaceForm}
+        bsSize="lg"
+        aria-labelledby="place-modal-title-lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="place-modal-title-lg">Modify Place</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <PlaceForm
+            place={place}
+            onCancel={this.hidePlaceForm}
+            onSubmit={this.hidePlaceForm}
+            formAction={'edit'}
+          />
+        </Modal.Body>
+      </Modal>
+    );
+  };
+
+  showPlaceForm = e => {
+    e.preventDefault();
+    this.setState({ placeFormOpen: true });
+  };
+
+  hidePlaceForm = () => {
+    this.setState({ placeFormOpen: false });
+  };
+
   render() {
     const { place } = this.state;
     if (!place) return null;
     return (
       <Grid>
+        {this.renderPlaceForm()}
         <Row>
           <Col xs={12}>
             <Panel bsStyle="info">
               <Panel.Heading>
-                <Panel.Title componentClass="h3">{place.name}</Panel.Title>
+                <Panel.Title componentClass="h3">
+                  {place.name}
+                  <Button
+                    className="margin-left-1 vert-text-top"
+                    bsSize="small"
+                    bsStyle="warning"
+                    onClick={this.showPlaceForm}
+                  >
+                    <Glyphicon glyph="pencil" />
+                  </Button>
+                </Panel.Title>
               </Panel.Heading>
               <Tab.Container id="place-tabs" defaultActiveKey="images">
                 <Panel.Body>

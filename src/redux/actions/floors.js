@@ -108,16 +108,19 @@ const uploadImage = (file, uid, floorId) => {
 
   return new Promise((resolve, reject) => {
     const currentUpload = file;
-    const uploadRef = storageRef.child(
-      `${uid}/tiles/${floorId}/${currentUpload.name}`
-    );
+    const ref = `${Date.now()}`;
+    const uploadRef = storageRef.child(`${uid}/tiles/${floorId}/${ref}`);
     uploadRef
       .put(currentUpload)
       .then(snapshot => {
         snapshot.ref
           .getDownloadURL()
           .then(url => {
-            resolve({ downloadUrl: url, fileName: currentUpload.name });
+            resolve({
+              downloadUrl: url,
+              fileName: currentUpload.name,
+              storageRef: `${uid}/tiles/${floorId}/${ref}`
+            });
           })
           .catch(err => reject(err));
       })

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { Button, Glyphicon } from 'react-bootstrap';
 import * as PlaceActions from '../redux/actions/places';
 import * as TagActions from '../redux/actions/tags';
 import { Multiselect, DropdownList } from 'react-widgets';
@@ -12,9 +14,16 @@ class PlacesForm extends Component {
     this.state = {
       images: {},
       attachedFiles: {},
+      newImages: {},
+      newAttachedFiles: {},
+      deletenewImagesKeys: [],
+      deletenewAttachedFilesKeys: [],
+      deleteimagesKeys: [],
+      deleteattachedFilesKeys: [],
       npcIds: [],
       placeIds: [],
       eventIds: [],
+      placeId: '',
       questIds: [],
       tagIds: [],
       history: '',
@@ -28,32 +37,84 @@ class PlacesForm extends Component {
     this.createPlaceType = this.createPlaceType.bind(this);
     this.handleImageUpload = this.handleImageUpload.bind(this);
     this.handleExtraFileUpload = this.handleExtraFileUpload.bind(this);
-    this.formatData = this.formatData.bind(this);
+    this.handleCloseRequest = this.handleCloseRequest.bind(this);
+    this.handleExistingDelete = this.handleExistingDelete.bind(this);
+    this.generateFileList = this.generateFileList.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.createTag = this.createTag.bind(this);
   }
 
-  formatData(formattedData, stateKeys) {
-    stateKeys.forEach(stateKey => {
-      formattedData[`${stateKey}Ids`] = Object.keys(
-        this.state[`${stateKey}Ids`]
-      ).map(key => this.state[`${stateKey}Ids`][key].value);
+  componentWillMount() {
+    const { place } = this.props;
+    const images = {};
+    const attachedFiles = {};
+    if (place.images.length) {
+      place.images.forEach((image, index) => {
+        images[index] = image;
+      });
+    }
+    if (place.attachedFiles.length) {
+      place.attachedFiles.forEach((attachedFile, index) => {
+        attachedFiles[index] = attachedFile;
+      });
+    }
+    this.setState({
+      images: images,
+      placeId: place.id || '',
+      attachedFiles: attachedFiles,
+      npcIds: [...place.npcIds] || [],
+      placeIds: [...place.placeIds] || [],
+      floorIds: [...place.floorIds] || [],
+      noteIds: [...place.noteIds] || [],
+      eventIds: [...place.eventIds] || [],
+      questIds: [...place.questIds] || [],
+      tagIds: [...place.tagIds] || [],
+      history: place.history || '',
+      location: place.location || '',
+      name: place.name || '',
+      type: place.type || '',
+      insideDescription: place.insideDescription || '',
+      outsideDescription: place.outsideDescription || '',
+      isSubmitting: place.isSubmitting || false
     });
   }
 
   onSubmit = e => {
+    const {
+      formAction,
+      createPlace,
+      history,
+      editPlace,
+      onSubmit
+    } = this.props;
     e.preventDefault();
     const formattedData = { ...this.state };
-    this.formatData(formattedData, ['npc', 'place', 'event', 'quest', 'tag']);
-
     this.setState({ isSubmitting: true }, () => {
-      this.props
-        .createPlace(formattedData)
-        .then(res => {
-          this.props.history.goBack();
-        })
-        .catch(err => alert(`Something went wrong: ${err}`));
+      if (formAction !== 'edit') {
+        createPlace(formattedData)
+          .then(res => {
+            history.goBack();
+          })
+          .catch(err => alert(`Something went wrong: ${err}`));
+      } else {
+        editPlace(formattedData)
+          .then(res => {
+            onSubmit(res);
+            this.setState({ isSubmitting: false });
+          })
+          .catch(err => alert(`Something went wrong: ${err}`));
+      }
     });
+  };
+
+  handleCloseRequest = e => {
+    const { history, onCancel, formAction } = this.props;
+    e.preventDefault();
+    if (formAction !== 'edit') {
+      history.goBack();
+    } else {
+      onCancel();
+    }
   };
 
   createPlaceType = typeName => {
@@ -66,12 +127,41 @@ class PlacesForm extends Component {
 
   handleImageUpload = e => {
     e.preventDefault();
-    this.setState({ images: e.target.files });
+    this.setState({ newImages: e.target.files });
   };
 
   handleExtraFileUpload = e => {
     e.preventDefault();
-    this.setState({ attachedFiles: e.target.files });
+    this.setState({ newAttachedFiles: e.target.files });
+  };
+
+  handleExistingDelete = (fileKey, type) => {
+    const currentFiles = { ...this.state[type] };
+    delete currentFiles[fileKey];
+    const deleteKeys = [...this.state[`delete${type}Keys`]];
+    deleteKeys.push(fileKey);
+    this.setState({ [type]: currentFiles, [`delete${type}Keys`]: deleteKeys });
+  };
+
+  generateFileList = stateName => {
+    return Object.keys(this.state[stateName]).map(key => {
+      const currentFile = this.state[stateName][key];
+      return (
+        <div key={`place-${stateName}-${key}`}>
+          <span>
+            {currentFile.name || currentFile.fileName}
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="danger"
+              onClick={() => this.handleExistingDelete(key, stateName)}
+            >
+              <Glyphicon glyph="trash" />
+            </Button>
+          </span>
+        </div>
+      );
+    });
   };
 
   render = () => {
@@ -268,7 +358,7 @@ class PlacesForm extends Component {
             </div>
           </div>
           {/*</editor-fold>*/}
-          {/*<editor-fold Events and Images>*/}
+          {/*<editor-fold Events>*/}
           <div className="row large-unstack padding-bottom-1">
             <div className="columns">
               <label htmlFor="#events">
@@ -291,44 +381,42 @@ class PlacesForm extends Component {
                 />
               </label>
             </div>
+          </div>
+          {/*</editor-fold>*/}
+          {/*<editor-fold Other Files and Images>*/}
+          <div className="row large-unstack">
             <div className="columns">
-              <label htmlFor="#place-images">
-                Images
-                <input
-                  id="place-images"
-                  type="file"
-                  multiple
-                  accept="image/png, image/jpeg, image/svg, image/gif"
-                  onChange={this.handleImageUpload}
-                />
-                {Object.keys(this.state.images).map(key => (
-                  <p key={`place-images-${key}`}>
-                    {this.state.images[key].name}
-                  </p>
-                ))}
-              </label>
+              <label htmlFor="#place-other-files">Other Files</label>
+              <input
+                id="place-other-files"
+                type="file"
+                multiple
+                accept="image/png, image/jpeg, image/svg, image/gif, application/xhtml+xml, application/xml, application/pdf"
+                onChange={this.handleExtraFileUpload}
+              />
+              <div className="max-height-200 overflow-y-scroll overflow-x-hidden margin-bottom-1">
+                {this.generateFileList('newAttachedFiles')}
+                {this.generateFileList('attachedFiles')}
+              </div>
+            </div>
+            <div className="columns">
+              <label htmlFor="#place-images">Images</label>
+              <input
+                id="place-images"
+                type="file"
+                multiple
+                accept="image/png, image/jpeg, image/svg, image/gif"
+                onChange={this.handleImageUpload}
+              />
+              <div className="max-height-200 overflow-y-scroll overflow-x-hidden margin-bottom-1">
+                {this.generateFileList('newImages')}
+                {this.generateFileList('images')}
+              </div>
             </div>
           </div>
           {/*</editor-fold>*/}
-          {/*<editor-fold Other Files>*/}
-          <div className="row large-unstack">
-            <div className="columns">
-              <label htmlFor="#place-other-files">
-                Other Files
-                <input
-                  id="place-other-files"
-                  type="file"
-                  multiple
-                  accept="image/png, image/jpeg, image/svg, image/gif, application/xhtml+xml, application/xml, application/pdf"
-                  onChange={this.handleExtraFileUpload}
-                />
-                {Object.keys(this.state.attachedFiles).map(key => (
-                  <p key={`attached-files-${key}`}>
-                    {this.state.attachedFiles[key].name}
-                  </p>
-                ))}
-              </label>
-            </div>
+          {/*<editor-fold Submit>*/}
+          <div className="row large-unstack padding-bottom-1">
             <div className="columns">
               <div className="row large-unstack">
                 <div className="columns">
@@ -339,10 +427,7 @@ class PlacesForm extends Component {
                 <div className="columns">
                   <button
                     className="button alert expanded"
-                    onClick={e => {
-                      e.preventDefault();
-                      this.props.history.goBack();
-                    }}
+                    onClick={this.handleCloseRequest}
                   >
                     Cancel
                   </button>
@@ -357,8 +442,21 @@ class PlacesForm extends Component {
   };
 }
 
-PlacesForm.defaultProps = {};
-PlacesForm.propTypes = {};
+PlacesForm.defaultProps = {
+  place: {
+    images: [],
+    attachedFiles: []
+  },
+  formAction: 'create',
+  onSubmit: () => {},
+  onCancel: () => {}
+};
+PlacesForm.propTypes = {
+  formAction: PropTypes.string,
+  place: PropTypes.shape({}),
+  onSubmit: PropTypes.func,
+  onCancel: PropTypes.func
+};
 
 const mapStateToProps = state => ({
   events: state.events.all,
@@ -375,7 +473,8 @@ const mapDispatchToProps = dispatch =>
     {
       createPlaceType: PlaceActions.createPlaceType,
       createTag: TagActions.createTag,
-      createPlace: PlaceActions.createPlace
+      createPlace: PlaceActions.createPlace,
+      editPlace: PlaceActions.editPlace
     },
     dispatch
   );

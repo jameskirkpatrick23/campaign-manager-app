@@ -11,6 +11,10 @@ label {
   text-align: left;
 }
 
+.max-height-200 {
+  max-height: 200px;
+}
+
 .vert-text-top {
   vertical-align: text-top;
 }
