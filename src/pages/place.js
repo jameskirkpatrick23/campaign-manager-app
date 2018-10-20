@@ -160,6 +160,24 @@ class Place extends Component {
     );
   };
 
+  renderAttachedFiles = () => {
+    const { place } = this.state;
+    return (
+      <Tab.Pane eventKey="attachedFiles">
+        {place.attachedFiles &&
+          place.attachedFiles.map(file => {
+            return (
+              <div key={`${file.fileName}-${file.downloadUrl}`}>
+                <a href="#" onClick={() => window.open(file.downloadUrl)}>
+                  {file.fileName}
+                </a>
+              </div>
+            );
+          })}
+      </Tab.Pane>
+    );
+  };
+
   renderPills = () => {
     return (
       <Nav bsStyle="pills">
@@ -174,6 +192,9 @@ class Place extends Component {
         </NavItem>
         <NavItem eventKey="notes">
           <Glyphicon glyph="comment" />
+        </NavItem>
+        <NavItem eventKey="attachedFiles">
+          <Glyphicon glyph="file" />
         </NavItem>
       </Nav>
     );
@@ -273,6 +294,7 @@ class Place extends Component {
                         {this.renderLocationHistory()}
                         {this.renderFloors()}
                         {this.renderNotes()}
+                        {this.renderAttachedFiles()}
                       </Tab.Content>
                     </Col>
                   </Row>
