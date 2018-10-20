@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Spinner from '../components/spinner';
+import Spinner from '../reusable-components/spinner';
 import * as FloorActions from '../redux/actions/floors';
 import { Row, Col, Button } from 'react-bootstrap';
 import { DropdownList, Multiselect } from 'react-widgets';

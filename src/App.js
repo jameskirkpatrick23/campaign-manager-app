@@ -8,7 +8,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as LoginActions from './redux/actions/login';
 import * as CampaignActions from './redux/actions/campaigns';
-import Breadcrumbs from './components/navigation-breadcrumbs';
+import Breadcrumbs from './reusable-components/navigation-breadcrumbs';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
 class App extends Component {

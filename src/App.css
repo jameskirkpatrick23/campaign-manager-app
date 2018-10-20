@@ -2,10 +2,8 @@
 @import 'stylesheets/registration.css';
 @import 'stylesheets/splash.css';
 @import 'stylesheets/layout.css';
-@import 'stylesheets/components/column-expansion.css';
-@import 'stylesheets/components/hero.css';
-@import 'stylesheets/components/campaign-render.css';
-@import 'stylesheets/components/spinner.css';
+@import 'stylesheets/components/index.css';
+@import 'stylesheets/page-components/index.css';
 
 label {
   text-align: left;

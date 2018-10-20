@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Image } from 'react-bootstrap';
 import { Multiselect } from 'react-widgets';
-import * as FloorActions from '../redux/actions/floors';
+import * as TileActions from '../redux/actions/tiles';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import Spinner from '../reusable-components/spinner';
 
 class TileForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       selectedFile: null,
-      selectedFileUrl: null
+      downloadUrl: null,
+      isSubmitting: false
     };
     this.readURL = this.readURL.bind(this);
     this.onFileSelect = this.onFileSelect.bind(this);
@@ -21,26 +23,58 @@ class TileForm extends Component {
     );
   }
 
+  componentWillMount() {
+    const { tile } = this.props;
+    this.setState({
+      selectedFile: null,
+      downloadUrl: (tile.image && tile.image.downloadUrl) || null,
+      legend: tile.legend || '',
+      description: tile.description || '',
+      loot: tile.loot || '',
+      skillChecks: tile.skillChecks || '',
+      other: tile.other || '',
+      objectiveIds: tile.objectiveIds || []
+    });
+  }
+
   onSubmit(e) {
     e.preventDefault();
-    const data = {
-      id: `${this.props.row}${this.props.col}`,
-      floorId: this.props.floor.id
-    };
-    this.props
-      .createTile({ ...this.state, ...data })
-      .then(res => {
-        this.props.onClose(res);
-      })
-      .catch(err => {
-        console.error('oh god no', err);
-      });
+    const {
+      createTile,
+      updateTile,
+      onClose,
+      formAction,
+      row,
+      col,
+      floor,
+      tile
+    } = this.props;
+    const data = { row, col, floorId: floor.id };
+    this.setState({ isSubmitting: true }, () => {
+      if (formAction !== 'edit') {
+        createTile({ ...this.state, ...data })
+          .then(res => {
+            onClose(res);
+          })
+          .catch(err => {
+            console.error('Something went wrong while creating your tile', err);
+          });
+      } else {
+        updateTile({ ...this.state, ...data, id: tile.id })
+          .then(res => {
+            onClose(res);
+          })
+          .catch(err => {
+            console.error('Something went wrong while updating your tile', err);
+          });
+      }
+    });
   }
 
   readURL = file => {
     const reader = new FileReader();
     reader.onload = e => {
-      this.setState({ selectedFileUrl: e.target.result });
+      this.setState({ downloadUrl: e.target.result });
     };
     reader.readAsDataURL(file);
   };
@@ -70,9 +104,10 @@ class TileForm extends Component {
   };
 
   render() {
-    const { floor } = this.props;
+    const { floor, tile } = this.props;
     return (
       <div>
+        <Spinner show={this.state.isSubmitting} />
         <form onSubmit={this.onSubmit}>
           <Row>
             <Col xs={12} sm={6}>
@@ -82,14 +117,14 @@ class TileForm extends Component {
                   <input
                     id="tile-image"
                     type="file"
-                    required
+                    required={!Object.keys(tile)}
                     onChange={this.onFileSelect}
                   />
                 </Col>
               </Row>
               <Row>
                 <Col>
-                  <img src={this.state.selectedFileUrl} alt="" />
+                  <Image src={this.state.downloadUrl} alt="" />
                 </Col>
               </Row>
             </Col>
@@ -171,14 +206,14 @@ class TileForm extends Component {
                     <Multiselect
                       id="tile-objectives"
                       data={this.getFormattedQuestObjectives()}
-                      value={this.state.selectedObjectives}
+                      value={this.state.objectiveIds}
                       textField="name"
                       valueField="value"
                       allowCreate={false}
                       placeholder="What objectives can be completed here?"
                       caseSensitive={false}
                       onChange={dataItems =>
-                        this.setState({ selectedObjectives: dataItems })
+                        this.setState({ objectiveIds: dataItems })
                       }
                       minLength={3}
                       filter="contains"
@@ -208,14 +243,24 @@ class TileForm extends Component {
   }
 }
 
-TileForm.defaultProps = {};
+TileForm.defaultProps = {
+  tile: {
+    image: {}
+  },
+  formAction: 'create',
+  createTile: () => {},
+  updateTile: () => {}
+};
 
 TileForm.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
+  formAction: PropTypes.string,
   onClose: PropTypes.func,
   createTile: PropTypes.func,
+  updateTile: PropTypes.func,
   floor: PropTypes.shape({}).isRequired,
+  tile: PropTypes.shape({}),
   quests: PropTypes.shape({
     objectives: PropTypes.shape({})
   }).isRequired
@@ -228,7 +273,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      createTile: FloorActions.createTile
+      createTile: TileActions.createTile,
+      updateTile: TileActions.updateTile
     },
     dispatch
   );

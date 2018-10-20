@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button, Glyphicon } from 'react-bootstrap';
+import { Button, Glyphicon, Row, Col } from 'react-bootstrap';
 import * as PlaceActions from '../redux/actions/places';
 import * as TagActions from '../redux/actions/tags';
 import { Multiselect, DropdownList } from 'react-widgets';
-import Spinner from '../components/spinner';
+import Spinner from '../reusable-components/spinner';
 
 class PlacesForm extends Component {
   constructor(props) {
@@ -170,8 +170,8 @@ class PlacesForm extends Component {
         <Spinner show={this.state.isSubmitting} />
         <form onSubmit={this.onSubmit}>
           {/*<editor-fold Name and Types>*/}
-          <div className="row large-unstack">
-            <div className="columns">
+          <Row>
+            <Col xs={6}>
               <label htmlFor="#place-name">
                 Name
                 <input
@@ -183,8 +183,8 @@ class PlacesForm extends Component {
                   onChange={e => this.setState({ name: e.target.value })}
                 />
               </label>
-            </div>
-            <div className="columns">
+            </Col>
+            <Col xs={6}>
               <label htmlFor="#place-type">
                 Type
                 <DropdownList
@@ -202,12 +202,12 @@ class PlacesForm extends Component {
                   filter="contains"
                 />
               </label>
-            </div>
-          </div>
+            </Col>
+          </Row>
           {/*</editor-fold>*/}
           {/*<editor-fold Location, Inside, and Outside Descriptions>*/}
-          <div className="row large-unstack">
-            <div className="columns">
+          <Row>
+            <Col xs={12}>
               <label htmlFor="#place-location">
                 Location
                 <textarea
@@ -217,10 +217,10 @@ class PlacesForm extends Component {
                   onChange={e => this.setState({ location: e.target.value })}
                 />
               </label>
-            </div>
-          </div>
-          <div className="row large-unstack">
-            <div className="columns">
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12}>
               <label htmlFor="#place-inside-description">
                 Inside Description
                 <textarea
@@ -232,10 +232,10 @@ class PlacesForm extends Component {
                   }
                 />
               </label>
-            </div>
-          </div>
-          <div className="row large-unstack">
-            <div className="columns">
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12}>
               <label htmlFor="#place-outside-description">
                 Outside Description
                 <textarea
@@ -247,12 +247,12 @@ class PlacesForm extends Component {
                   }
                 />
               </label>
-            </div>
-          </div>
+            </Col>
+          </Row>
           {/*</editor-fold>*/}
           {/*<editor-fold History>*/}
-          <div className="row large-unstack">
-            <div className="columns">
+          <Row>
+            <Col xs={12}>
               <label htmlFor="#place-history">
                 History
                 <textarea
@@ -262,12 +262,12 @@ class PlacesForm extends Component {
                   onChange={e => this.setState({ history: e.target.value })}
                 />
               </label>
-            </div>
-          </div>
+            </Col>
+          </Row>
           {/*</editor-fold>*/}
           {/*<editor-fold People and Places>*/}
-          <div className="row large-unstack padding-bottom-1">
-            <div className="columns">
+          <Row className="padding-bottom-1">
+            <Col xs={6}>
               <label htmlFor="#place-places">
                 Places
                 <Multiselect
@@ -287,8 +287,8 @@ class PlacesForm extends Component {
                   filter="contains"
                 />
               </label>
-            </div>
-            <div className="columns">
+            </Col>
+            <Col xs={6}>
               <label htmlFor="#place-npcs">
                 NPCs
                 <Multiselect
@@ -301,19 +301,19 @@ class PlacesForm extends Component {
                   valueField="value"
                   value={this.state.npcIds}
                   allowCreate={false}
-                  placeholder="Do any NPCs you created live, work, or interact here?"
+                  placeholder="Do any NPCs interact here?"
                   onChange={dataItems => this.setState({ npcIds: dataItems })}
                   caseSensitive={false}
                   minLength={3}
                   filter="contains"
                 />
               </label>
-            </div>
-          </div>
+            </Col>
+          </Row>
           {/*</editor-fold>*/}
           {/*<editor-fold Quests and Tags>*/}
-          <div className="row large-unstack padding-bottom-1">
-            <div className="columns">
+          <Row className="padding-bottom-1">
+            <Col xs={6}>
               <label htmlFor="#place-quests">
                 Quests
                 <Multiselect
@@ -333,8 +333,8 @@ class PlacesForm extends Component {
                   filter="contains"
                 />
               </label>
-            </div>
-            <div className="columns">
+            </Col>
+            <Col xs={6}>
               <label htmlFor="#tags">
                 Tags
                 <Multiselect
@@ -355,12 +355,12 @@ class PlacesForm extends Component {
                   filter="contains"
                 />
               </label>
-            </div>
-          </div>
+            </Col>
+          </Row>
           {/*</editor-fold>*/}
           {/*<editor-fold Events>*/}
-          <div className="row large-unstack padding-bottom-1">
-            <div className="columns">
+          <Row className="padding-bottom-1">
+            <Col xs={6}>
               <label htmlFor="#events">
                 Events
                 <Multiselect
@@ -380,12 +380,12 @@ class PlacesForm extends Component {
                   filter="contains"
                 />
               </label>
-            </div>
-          </div>
+            </Col>
+          </Row>
           {/*</editor-fold>*/}
           {/*<editor-fold Other Files and Images>*/}
-          <div className="row large-unstack">
-            <div className="columns">
+          <Row>
+            <Col xs={6}>
               <label htmlFor="#place-other-files">Other Files</label>
               <input
                 id="place-other-files"
@@ -398,8 +398,8 @@ class PlacesForm extends Component {
                 {this.generateFileList('newAttachedFiles')}
                 {this.generateFileList('attachedFiles')}
               </div>
-            </div>
-            <div className="columns">
+            </Col>
+            <Col xs={6}>
               <label htmlFor="#place-images">Images</label>
               <input
                 id="place-images"
@@ -412,29 +412,29 @@ class PlacesForm extends Component {
                 {this.generateFileList('newImages')}
                 {this.generateFileList('images')}
               </div>
-            </div>
-          </div>
+            </Col>
+          </Row>
           {/*</editor-fold>*/}
           {/*<editor-fold Submit>*/}
-          <div className="row large-unstack padding-bottom-1">
-            <div className="columns">
-              <div className="row large-unstack">
-                <div className="columns">
+          <Row className="padding-bottom-1">
+            <Col xsOffset={6} xs={6}>
+              <Row>
+                <Col xs={6}>
                   <button type="submit" className="button expanded">
                     Submit
                   </button>
-                </div>
-                <div className="columns">
+                </Col>
+                <Col xs={6}>
                   <button
                     className="button alert expanded"
                     onClick={this.handleCloseRequest}
                   >
                     Cancel
                   </button>
-                </div>
-              </div>
-            </div>
-          </div>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
           {/*</editor-fold>*/}
         </form>
       </div>

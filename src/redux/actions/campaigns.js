@@ -5,6 +5,7 @@ import * as TagActions from './tags';
 import * as NPCActions from './npcs';
 import * as QuestActions from './quests';
 import * as FloorActions from './floors';
+import * as TileActions from './tiles';
 import * as NoteActions from './notes';
 import firebase from 'firebase';
 
@@ -47,6 +48,9 @@ export const setListeners = () => (dispatch, getState) => {
   let notesRef = database.collection(`notes`).where('creatorId', '==', userUid);
   dispatch({ type: constants.Note.SET_NOTES_LISTENER });
   setListenerFor(notesRef, NoteActions.updateNotesList, dispatch);
+  let tilesRef = database.collection(`tiles`).where('creatorId', '==', userUid);
+  dispatch({ type: constants.Tile.SET_TILES_LISTENER });
+  setListenerFor(tilesRef, TileActions.updateTileList, dispatch);
 };
 
 export const setCurrentCampaign = campaign => dispatch => {

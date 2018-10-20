@@ -103,64 +103,23 @@ export const createFloor = floorData => (dispatch, getState) => {
   });
 };
 
-const uploadImage = (file, uid, floorId) => {
-  const storageRef = app.storage().ref();
-
+export const removeTiles = (tile, floorId) => (dispatch, getState) => {
+  const usedFloor = getState().floors.all[floorId];
   return new Promise((resolve, reject) => {
-    const currentUpload = file;
-    const ref = `${Date.now()}`;
-    const uploadRef = storageRef.child(`${uid}/tiles/${floorId}/${ref}`);
-    uploadRef
-      .put(currentUpload)
-      .then(snapshot => {
-        snapshot.ref
-          .getDownloadURL()
-          .then(url => {
-            resolve({
-              downloadUrl: url,
-              fileName: currentUpload.name,
-              storageRef: `${uid}/tiles/${floorId}/${ref}`
-            });
-          })
-          .catch(err => reject(err));
+    database
+      .collection(`floors`)
+      .doc(floorId)
+      .update({
+        tiles: {
+          ...usedFloor.tiles,
+          [`${tile.row}${tile.col}`]: {}
+        }
       })
-      .catch(err => reject(err));
-  });
-};
-
-export const createTile = tileData => (dispatch, getState) => {
-  const floorCopy = { ...getState().floors.all[tileData.floorId] };
-
-  return new Promise((resolve, reject) => {
-    uploadImage(
-      tileData.selectedFile,
-      getState().login.user.uid,
-      tileData.floorId
-    )
-      .then(imageInformation => {
-        const tileDataCopy = { ...tileData };
-        delete tileDataCopy.selectedFile;
-        delete tileDataCopy.selectedFileUrl;
-
-        floorCopy.tiles[tileDataCopy.id] = {
-          ...floorCopy.tiles[tileDataCopy.id],
-          ...imageInformation,
-          ...tileDataCopy
-        };
-
-        database
-          .collection('floors')
-          .doc(tileData.floorId)
-          .update({ ...floorCopy })
-          .then(res => {
-            resolve(res);
-          })
-          .catch(error => {
-            reject('Error writing document: ', error);
-          });
+      .then(res => {
+        resolve(res);
       })
       .catch(err => {
-        reject('Error writing document: ', err);
+        reject(err);
       });
   });
 };

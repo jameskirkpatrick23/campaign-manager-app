@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import ColumnExpander from '../components/column-expansion';
+import ColumnExpander from '../reusable-components/column-expansion';
 import NPCImage from '../assets/npcImages.png';
 import QuestsImage from '../assets/dnd-adventure-1.jpeg';
 import TownsImage from '../assets/Neverwinter_cityscape.jpg';

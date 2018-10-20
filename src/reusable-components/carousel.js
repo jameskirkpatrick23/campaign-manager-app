@@ -18,10 +18,12 @@ export default class Carousel extends React.Component {
         <div className="orbit-wrapper">
           <div className="orbit-controls">
             <button className="orbit-previous">
-              <span className="show-for-sr">Previous Slide</span>&#9664;&#xFE0E;
+              <span className="show-for-sr">Previous Slide</span>
+              &#9664;&#xFE0E;
             </button>
             <button className="orbit-next">
-              <span className="show-for-sr">Next Slide</span>&#9654;&#xFE0E;
+              <span className="show-for-sr">Next Slide</span>
+              &#9654;&#xFE0E;
             </button>
           </div>
           <ul className="orbit-container">
