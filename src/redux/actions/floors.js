@@ -2,11 +2,21 @@ import * as constants from '../constants';
 import database, { app } from '../../firebase';
 import * as PlaceActions from './places';
 import firebase from 'firebase';
+import * as TileActions from './tiles';
 
 export const updateFloorsList = floor => (dispatch, getState) => {
   const updatedState = { ...getState().floors.all };
   updatedState[floor.id] = floor;
   dispatch({ type: constants.Floor.UPDATE_FLOOR_LIST, floors: updatedState });
+};
+
+const removeFloorFromList = floorId => (dispatch, getState) => {
+  const updatedState = { ...getState().floors.all };
+  delete updatedState[floorId];
+  dispatch({
+    type: constants.Floor.UPDATE_FLOOR_LIST,
+    floors: updatedState
+  });
 };
 
 export const updateTiles = (floor, newTiles) => (dispatch, getState) => {
@@ -100,6 +110,76 @@ export const createFloor = floorData => (dispatch, getState) => {
       .catch(error => {
         reject('Error writing document: ', error);
       });
+  });
+};
+
+const removeFloorFromPlace = (floorId, placeId) => {
+  return new Promise((resolve, reject) => {
+    database
+      .collection('places')
+      .doc(placeId)
+      .update({
+        floorIds: firebase.firestore.FieldValue.arrayRemove(floorId)
+      })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(error => {
+        reject(`Unable to remove floor from place ${error}`);
+      });
+  });
+};
+
+const getUsedTiles = (floor, allTiles) => {
+  const tiles = [];
+  const rows = Array.from(Array(floor.rows).keys());
+  const cols = Array.from(Array(floor.cols).keys());
+  rows.forEach(row => {
+    cols.forEach(col => {
+      let floorTile = floor.tiles[`${row}${col}`];
+      if (floorTile && floorTile.id) tiles.push({ ...allTiles[floorTile.id] });
+    });
+  });
+  return tiles;
+};
+
+export const deleteFloor = floorId => (dispatch, getState) => {
+  const usedFloor = { ...getState().floors.all[floorId] };
+  const allTiles = getState().tiles.all;
+  const usedTiles = getUsedTiles(usedFloor, allTiles);
+  const deletePromises = generateDeleteTilePromises(usedTiles, dispatch);
+  return new Promise((resolve, reject) => {
+    Promise.all(deletePromises)
+      .then(allPromRes => {
+        database
+          .collection('floors')
+          .doc(floorId)
+          .delete()
+          .then(response => {
+            removeFloorFromPlace(floorId, usedFloor.placeId)
+              .then(re => {
+                dispatch(removeFloorFromList(floorId));
+                resolve(response);
+              })
+              .catch(er => {
+                reject(
+                  `Something went wrong removing the floor from the place ${er}`
+                );
+              });
+          })
+          .catch(error => {
+            reject(`Something went wrong while deleting the floor ${error}`);
+          });
+      })
+      .catch(allPromErr => {
+        reject(`Something went wrong deleting the tiles ${allPromErr}`);
+      });
+  });
+};
+
+const generateDeleteTilePromises = (tiles, dispatch) => {
+  return tiles.map(tile => {
+    return dispatch(TileActions.deleteTile(tile));
   });
 };
 

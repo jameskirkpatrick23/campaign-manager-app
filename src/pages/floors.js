@@ -139,6 +139,7 @@ class Floors extends Component {
   };
 
   renderFloor = floor => {
+    const { deleteFloor } = this.props;
     return (
       <div key={floor.id}>
         <Panel bsStyle="warning" defaultExpanded={false}>
@@ -166,7 +167,7 @@ class Floors extends Component {
                   className="margin-left-1 vert-text-top"
                   bsSize="small"
                   bsStyle="danger"
-                  onClick={() => {}}
+                  onClick={() => deleteFloor(floor.id)}
                 >
                   <Glyphicon glyph="trash" />
                 </Button>
@@ -269,7 +270,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      updateTiles: FloorActions.updateTiles
+      updateTiles: FloorActions.updateTiles,
+      deleteFloor: FloorActions.deleteFloor
     },
     dispatch
   );

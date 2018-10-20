@@ -44,6 +44,7 @@ export const Tag = {
 
 export const Floor = {
   UPDATE_FLOOR_LIST: 'UPDATE_FLOOR_LIST',
+  DELETING_FLOOR: 'DELETING_FLOOR',
   SET_FLOORS_LISTENER: 'SET_FLOORS_LISTENER'
 };
 

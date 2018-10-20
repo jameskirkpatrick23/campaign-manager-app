@@ -26,8 +26,8 @@ const updateTileParent = (tileData, res, resolve) => (dispatch, getState) => {
     .catch(err => {});
 };
 
-const removeTileFromParent = (tile, floorId) => {
-  FloorActions.removeTiles(tile, floorId);
+const removeTileFromParent = (tile, floorId) => dispatch => {
+  dispatch(FloorActions.removeTiles(tile, floorId));
 };
 
 const removeTileFromList = tileId => (dispatch, getState) => {
@@ -40,7 +40,6 @@ const removeTileFromList = tileId => (dispatch, getState) => {
 };
 
 export const createTile = tileData => (dispatch, getState) => {
-  console.warn('inside the create');
   dispatch({ type: constants.Tile.CREATING_TILE, tile: tileData });
   return new Promise((resolve, reject) => {
     uploadImage(
@@ -119,17 +118,32 @@ export const updateTile = tileData => (dispatch, getState) => {
 
 export const deleteTile = tile => (dispatch, getState) => {
   dispatch({ type: constants.Tile.DELETING_TILE, tile });
-
+  const storageRef = app.storage().ref();
   const foundTile = { ...tile }; //we want a copy because we are going to delete the redux stores
+  const foundFloor = getState().floors.all[foundTile.floorId];
+  const floorHasTile =
+    foundFloor &&
+    Object.keys(foundFloor.tiles).find(tile => tile.id === foundTile.id);
+  //we want a copy because we are going to delete the redux stores
   return new Promise((resolve, reject) => {
     database
       .collection('tiles')
       .doc(foundTile.id)
       .delete()
       .then(res => {
-        dispatch(removeTileFromParent(foundTile, foundTile.floorId));
-        dispatch(removeTileFromList(foundTile.id));
-        resolve(res);
+        storageRef
+          .child(foundTile.image.storageRef)
+          .delete()
+          .then(deleteRes => {
+            if (floorHasTile) {
+              dispatch(removeTileFromParent(foundTile, foundTile.floorId));
+            }
+            dispatch(removeTileFromList(foundTile.id));
+            resolve(deleteRes);
+          })
+          .catch(deleteError => {
+            reject('Error deleting image from tile', deleteError);
+          });
       })
       .catch(error => {
         reject('Error writing document: ', error);
