@@ -4,7 +4,7 @@ import Home from './pages/home';
 import CampaignPage from './pages/campaigns';
 import CampaignForm from './forms/campaign-form';
 import PlacesPage from './pages/places';
-import PlaceDetails from './pages/place-details';
+import PlaceDetails from './pages/place';
 import PlacesForm from './forms/places-form';
 import NPCPage from './pages/npcs';
 import NPCForm from './forms/npc-form';

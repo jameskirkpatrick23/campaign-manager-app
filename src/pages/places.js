@@ -110,7 +110,7 @@ class Places extends Component {
               <Panel.Title componentClass="h3">{place.name}</Panel.Title>
             </Panel.Heading>
             <Panel.Body className="padding-0">
-              <Image src={this.getPlaceImage(place)} />
+              <Image src={this.getPlaceImage(place)} className="place-image" />
             </Panel.Body>
           </Panel>
         </Col>

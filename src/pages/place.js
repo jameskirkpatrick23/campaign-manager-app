@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import {
   Grid,
   Row,
@@ -18,8 +19,9 @@ import {
 import Floors from './floors';
 import PlaceForm from '../forms/places-form';
 import Notes from './notes';
+import * as PlaceActions from '../redux/actions/places';
 
-class PlaceDetails extends Component {
+class Place extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -230,6 +232,7 @@ class PlaceDetails extends Component {
 
   render() {
     const { place } = this.state;
+    const { deletePlace } = this.props;
     if (!place) return null;
     return (
       <Grid>
@@ -247,6 +250,14 @@ class PlaceDetails extends Component {
                     onClick={this.showPlaceForm}
                   >
                     <Glyphicon glyph="pencil" />
+                  </Button>
+                  <Button
+                    className="margin-left-1 vert-text-top"
+                    bsSize="small"
+                    bsStyle="danger"
+                    onClick={() => deletePlace(place)}
+                  >
+                    <Glyphicon glyph="trash" />
                   </Button>
                 </Panel.Title>
               </Panel.Heading>
@@ -278,14 +289,21 @@ class PlaceDetails extends Component {
   }
 }
 
-PlaceDetails.defaultProps = {};
-PlaceDetails.propTypes = {};
+Place.defaultProps = {};
+Place.propTypes = {};
 const mapStateToProps = state => ({
   places: state.places.all,
   currentCampaign: state.campaigns.currentCampaign
 });
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      deletePlace: PlaceActions.deletePlace
+    },
+    dispatch
+  );
 
 export default connect(
   mapStateToProps,
-  null
-)(PlaceDetails);
+  mapDispatchToProps
+)(Place);

@@ -1,6 +1,8 @@
 import * as constants from '../constants';
 import database, { app } from '../../firebase';
 import firebase from 'firebase';
+import * as FloorActions from './floors';
+import * as NoteActions from './notes';
 //<editor-fold Types>
 
 export const updatePlaceTypesList = type => (dispatch, getState) => {
@@ -66,7 +68,24 @@ const removePlaceFromList = placeId => (dispatch, getState) => {
   dispatch({ type: constants.Place.UPDATE_PLACE_LIST, places: updatedState });
 };
 
-export const deletePlace = place => (dispatch, getState) => {
+const deleteFloors = place => dispatch => {
+  place.floorIds.forEach(floorId => {
+    dispatch(FloorActions.deleteFloor(floorId));
+  });
+};
+
+export const deletePlace = place => dispatch => {
+  const usedPlace = { ...place };
+  const allImageKeys = Array.from(Array(place.images.length).keys());
+  const imagePromise = generateFileDeletePromiseArray(
+    allImageKeys,
+    place.images
+  );
+  const allFileKeys = Array.from(Array(place.attachedFiles.length).keys());
+  const filePromise = generateFileDeletePromiseArray(
+    allFileKeys,
+    place.attachedFiles
+  );
   dispatch({ type: constants.Place.DELETING_PLACE, id: place.id });
   return new Promise((resolve, reject) => {
     database
@@ -74,13 +93,21 @@ export const deletePlace = place => (dispatch, getState) => {
       .doc(`${place.id}`)
       .delete()
       .then(res => {
-        dispatch(removePlaceFromList(place.id));
-        resolve(res);
-        console.log('Place deleted successfully');
+        Promise.all([...imagePromise, ...filePromise])
+          .then(resolve => {
+            dispatch(deleteNotes(place.noteIds));
+            dispatch(removePlaceFromList(place.id));
+            dispatch(deleteFloors(usedPlace));
+            resolve(res);
+          })
+          .catch(err => {
+            reject(
+              `Failed to delete all the images and files for place ${err}`
+            );
+          });
       })
       .catch(err => {
-        console.error('Something went wrong while trying to delete:', err);
-        reject(err);
+        reject(`Something went wrong while trying to delete: ${err}`);
       });
   });
 };
@@ -129,7 +156,7 @@ const generatePromiseArray = (collection, uid, type) => {
   });
 };
 
-const generateDeletePromiseArray = (deleteKeys, currentArray) => {
+const generateFileDeletePromiseArray = (deleteKeys, currentArray) => {
   const storageRef = app.storage().ref();
   const promiseArray = [];
   for (let i = 0; i < deleteKeys.length; i++) {
@@ -149,43 +176,15 @@ const generateDeletePromiseArray = (deleteKeys, currentArray) => {
   return promiseArray;
 };
 
-// const generateArrays = (options) => {
-//   const newImagePromiseArray = generatePromiseArray(
-//     options.placeData.newImages,
-//     options.userUid,
-//     'images'
-//   );
-//
-//   const newAttachedFilePromiseArray = generatePromiseArray(
-//     options.placeData.newAttachedFiles,
-//     options.userUid,
-//     'files'
-//   );
-//
-//   const deleteImagePromiseArray = generateDeletePromiseArray(
-//     options.placeData.deleteImageIndexes,
-//     options.currentPlace.images,
-//     options.userUid,
-//     'images',
-//     options.updatedImageArray,
-//   );
-//
-//   const deleteAttachedFilePromiseArray = generateDeletePromiseArray(
-//     options.placeData.deleteFileIndexes,
-//     options.currentPlace.attachedFiles,
-//     options.userUid,
-//     'files',
-//     options.updatedFileArray,
-//   );
-//
-//   return {newImagePromiseArray, newAttachedFilePromiseArray, deleteAttachedFilePromiseArray, deleteImagePromiseArray}
-// };
+const deleteNotes = noteIds => dispatch => {
+  noteIds.forEach(noteId => {
+    dispatch(NoteActions.deleteNote({ id: noteId }));
+  });
+};
 
 export const editPlace = placeData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   const currentPlace = getState().places.all[placeData.placeId];
-
-  // i know we need to attach these at a bare minimum
 
   const {
     deleteimagesKeys,
@@ -196,11 +195,11 @@ export const editPlace = placeData => (dispatch, getState) => {
     attachedFiles
   } = placeData;
 
-  const deleteImageArray = generateDeletePromiseArray(
+  const deleteImageArray = generateFileDeletePromiseArray(
     deleteimagesKeys,
     currentPlace.images
   );
-  const deleteAttachedArray = generateDeletePromiseArray(
+  const deleteAttachedArray = generateFileDeletePromiseArray(
     deleteattachedFilesKeys,
     currentPlace.images
   );

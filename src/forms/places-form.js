@@ -445,6 +445,13 @@ class PlacesForm extends Component {
 PlacesForm.defaultProps = {
   place: {
     images: [],
+    npcIds: [],
+    placeIds: [],
+    floorIds: [],
+    noteIds: [],
+    eventIds: [],
+    questIds: [],
+    tagIds: [],
     attachedFiles: []
   },
   formAction: 'create',
