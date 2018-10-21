@@ -12,10 +12,10 @@ class CampaignPage extends Component {
   };
 
   getCampaignImage = currentCampaign => {
-    if (currentCampaign.image) {
-      return currentCampaign.image.downloadUrl;
-    }
-    return require('../assets/placeholder-location.png');
+    return (
+      (currentCampaign.image && currentCampaign.image.downloadUrl) ||
+      require('../assets/placeholder-location.png')
+    );
   };
 
   renderCampaigns() {

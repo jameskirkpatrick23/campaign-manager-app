@@ -141,12 +141,12 @@ export const deleteCampaign = campaign => dispatch => {
 
 export const createCampaign = campaignData => (dispatch, getState) => {
   const storageRef = app.storage().ref();
-  const imagesRef = storageRef.child(
-    `${getState().login.user.uid}/campaigns/${campaignData.image.name}`
-  );
   dispatch({ type: constants.Campaign.CREATING_CAMPAIGN, data: campaignData });
   return new Promise((resolve, reject) => {
     if (campaignData.image) {
+      const imagesRef = storageRef.child(
+        `${getState().login.user.uid}/campaigns/${campaignData.image.name}`
+      );
       imagesRef.put(campaignData.image).then(snapshot => {
         snapshot.ref.getDownloadURL().then(url => {
           const ref = `${Date.now()}`;
