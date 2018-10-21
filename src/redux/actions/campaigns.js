@@ -146,32 +146,51 @@ export const createCampaign = campaignData => (dispatch, getState) => {
   );
   dispatch({ type: constants.Campaign.CREATING_CAMPAIGN, data: campaignData });
   return new Promise((resolve, reject) => {
-    imagesRef.put(campaignData.image).then(snapshot => {
-      snapshot.ref.getDownloadURL().then(url => {
-        const ref = `${Date.now()}`;
-        database
-          .collection('campaigns')
-          .add({
-            name: campaignData.name,
-            creatorId: getState().login.user.uid,
-            collaboratorIds: [],
-            createdAt: firebase.firestore.Timestamp.now(),
-            description: campaignData.description,
-            images: {
-              '0': {
+    if (campaignData.image) {
+      imagesRef.put(campaignData.image).then(snapshot => {
+        snapshot.ref.getDownloadURL().then(url => {
+          const ref = `${Date.now()}`;
+          database
+            .collection('campaigns')
+            .add({
+              name: campaignData.name,
+              creatorId: getState().login.user.uid,
+              collaboratorIds: [],
+              createdAt: firebase.firestore.Timestamp.now(),
+              updatedAt: firebase.firestore.Timestamp.now(),
+              description: campaignData.description,
+              image: {
                 downloadUrl: url,
                 fileName: campaignData.image.name,
                 storageRef: `${getState().login.user.uid}/campaigns/${ref}`
               }
-            }
-          })
-          .then(res => {
-            resolve(res);
-          })
-          .catch(function(error) {
-            reject('Error writing document: ', error);
-          });
+            })
+            .then(res => {
+              resolve(res);
+            })
+            .catch(function(error) {
+              reject('Error writing document: ', error);
+            });
+        });
       });
-    });
+    } else {
+      database
+        .collection('campaigns')
+        .add({
+          name: campaignData.name,
+          creatorId: getState().login.user.uid,
+          collaboratorIds: [],
+          createdAt: firebase.firestore.Timestamp.now(),
+          updatedAt: firebase.firestore.Timestamp.now(),
+          description: campaignData.description,
+          image: {}
+        })
+        .then(res => {
+          resolve(res);
+        })
+        .catch(function(error) {
+          reject('Error writing document: ', error);
+        });
+    }
   });
 };

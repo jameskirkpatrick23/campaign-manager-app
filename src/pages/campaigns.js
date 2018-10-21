@@ -12,8 +12,8 @@ class CampaignPage extends Component {
   };
 
   getCampaignImage = currentCampaign => {
-    if (currentCampaign.images.length) {
-      return currentCampaign.images[0].downloadUrl;
+    if (currentCampaign.image) {
+      return currentCampaign.image.downloadUrl;
     }
     return require('../assets/placeholder-location.png');
   };
