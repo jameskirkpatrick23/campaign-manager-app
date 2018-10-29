@@ -90,7 +90,7 @@ class Floors extends Component {
               });
             })
             .catch(err => {
-              console.error('Error when writing doc', err);
+              console.error('Error when writing doc', err.message);
             });
         });
       }

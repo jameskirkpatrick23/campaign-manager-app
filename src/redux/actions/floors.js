@@ -3,6 +3,7 @@ import database, { app } from '../../firebase';
 import * as PlaceActions from './places';
 import firebase from 'firebase';
 import * as TileActions from './tiles';
+import { deleteTile } from './tiles';
 
 export const updateFloorsList = floor => (dispatch, getState) => {
   const updatedState = { ...getState().floors.all };
@@ -19,7 +20,7 @@ const removeFloorFromList = floorId => (dispatch, getState) => {
   });
 };
 
-export const updateTiles = (floor, newTiles) => (dispatch, getState) => {
+export const updateTiles = (floor, newTiles) => (_dispatch, _getState) => {
   return new Promise((resolve, reject) => {
     database
       .collection(`floors`)
@@ -32,23 +33,34 @@ export const updateTiles = (floor, newTiles) => (dispatch, getState) => {
         resolve(res);
       })
       .catch(error => {
-        reject('Error writing document: ', error);
+        reject('Error writing document: ', error.message);
       });
   });
 };
 
 export const updateFloor = floorData => (dispatch, getState) => {
   const currentFloorCopy = getState().floors.all[floorData.floorId];
+  const allTiles = getState().tiles.all;
   const tiles = { ...currentFloorCopy.tiles };
   const newTiles = {};
-  for (let i = 0; i < floorData.numRows; i++) {
-    for (let j = 0; j < floorData.numCols; j++) {
-      if (tiles[`${i}${j}`] === undefined) {
-        //for instance you have added a row or column
+  const makingRowsSmaller = currentFloorCopy.rows > floorData.numRows;
+  const makingColsSmaller = currentFloorCopy.cols > floorData.numCols;
+  let usedRows = makingRowsSmaller ? currentFloorCopy.rows : floorData.numRows;
+  let usedCols = makingColsSmaller ? currentFloorCopy.cols : floorData.numCols;
+
+  for (let i = 0; i < usedRows; i++) {
+    for (let j = 0; j < usedCols; j++) {
+      let findableTile = tiles[`${i}${j}`];
+      if (
+        (makingRowsSmaller && i + 1 > floorData.numRows) ||
+        (makingColsSmaller && j + 1 > floorData.numCols)
+      ) {
+        if (findableTile && findableTile.id && allTiles[findableTile.id]) {
+          dispatch(TileActions.deleteTile(allTiles[findableTile.id]));
+        }
         newTiles[`${i}${j}`] = {};
       } else {
-        //otherwise use the old data as the new one
-        newTiles[`${i}${j}`] = { ...tiles[`${i}${j}`] };
+        newTiles[`${i}${j}`] = findableTile ? { ...findableTile } : {};
       }
     }
   }
@@ -70,7 +82,7 @@ export const updateFloor = floorData => (dispatch, getState) => {
         resolve(res);
       })
       .catch(error => {
-        reject('Error writing document: ', error);
+        reject('Error writing document: ', error.message);
       });
   });
 };
@@ -108,16 +120,17 @@ export const createFloor = floorData => (dispatch, getState) => {
           });
       })
       .catch(error => {
-        reject('Error writing document: ', error);
+        reject('Error writing document: ', error.message);
       });
   });
 };
 
-const removeFloorFromPlace = (floorId, placeId) => {
+const removeFloorFromPlace = (floorId, place) => {
   return new Promise((resolve, reject) => {
+    if (!place) resolve();
     database
       .collection('places')
-      .doc(placeId)
+      .doc(place.id)
       .update({
         floorIds: firebase.firestore.FieldValue.arrayRemove(floorId)
       })
@@ -125,7 +138,7 @@ const removeFloorFromPlace = (floorId, placeId) => {
         resolve(res);
       })
       .catch(error => {
-        reject(`Unable to remove floor from place ${error}`);
+        reject(`Unable to remove floor from place ${error.message}`);
       });
   });
 };
@@ -156,23 +169,30 @@ export const deleteFloor = floorId => (dispatch, getState) => {
           .doc(floorId)
           .delete()
           .then(response => {
-            removeFloorFromPlace(floorId, usedFloor.placeId)
+            removeFloorFromPlace(
+              floorId,
+              getState().places.all[usedFloor.placeId]
+            )
               .then(re => {
                 dispatch(removeFloorFromList(floorId));
                 resolve(response);
               })
               .catch(er => {
                 reject(
-                  `Something went wrong removing the floor from the place ${er}`
+                  `Something went wrong removing the floor from the place ${
+                    er.message
+                  }`
                 );
               });
           })
           .catch(error => {
-            reject(`Something went wrong while deleting the floor ${error}`);
+            reject(
+              `Something went wrong while deleting the floor ${error.message}`
+            );
           });
       })
       .catch(allPromErr => {
-        reject(`Something went wrong deleting the tiles ${allPromErr}`);
+        reject(`Something went wrong deleting the tiles ${allPromErr.message}`);
       });
   });
 };

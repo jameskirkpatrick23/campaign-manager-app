@@ -95,14 +95,14 @@ class PlacesForm extends Component {
           .then(res => {
             history.goBack();
           })
-          .catch(err => alert(`Something went wrong: ${err}`));
+          .catch(err => alert(`Something went wrong: ${err.message}`));
       } else {
         editPlace(formattedData)
           .then(res => {
             onSubmit(res);
             this.setState({ isSubmitting: false });
           })
-          .catch(err => alert(`Something went wrong: ${err}`));
+          .catch(err => alert(`Something went wrong: ${err.message}`));
       }
     });
   };

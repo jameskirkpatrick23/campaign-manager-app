@@ -57,7 +57,10 @@ class TileForm extends Component {
             onClose(res);
           })
           .catch(err => {
-            console.error('Something went wrong while creating your tile', err);
+            console.error(
+              'Something went wrong while creating your tile',
+              err.message
+            );
           });
       } else {
         updateTile({ ...this.state, ...data, id: tile.id })
@@ -65,7 +68,10 @@ class TileForm extends Component {
             onClose(res);
           })
           .catch(err => {
-            console.error('Something went wrong while updating your tile', err);
+            console.error(
+              'Something went wrong while updating your tile',
+              err.message
+            );
           });
       }
     });

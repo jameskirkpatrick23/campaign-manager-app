@@ -36,12 +36,12 @@ class Tiles extends React.Component {
       tileFormOpen,
       selectedCol
     } = this.state;
-
     const { tiles } = this.props;
-
     const foundFloorTile = selectedFloor.tiles[`${selectedRow}${selectedCol}`];
-    const foundTile = tiles[foundFloorTile.id];
 
+    if (!foundFloorTile) return null;
+
+    const foundTile = tiles[foundFloorTile.id];
     return (
       <Modal
         show={tileFormOpen}
@@ -90,7 +90,7 @@ class Tiles extends React.Component {
               >
                 <Tile
                   tile={tiles[floor.tiles[`${rowNumber}${colNumber}`].id]}
-                  onClick={e =>
+                  onClick={() =>
                     this.handleTileClick(floor, rowNumber, colNumber)
                   }
                 />

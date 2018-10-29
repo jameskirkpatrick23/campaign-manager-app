@@ -88,26 +88,28 @@ export const deletePlace = place => dispatch => {
   );
   dispatch({ type: constants.Place.DELETING_PLACE, id: place.id });
   return new Promise((resolve, reject) => {
-    database
-      .collection(`places`)
-      .doc(`${place.id}`)
-      .delete()
-      .then(res => {
-        Promise.all([...imagePromise, ...filePromise])
-          .then(resolve => {
-            dispatch(deleteNotes(place.noteIds));
-            dispatch(removePlaceFromList(place.id));
-            dispatch(deleteFloors(usedPlace));
+    Promise.all([...imagePromise, ...filePromise])
+      .then(() => {
+        dispatch(deleteNotes(place.noteIds));
+        dispatch(removePlaceFromList(place.id));
+        dispatch(deleteFloors(usedPlace));
+        database
+          .collection(`places`)
+          .doc(`${place.id}`)
+          .delete()
+          .then(res => {
             resolve(res);
           })
           .catch(err => {
             reject(
-              `Failed to delete all the images and files for place ${err}`
+              `Something went wrong while trying to delete: ${err.message}`
             );
           });
       })
       .catch(err => {
-        reject(`Something went wrong while trying to delete: ${err}`);
+        reject(
+          `Failed to delete all the images and files for place ${err.message}`
+        );
       });
   });
 };
@@ -132,9 +134,9 @@ export const updatePlaceFloors = (placeId, floorId, dispatch) => {
 
 const generatePromiseArray = (collection, uid, type) => {
   const storageRef = app.storage().ref();
-  return Object.keys(collection).map(key => {
+  return Object.keys(collection).map((key, index) => {
     return new Promise((resolve, reject) => {
-      const ref = `${Date.now()}`;
+      const ref = `${Date.now()}${index}`;
       const currentUpload = collection[key];
       const uploadRef = storageRef.child(`${uid}/places/${type}/${ref}`);
       uploadRef
@@ -258,28 +260,31 @@ export const editPlace = placeData => (dispatch, getState) => {
                       resolve(res);
                     })
                     .catch(error => {
-                      reject('Error writing document: ', error);
+                      reject('Error writing document: ', error.message);
                     });
                 }).catch(err => {
-                  reject(err);
+                  reject(err.message);
                 });
               })
               .catch(err => {
-                console.error(
+                reject(
                   'Something went wrong while trying upload files:',
-                  err
+                  err.message
                 );
               });
           })
           .catch(err => {
-            console.error(
+            reject(
               'Something went wrong while trying upload images:',
-              err
+              err.message
             );
           });
       })
       .catch(err => {
-        console.error('Something went wrong while trying upload images:', err);
+        reject(
+          'Something went wrong while trying upload images and files:',
+          err.message
+        );
       });
   });
 };

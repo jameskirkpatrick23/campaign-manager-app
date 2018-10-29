@@ -57,7 +57,7 @@ export const createNote = noteData => (dispatch, getState) => {
         updateNoteParent({ ...noteData, id: res.id });
       })
       .catch(error => {
-        reject('Error writing document: ', error);
+        reject('Error writing document: ', error.message);
       });
   });
 };
@@ -77,7 +77,7 @@ export const updateNote = noteData => (dispatch, getState) => {
         resolve(res);
       })
       .catch(error => {
-        reject('Error writing document: ', error);
+        reject('Error writing document: ', error.message);
       });
   });
 };
@@ -99,7 +99,7 @@ export const deleteNote = note => (dispatch, getState) => {
         dispatch(removeNoteFromList(foundNote.id));
       })
       .catch(error => {
-        reject('Error writing document: ', error);
+        reject('Error writing document: ', error.message);
       });
   });
 };

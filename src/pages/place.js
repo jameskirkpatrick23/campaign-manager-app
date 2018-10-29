@@ -33,6 +33,7 @@ class Place extends Component {
     };
     this.findRelatedObjects = this.findRelatedObjects.bind(this);
     this.renderLocationHistory = this.renderLocationHistory.bind(this);
+    this.handlePlaceDelete = this.handlePlaceDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderFloors = this.renderFloors.bind(this);
   }
@@ -60,6 +61,12 @@ class Place extends Component {
       });
     }
     this.findRelatedObjects(nextProps);
+  };
+
+  handlePlaceDelete = place => {
+    const { deletePlace, history } = this.props;
+    deletePlace(place);
+    history.goBack();
   };
 
   renderLocationHistory = () => {
@@ -276,7 +283,7 @@ class Place extends Component {
                     className="margin-left-1 vert-text-top"
                     bsSize="small"
                     bsStyle="danger"
-                    onClick={() => deletePlace(place)}
+                    onClick={() => this.handlePlaceDelete(place)}
                   >
                     <Glyphicon glyph="trash" />
                   </Button>
