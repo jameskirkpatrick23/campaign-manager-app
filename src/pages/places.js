@@ -23,13 +23,15 @@ class Places extends Component {
   }
 
   formatPlacesByType(props) {
-    const placeTypes = { ...props.placeTypes };
+    const { places, placeTypes, currentCampaign } = props;
     Object.keys(placeTypes).forEach(placeTypeKey => {
       const foundPlaceType = placeTypes[placeTypeKey];
       foundPlaceType.places = {};
-      Object.keys(props.places).forEach(placeKey => {
-        if (props.places[placeKey].type === foundPlaceType.name) {
-          foundPlaceType.places[placeKey] = props.places[placeKey];
+      Object.keys(places).forEach(placeKey => {
+        if (places[placeKey].campaignIds.includes(currentCampaign.id)) {
+          if (places[placeKey].type === foundPlaceType.name) {
+            foundPlaceType.places[placeKey] = places[placeKey];
+          }
         }
       });
     });
