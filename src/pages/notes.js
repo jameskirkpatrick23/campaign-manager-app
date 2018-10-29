@@ -7,7 +7,10 @@ import {
   Modal,
   Row,
   Col,
-  Glyphicon
+  Glyphicon,
+  FormGroup,
+  InputGroup,
+  FormControl
 } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -21,12 +24,14 @@ class Notes extends Component {
       showNoteForm: false,
       showDeleteNoteForm: false,
       showNote: false,
+      searchTerm: '',
       note: {},
       formAction: null
     };
     this.showCreateNoteForm = this.showCreateNoteForm.bind(this);
     this.showUpdateNoteForm = this.showUpdateNoteForm.bind(this);
     this.hideNoteForm = this.hideNoteForm.bind(this);
+    this.onSearch = this.onSearch.bind(this);
     this.showNote = this.showNote.bind(this);
     this.hideNote = this.hideNote.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
@@ -139,6 +144,20 @@ class Notes extends Component {
     this.setState({ showNote: false, note: {} });
   };
 
+  filterNotes = () => {
+    const { searchTerm } = this.state;
+    const { notes, noteIds } = this.props;
+    return noteIds.filter(
+      noteId =>
+        notes[noteId].description.includes(searchTerm) ||
+        notes[noteId].title.includes(searchTerm)
+    );
+  };
+
+  onSearch = e => {
+    this.setState({ searchTerm: e.target.value });
+  };
+
   renderNoteModal = () => {
     const { showNote, note } = this.state;
     return (
@@ -176,13 +195,42 @@ class Notes extends Component {
   };
 
   render = () => {
-    const { noteIds, notes } = this.props;
+    const { notes } = this.props;
+    const noteIds = this.filterNotes();
+    const { searchTerm } = this.state;
     return (
       <div>
-        <Button onClick={this.showCreateNoteForm} className="margin-bottom-1">
-          Create Note
-        </Button>
-        {!noteIds.length && <p>You don't have any notes, please create one</p>}
+        <Row>
+          <Col xs={4}>
+            <Button
+              onClick={this.showCreateNoteForm}
+              className="margin-bottom-1"
+            >
+              Create Note
+            </Button>
+          </Col>
+          <Col xsOffset={2} xs={6}>
+            <FormGroup>
+              <InputGroup>
+                <InputGroup.Addon
+                  style={{ paddingRight: '25px', paddingTop: '10px' }}
+                >
+                  <Glyphicon glyph="search" />
+                </InputGroup.Addon>
+                <FormControl
+                  type="text"
+                  onChange={this.onSearch}
+                  value={searchTerm}
+                  placeholder="Search through your notes"
+                />
+              </InputGroup>
+            </FormGroup>
+          </Col>
+        </Row>
+        {!noteIds.length &&
+          !searchTerm && <p>You don't have any notes, please create one</p>}
+        {!noteIds.length &&
+          searchTerm && <p>Your search does not match any notes</p>}
         {!!noteIds.length && (
           <ListGroup>
             {noteIds.map(noteKey => {
