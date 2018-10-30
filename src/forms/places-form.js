@@ -89,6 +89,7 @@ class PlacesForm extends Component {
     } = this.props;
     e.preventDefault();
     const formattedData = { ...this.state };
+    formattedData.placeIds = formattedData.placeIds.map(item => item.value);
     this.setState({ isSubmitting: true }, () => {
       if (formAction !== 'edit') {
         createPlace(formattedData)
@@ -165,9 +166,33 @@ class PlacesForm extends Component {
   };
 
   render = () => {
+    const {
+      isSubmitting,
+      name,
+      type,
+      location,
+      insideDescription,
+      outsideDescription,
+      history,
+      placeIds,
+      npcIds,
+      questIds,
+      tagIds,
+      placeId,
+      eventIds
+    } = this.state;
+    const {
+      placeTypes,
+      places,
+      currentCampaignId,
+      npcs,
+      quests,
+      tags,
+      events
+    } = this.props;
     return (
       <div>
-        <Spinner show={this.state.isSubmitting} />
+        <Spinner show={isSubmitting} />
         <form onSubmit={this.onSubmit}>
           {/*<editor-fold Name and Types>*/}
           <Row>
@@ -178,7 +203,7 @@ class PlacesForm extends Component {
                   id="place-name"
                   type="text"
                   placeholder="Give the place a meaningful name"
-                  value={this.state.name}
+                  value={name}
                   required
                   onChange={e => this.setState({ name: e.target.value })}
                 />
@@ -189,10 +214,10 @@ class PlacesForm extends Component {
                 Type
                 <DropdownList
                   id="place-type"
-                  data={Object.keys(this.props.placeTypes).map(
-                    key => this.props.placeTypes[key].name
+                  data={Object.keys(placeTypes).map(
+                    key => placeTypes[key].name
                   )}
-                  value={this.state.type}
+                  value={type}
                   placeholder="Town, City, Underground Cavern, Castle Dungeon, etc."
                   allowCreate={'onFilter'}
                   onCreate={this.createPlaceType}
@@ -213,7 +238,7 @@ class PlacesForm extends Component {
                 <textarea
                   id="place-location"
                   placeholder="Where is this place located?"
-                  value={this.state.location}
+                  value={location}
                   onChange={e => this.setState({ location: e.target.value })}
                 />
               </label>
@@ -226,7 +251,7 @@ class PlacesForm extends Component {
                 <textarea
                   id="place-inside-description"
                   placeholder="What do the characters see, hear, smell, and even taste when they look inside this place..."
-                  value={this.state.insideDescription}
+                  value={insideDescription}
                   onChange={e =>
                     this.setState({ insideDescription: e.target.value })
                   }
@@ -241,7 +266,7 @@ class PlacesForm extends Component {
                 <textarea
                   id="place-outside-description"
                   placeholder="What do the characters see, hear, smell, and even taste when they look at this place from the outside..."
-                  value={this.state.outsideDescription}
+                  value={outsideDescription}
                   onChange={e =>
                     this.setState({ outsideDescription: e.target.value })
                   }
@@ -258,7 +283,7 @@ class PlacesForm extends Component {
                 <textarea
                   id="place-history"
                   placeholder="How did this place come to be, what happened here in the past"
-                  value={this.state.history}
+                  value={history}
                   onChange={e => this.setState({ history: e.target.value })}
                 />
               </label>
@@ -272,11 +297,18 @@ class PlacesForm extends Component {
                 Places
                 <Multiselect
                   id="place-places"
-                  data={Object.keys(this.props.places).map(key => ({
-                    name: this.props.places[key].name,
-                    value: key
-                  }))}
-                  value={this.state.placeIds}
+                  data={Object.keys(places)
+                    .filter(
+                      placeKey =>
+                        places[placeKey].campaignIds.includes(
+                          currentCampaignId
+                        ) && places[placeKey].id !== placeId
+                    )
+                    .map(key => ({
+                      name: places[key].name,
+                      value: key
+                    }))}
+                  value={placeIds}
                   placeholder="Is this place related to others you created?"
                   textField="name"
                   valueField="value"
@@ -293,13 +325,13 @@ class PlacesForm extends Component {
                 NPCs
                 <Multiselect
                   id="place-npcs"
-                  data={Object.keys(this.props.npcs).map(key => ({
-                    name: this.props.npcs[key].name,
+                  data={Object.keys(npcs).map(key => ({
+                    name: npcs[key].name,
                     value: key
                   }))}
                   textField="name"
                   valueField="value"
-                  value={this.state.npcIds}
+                  value={npcIds}
                   allowCreate={false}
                   placeholder="Do any NPCs interact here?"
                   onChange={dataItems => this.setState({ npcIds: dataItems })}
@@ -318,12 +350,12 @@ class PlacesForm extends Component {
                 Quests
                 <Multiselect
                   id="place-quests"
-                  data={Object.keys(this.props.quests).map(key => ({
-                    name: this.props.quests[key].name,
+                  data={Object.keys(quests).map(key => ({
+                    name: quests[key].name,
                     value: key
                   }))}
                   textField="name"
-                  value={this.state.questIds}
+                  value={questIds}
                   valueField="value"
                   allowCreate={false}
                   placeholder="Are there any quests that take place here?"
@@ -339,11 +371,11 @@ class PlacesForm extends Component {
                 Tags
                 <Multiselect
                   id="tags"
-                  data={Object.keys(this.props.tags).map(key => ({
-                    name: this.props.tags[key].name,
+                  data={Object.keys(tags).map(key => ({
+                    name: tags[key].name,
                     value: key
                   }))}
-                  value={this.state.tagIds}
+                  value={tagIds}
                   allowCreate={'onFilter'}
                   textField="name"
                   valueField="value"
@@ -365,11 +397,11 @@ class PlacesForm extends Component {
                 Events
                 <Multiselect
                   id="events"
-                  data={Object.keys(this.props.events).map(key => ({
-                    name: this.props.events[key].name,
+                  data={Object.keys(events).map(key => ({
+                    name: events[key].name,
                     value: key
                   }))}
-                  value={this.state.eventIds}
+                  value={eventIds}
                   textField="name"
                   valueField="value"
                   allowCreate={false}

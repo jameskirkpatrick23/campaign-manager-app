@@ -36,6 +36,8 @@ class Place extends Component {
     this.handlePlaceDelete = this.handlePlaceDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderFloors = this.renderFloors.bind(this);
+    this.renderPlaces = this.renderPlaces.bind(this);
+    this.getPlaceImage = this.getPlaceImage.bind(this);
   }
 
   findRelatedObjects = () => {
@@ -51,11 +53,9 @@ class Place extends Component {
 
   componentWillReceiveProps = nextProps => {
     const placeId = nextProps.match.params.place_id;
+    const oldPlaceId = this.props.match.params.place_id;
     const foundPlace = nextProps.places[placeId];
-    if (
-      this.props.places !== nextProps.places ||
-      foundPlace !== this.props.places[placeId]
-    ) {
+    if (this.props.places !== nextProps.places || placeId !== oldPlaceId) {
       this.setState({ place: foundPlace }, () => {
         this.findRelatedObjects(nextProps);
       });
@@ -185,25 +185,57 @@ class Place extends Component {
     );
   };
 
-  renderPills = () => {
+  getPlaceImage = place => {
+    if (place.images.length) {
+      return place.images[0].downloadUrl;
+    }
+    return require('../assets/placeholder-location.png');
+  };
+
+  renderPlaces = () => {
+    const { place } = this.state;
+    const { places, currentCampaign, history } = this.props;
     return (
-      <Nav bsStyle="pills">
-        <NavItem eventKey="images">
-          <Glyphicon glyph="picture" />
-        </NavItem>
-        <NavItem eventKey="location-history">
-          <Glyphicon glyph="book" />
-        </NavItem>
-        <NavItem eventKey="floors">
-          <Glyphicon glyph="th-large" />
-        </NavItem>
-        <NavItem eventKey="notes">
-          <Glyphicon glyph="comment" />
-        </NavItem>
-        <NavItem eventKey="attachedFiles">
-          <Glyphicon glyph="file" />
-        </NavItem>
-      </Nav>
+      <Tab.Pane eventKey="places">
+        <Row>
+          <h3>Related Places</h3>
+        </Row>
+        <Row>
+          {!place.placeIds.length && (
+            <div>
+              You have no related places. Please add some to see them here.
+            </div>
+          )}
+          {place.placeIds.map(placeKey => {
+            const foundPlace = places[placeKey];
+            const placeRoute = `/campaigns/${
+              currentCampaign.id
+            }/home/places/${placeKey}`;
+            if (foundPlace)
+              return (
+                <Col xs={4} key={`place-${placeKey}`}>
+                  <Panel
+                    bsStyle="warning"
+                    className="place-card clickable"
+                    onClick={() => history.push(placeRoute)}
+                  >
+                    <Panel.Heading>
+                      <Panel.Title componentClass="h3">
+                        {foundPlace.name}
+                      </Panel.Title>
+                    </Panel.Heading>
+                    <Panel.Body className="padding-0">
+                      <Image
+                        src={this.getPlaceImage(foundPlace)}
+                        className="place-image"
+                      />
+                    </Panel.Body>
+                  </Panel>
+                </Col>
+              );
+          })}
+        </Row>
+      </Tab.Pane>
     );
   };
 
@@ -258,9 +290,33 @@ class Place extends Component {
     this.setState({ placeFormOpen: false });
   };
 
+  renderPills = () => {
+    return (
+      <Nav bsStyle="pills" className="margin-left-0">
+        <NavItem eventKey="images">
+          <Glyphicon glyph="picture" />
+        </NavItem>
+        <NavItem eventKey="location-history">
+          <Glyphicon glyph="book" />
+        </NavItem>
+        <NavItem eventKey="floors">
+          <Glyphicon glyph="th-large" />
+        </NavItem>
+        <NavItem eventKey="notes">
+          <Glyphicon glyph="comment" />
+        </NavItem>
+        <NavItem eventKey="places">
+          <Glyphicon glyph="globe" />
+        </NavItem>
+        <NavItem eventKey="attachedFiles">
+          <Glyphicon glyph="duplicate" />
+        </NavItem>
+      </Nav>
+    );
+  };
+
   render() {
     const { place } = this.state;
-    const { deletePlace } = this.props;
     if (!place) return null;
     return (
       <Grid>
@@ -291,9 +347,10 @@ class Place extends Component {
               </Panel.Heading>
               <Tab.Container id="place-tabs" defaultActiveKey="images">
                 <Panel.Body>
-                  <Row className="margin-bottom-1">
+                  <Row>
+                    <Col xs={1}>{this.renderPills()}</Col>
                     <Col
-                      xs={12}
+                      xs={10}
                       style={{ maxHeight: '500px', overflowY: 'scroll' }}
                     >
                       <Tab.Content animation>
@@ -302,11 +359,9 @@ class Place extends Component {
                         {this.renderFloors()}
                         {this.renderNotes()}
                         {this.renderAttachedFiles()}
+                        {this.renderPlaces()}
                       </Tab.Content>
                     </Col>
-                  </Row>
-                  <Row>
-                    <Col xs={12}>{this.renderPills()}</Col>
                   </Row>
                 </Panel.Body>
               </Tab.Container>
