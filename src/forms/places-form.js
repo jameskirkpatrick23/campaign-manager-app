@@ -89,21 +89,24 @@ class PlacesForm extends Component {
     } = this.props;
     e.preventDefault();
     const formattedData = { ...this.state };
-    formattedData.placeIds = formattedData.placeIds.map(item => item.value);
+    formattedData.placeIds = formattedData.placeIds.map(
+      item => item.value || item
+    );
+    formattedData.tagIds = formattedData.tagIds.map(item => item.value || item);
     this.setState({ isSubmitting: true }, () => {
       if (formAction !== 'edit') {
         createPlace(formattedData)
           .then(res => {
             history.goBack();
           })
-          .catch(err => alert(`Something went wrong: ${err.message}`));
+          .catch(err => alert(`Something went wrong: ${err}`));
       } else {
         editPlace(formattedData)
           .then(res => {
             onSubmit(res);
             this.setState({ isSubmitting: false });
           })
-          .catch(err => alert(`Something went wrong: ${err.message}`));
+          .catch(err => alert(`Something went wrong: ${err}`));
       }
     });
   };
@@ -178,18 +181,9 @@ class PlacesForm extends Component {
       npcIds,
       questIds,
       tagIds,
-      placeId,
       eventIds
     } = this.state;
-    const {
-      placeTypes,
-      places,
-      currentCampaignId,
-      npcs,
-      quests,
-      tags,
-      events
-    } = this.props;
+    const { placeTypes, places, npcs, quests, tags, events } = this.props;
     return (
       <div>
         <Spinner show={isSubmitting} />
@@ -297,17 +291,10 @@ class PlacesForm extends Component {
                 Places
                 <Multiselect
                   id="place-places"
-                  data={Object.keys(places)
-                    .filter(
-                      placeKey =>
-                        places[placeKey].campaignIds.includes(
-                          currentCampaignId
-                        ) && places[placeKey].id !== placeId
-                    )
-                    .map(key => ({
-                      name: places[key].name,
-                      value: key
-                    }))}
+                  data={Object.keys(places).map(key => ({
+                    name: places[key].name,
+                    value: key
+                  }))}
                   value={placeIds}
                   placeholder="Is this place related to others you created?"
                   textField="name"

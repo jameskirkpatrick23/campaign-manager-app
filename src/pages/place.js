@@ -150,19 +150,23 @@ class Place extends Component {
 
   renderImages = () => {
     const { place } = this.state;
-
     return (
       <Tab.Pane eventKey="images">
-        <Carousel interval={null}>
-          {place.images &&
-            place.images.map(image => {
-              return (
-                <Carousel.Item key={`place-image-${image.fileName}`}>
-                  <Image src={image.downloadUrl} responsive />
-                </Carousel.Item>
-              );
-            })}
-        </Carousel>
+        {place.images.length === 1 && (
+          <Image src={place.images[0].downloadUrl} responsive />
+        )}
+        {place.images.length > 1 && (
+          <Carousel interval={null}>
+            {place.images &&
+              place.images.map(image => {
+                return (
+                  <Carousel.Item key={`place-image-${image.fileName}`}>
+                    <Image src={image.downloadUrl} responsive />
+                  </Carousel.Item>
+                );
+              })}
+          </Carousel>
+        )}
       </Tab.Pane>
     );
   };
@@ -267,7 +271,7 @@ class Place extends Component {
         aria-labelledby="place-modal-title-lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="place-modal-title-lg">Modify Place</Modal.Title>
+          <Modal.Title id="place-modal-title-lg">Edit {place.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <PlaceForm
