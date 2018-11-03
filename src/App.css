@@ -17,6 +17,18 @@ label {
   vertical-align: text-top;
 }
 
+.fieldset {
+  position: relative;
+}
+
+.fieldset-label {
+  position: absolute;
+  top: -1em;
+  background-color: white;
+  padding: 2px 5px;
+  font-weight: bold;
+}
+
 .truncate {
   width: 100%;
   white-space: nowrap;

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import 'react-widgets/dist/css/react-widgets.css';
 import { Multiselect, DropdownList } from 'react-widgets';
+import { ControlLabel, FormControl, FormGroup, Button } from 'react-bootstrap';
+import Fieldset from '../reusable-components/fieldset';
 
 class NPCForm extends Component {
   constructor(props) {
@@ -8,12 +10,12 @@ class NPCForm extends Component {
     this.state = {
       name: '',
       description: '',
-      personality: '',
+      backstory: '',
       height: '',
       weight: '',
       alignment: '',
       clothing: '',
-      avatar: '',
+      image: '',
       race: '',
       gender: '',
       occupation: '',
@@ -193,6 +195,7 @@ class NPCForm extends Component {
       'Allergic to something very unusual (undead/gryphons/baby powder/etc.) and begins to sneeze uncontrollably when he is within a short distance it.',
       'Very sarcastic, especially when in life or death situations.'
     ];
+    this.genders = ['Male', 'Female', 'Other', 'Not Applicable', 'Fluid'];
     this.races = [
       'Aarakocra',
       'Aasimar',
@@ -238,149 +241,240 @@ class NPCForm extends Component {
       'Warforged',
       'Yuan-Ti Pureblood'
     ];
+    this.occupations = [
+      'Noble',
+      'Craftsman',
+      'Warrior',
+      'Urchin',
+      'Commoner',
+      'Entertainer'
+    ];
   }
 
   onSubmit() {}
+
+  getValidationState = formKey => {
+    const length = this.state[formKey] && this.state[formKey].length;
+    if (length > 0) return 'success';
+    return null;
+  };
+
+  createQuirk = quirk => {
+    this.props.createQuirk(quirk);
+  };
+
+  createOccupation = occupation => {
+    this.props.createOccupation(occupation);
+  };
+
+  createValue = value => {
+    this.props.createValue(value);
+  };
 
   createCollection() {}
 
   render() {
     const {
       name,
-      description,
-      personality,
+      backstory,
       height,
       weight,
-      clothing,
-      avatar,
+      image,
       gender,
       attachedFiles,
-      occupation
+      occupation,
+      alignment,
+      values,
+      race,
+      physDescription
     } = this.state;
     return (
       <div>
-        <button
-          className="button"
-          onClick={this.createCollection('coreValues')}
-        >
+        <Button onClick={this.createCollection('coreValues')}>
           Create Values
-        </button>
+        </Button>
         <form onSubmit={this.onSubmit}>
-          <label htmlFor="#npc-quirks">
-            Quirks
-            <Multiselect
-              data={this.quirks}
-              caseSensitive={false}
-              minLength={3}
-              filter="contains"
-            />
-          </label>
-          <label htmlFor="#npc-name">
-            Name
+          <Fieldset label="General Information">
+            <FormGroup validationState={this.getValidationState('name')}>
+              <ControlLabel htmlFor="#npc-name">Name</ControlLabel>
+              <FormControl
+                id="npc-name"
+                type="text"
+                value={name}
+                required
+                placeholder="Give this NPC a name"
+                onChange={e => this.setState({ name: e.target.value })}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup validationState={this.getValidationState('occupation')}>
+              <ControlLabel htmlFor="npc-occupation">Occupation</ControlLabel>
+              <DropdownList
+                id="npc-occupation"
+                data={this.occupations}
+                value={occupation}
+                placeholder="Noble, Urchin, Smithy, Artisan, etc."
+                allowCreate={'onFilter'}
+                onCreate={this.createOccupation}
+                onChange={dataItem => this.setState({ occupation: dataItem })}
+                caseSensitive={false}
+                minLength={3}
+                filter="contains"
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup validationState={this.getValidationState('race')}>
+              <ControlLabel htmlFor="npc-race">Race</ControlLabel>
+              <DropdownList
+                id="npc-race"
+                data={this.races}
+                value={race}
+                allowCreate={'onFilter'}
+                onCreate={this.createValue}
+                minLength={2}
+                filter="contains"
+                placeholder="Human, Elf, Tiefling, Orc, etc."
+                caseSensitive={false}
+                onChange={dataItem => this.setState({ race: dataItem })}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup validationState={this.getValidationState('gender')}>
+              <ControlLabel htmlFor="npc-gender">Gender</ControlLabel>
+              <DropdownList
+                id="npc-gender"
+                data={this.genders}
+                value={gender}
+                allowCreate={false}
+                minLength={2}
+                filter="contains"
+                placeholder="What gender is this NPC"
+                caseSensitive={false}
+                onChange={dataItem => this.setState({ gender: dataItem })}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+          </Fieldset>
+          <Fieldset label="Physical Characteristics">
+            <FormGroup validationState={this.getValidationState('height')}>
+              <ControlLabel htmlFor="#npc-height">Height</ControlLabel>
+              <FormControl
+                id="npc-height"
+                type="text"
+                value={height}
+                required
+                placeholder="How tall is this NPC"
+                onChange={e => this.setState({ height: e.target.value })}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup validationState={this.getValidationState('weight')}>
+              <ControlLabel htmlFor="#npc-weight">Weight</ControlLabel>
+              <FormControl
+                id="npc-weight"
+                type="text"
+                value={weight}
+                required
+                placeholder="How heavy is this NPC"
+                onChange={e => this.setState({ weight: e.target.value })}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup
+              validationState={this.getValidationState('physDescription')}
+            >
+              <ControlLabel htmlFor="#npc-physDescription">
+                Physical Appearance
+              </ControlLabel>
+              <FormControl
+                id="npc-physDescription"
+                type="text"
+                componentClass="textarea"
+                value={physDescription}
+                required
+                placeholder="Describe how this NPC looks"
+                onChange={e =>
+                  this.setState({ physDescription: e.target.value })
+                }
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+          </Fieldset>
+          <Fieldset label="Personality Makeup">
+            <FormGroup validationState={this.getValidationState('alignment')}>
+              <ControlLabel htmlFor="npc-alignment">Alignment</ControlLabel>
+              <DropdownList
+                id="npc-alignment"
+                data={this.alignments}
+                value={alignment}
+                placeholder="Lawful, Chaotic, Good, Evil, Neutral"
+                allowCreate={false}
+                onChange={dataItem => this.setState({ alignment: dataItem })}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup validationState={this.getValidationState('quirks')}>
+              <ControlLabel htmlFor="#npc-quirks">Quirks</ControlLabel>
+              <Multiselect
+                id="npc-quirks"
+                data={this.quirks}
+                caseSensitive={false}
+                minLength={3}
+                allowCreate={'onFilter'}
+                onCreate={this.createQuirk}
+                filter="contains"
+                onChange={dataItems => this.setState({ quirks: dataItems })}
+                placeholder="What quirks does this NPC have?"
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup validationState={this.getValidationState('values')}>
+              <ControlLabel htmlFor="npc-values">Values</ControlLabel>
+              <Multiselect
+                id="npc-values"
+                data={this.coreValues}
+                value={values}
+                allowCreate={'onFilter'}
+                onCreate={this.createValue}
+                placeholder="What values does this NPC hold?"
+                onChange={dataItem => this.setState({ values: dataItem })}
+                caseSensitive={false}
+                minLength={2}
+                filter="contains"
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup validationState={this.getValidationState('backstory')}>
+              <ControlLabel htmlFor="#npc-backstory">Backstory</ControlLabel>
+              <FormControl
+                id="npc-backstory"
+                type="text"
+                componentClass="textarea"
+                value={backstory}
+                required
+                placeholder="Describe the NPC's backstory"
+                onChange={e => this.setState({ backstory: e.target.value })}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+          </Fieldset>
+          <FormGroup>
+            <ControlLabel htmlFor="#npc-image">Image</ControlLabel>
             <input
-              id="npc-name"
-              type="text"
-              value={name}
-              onChange={e => this.setState({ name: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-height">
-            Height in Feet
-            <input
-              id="npc-height"
-              type="text"
-              value={height}
-              onChange={e => this.setState({ height: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-occupation">
-            Occupation
-            <input
-              id="npc-occupation"
-              type="text"
-              value={occupation}
-              onChange={e => this.setState({ occupation: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-alignment">
-            Alignment
-            <DropdownList data={this.alignments} />
-          </label>
-          <label htmlFor="#npc-values">
-            Values
-            <Multiselect
-              data={this.coreValues}
-              caseSensitive={false}
-              minLength={1}
-              filter="contains"
-            />
-          </label>
-          <label htmlFor="#npc-race">
-            Race
-            <DropdownList
-              data={this.races}
-              caseSensitive={false}
-              minLength={1}
-              filter="contains"
-            />
-          </label>
-          <label htmlFor="#npc-gender">
-            Gender
-            <input
-              id="npc-gender"
-              type="text"
-              value={gender}
-              onChange={e => this.setState({ gender: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-weight">
-            Weight in pounds
-            <input
-              id="npc-weight"
-              type="number"
-              value={weight}
-              onChange={e => this.setState({ weight: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-description">
-            Description
-            <textarea
-              id="npc-description"
-              value={description}
-              onChange={e => this.setState({ description: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-clothing">
-            Clothing
-            <textarea
-              id="npc-clothing"
-              value={clothing}
-              onChange={e => this.setState({ clothing: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-personality">
-            Personality
-            <textarea
-              id="npc-personality"
-              value={personality}
-              onChange={e => this.setState({ personality: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-avatar">
-            Image
-            <input
-              id="npc-avatar"
+              id="npc-image"
               type="file"
               accept="image/png, image/jpeg, image/gif"
               onChange={e => {
                 e.preventDefault();
-                this.setState({ avatar: e.target.files[0] });
+                this.setState({ image: e.target.files[0] });
               }}
             />
-            <img src={avatar} alt={avatar.name} />
-          </label>
-          <label htmlFor="#npc-avatar">
-            Attach Other Files
+            <img src={image} alt={image.name} />
+          </FormGroup>
+          <FormGroup>
+            <ControlLabel htmlFor="#npc-attachedFiles">
+              Other Files
+            </ControlLabel>
             <input
               id="npc-attachedFiles"
               type="file"
@@ -392,7 +486,7 @@ class NPCForm extends Component {
               }}
             />
             {attachedFiles.map(file => file.name).join(' ')}
-          </label>
+          </FormGroup>
         </form>
       </div>
     );
