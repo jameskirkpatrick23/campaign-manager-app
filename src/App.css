@@ -29,6 +29,15 @@ label {
   font-weight: bold;
 }
 
+.font-static {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.rw-input {
+  padding: 0px 10px !important;
+}
+
 .truncate {
   width: 100%;
   white-space: nowrap;
