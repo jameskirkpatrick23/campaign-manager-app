@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Row, Col, Panel, Image } from 'react-bootstrap';
 
 class NPCPage extends Component {
   constructor(props) {
@@ -12,24 +13,31 @@ class NPCPage extends Component {
     const { npcs, currentCampaign } = this.props;
     return Object.keys(npcs).map(key => {
       const npc = npcs[key];
+      let url = npc.images[0]
+        ? npc.images[0].downloadUrl
+        : require('../assets/placeholder-npc.png');
+      const npcRoute = `/campaigns/${currentCampaign.id}/home/npcs/${npc.id}`;
       return (
-        <div className="card" key={key}>
-          <img src={npc.avatar} alt={`${npc.name} Avatar`} />
-          <div className="card-section">
-            <h4>{npc.name}</h4>
-            <div>{npc.description}</div>
-          </div>
-          <Link to={`/campaigns/${currentCampaign.id}/home/npcs/${npc.id}`}>
-            See More
-          </Link>
-        </div>
+        <Col key={key} xs={4} md={3}>
+          <Panel
+            bsStyle="info"
+            className="npc-card clickable"
+            onClick={() => this.props.history.push(npcRoute)}
+          >
+            <Panel.Heading>
+              <Panel.Title componentClass="h3">{npc.name}</Panel.Title>
+            </Panel.Heading>
+            <Panel.Body className="padding-0">
+              <Image src={url} className="place-image" />
+            </Panel.Body>
+          </Panel>
+        </Col>
       );
     });
   }
 
   render() {
     const { currentCampaign } = this.props;
-
     return (
       <div>
         <Link
@@ -38,8 +46,7 @@ class NPCPage extends Component {
         >
           Create a new NPC
         </Link>
-        <div>I am the text!</div>
-        {this.renderNpcs()}
+        <Row>{this.renderNpcs()}</Row>
       </div>
     );
   }
