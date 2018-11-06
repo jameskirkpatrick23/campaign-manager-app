@@ -108,14 +108,23 @@ class NoteForm extends Component {
               </FormGroup>
             </Col>
           </Row>
-          <Row>
-            <Col xs={6}>
-              <Button bsStyle="primary" onClick={this.onSubmit}>
-                Submit
-              </Button>
-            </Col>
-            <Col xs={6}>
-              <Button onClick={this.props.onClose}>Cancel</Button>
+          <Row className="padding-bottom-1">
+            <Col xsOffset={6} xs={6}>
+              <Row>
+                <Col xs={6}>
+                  <button type="submit" className="button expanded">
+                    Submit
+                  </button>
+                </Col>
+                <Col xs={6}>
+                  <button
+                    className="button alert expanded"
+                    onClick={this.props.onClose}
+                  >
+                    Cancel
+                  </button>
+                </Col>
+              </Row>
             </Col>
           </Row>
         </form>

@@ -8,6 +8,7 @@ import PlaceDetails from './pages/place';
 import PlacesForm from './forms/places-form';
 import NPCPage from './pages/npcs';
 import NPCForm from './forms/npc-form';
+import NPCDetails from './pages/npc';
 
 export default {
   '/': {
@@ -85,5 +86,14 @@ export default {
     path: '/campaigns/:campaign_id/home/npcs/new',
     exact: true,
     component: NPCForm
+  },
+  '/campaigns/:campaign_id/home/npcs/:npc_id': {
+    key: 'NPC Show',
+    name: 'NPC Show',
+    hasCustomName: true,
+    customName: { collection: 'npcs', pathIdentifier: 'npc_id' },
+    path: '/campaigns/:campaign_id/home/npcs/:npc_id',
+    exact: true,
+    component: NPCDetails
   }
 };

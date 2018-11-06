@@ -10,11 +10,13 @@ import {
   FormGroup,
   Button,
   Row,
-  Col
+  Col,
+  Glyphicon
 } from 'react-bootstrap';
 import Fieldset from '../reusable-components/fieldset';
-import { createNpc } from '../redux/actions/npcs';
+import { createNPC, editNPC } from '../redux/actions/npcs';
 import { createTag } from '../redux/actions/tags';
+import Spinner from '../reusable-components/spinner';
 
 class NPCForm extends Component {
   constructor(props) {
@@ -36,15 +38,60 @@ class NPCForm extends Component {
       npcIds: [],
       questIds: [],
       eventIds: [],
+      images: {},
+      attachedFiles: {},
       newImages: {},
-      newAttachedFiles: {}
+      newAttachedFiles: {},
+      deletenewImagesKeys: [],
+      deletenewAttachedFilesKeys: [],
+      deleteimagesKeys: [],
+      deleteattachedFilesKeys: [],
+      isSubmitting: false
     };
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  componentWillMount() {
+    const { npc } = this.props;
+    const images = {};
+    const attachedFiles = {};
+    if (npc.images.length) {
+      npc.images.forEach((image, index) => {
+        images[index] = image;
+      });
+    }
+    if (npc.attachedFiles.length) {
+      npc.attachedFiles.forEach((attachedFile, index) => {
+        attachedFiles[index] = attachedFile;
+      });
+    }
+    this.setState({
+      images: images,
+      npcId: npc.id || '',
+      attachedFiles: attachedFiles,
+      npcIds: [...npc.npcIds] || [],
+      placeIds: [...npc.placeIds] || [],
+      noteIds: [...npc.noteIds] || [],
+      eventIds: [...npc.eventIds] || [],
+      questIds: [...npc.questIds] || [],
+      tagIds: [...npc.tagIds] || [],
+      name: npc.name || '',
+      physDescription: npc.physDescription || '',
+      backstory: npc.backstory || '',
+      height: npc.height || '',
+      weight: npc.weight || '',
+      quirks: [...npc.quirks] || [],
+      values: [...npc.values] || [],
+      alignment: npc.alignment || '',
+      race: npc.race || '',
+      gender: npc.gender || '',
+      occupation: npc.occupation || ''
+    });
+  }
+
   onSubmit = e => {
     e.preventDefault();
-    const { createNpc, formAction } = this.props;
+    const { createNPC, formAction, history, onSubmit, editNPC } = this.props;
     const formattedData = { ...this.state };
     ['tagIds', 'placeIds', 'npcIds', 'questIds', 'eventIds'].forEach(
       stateKey => {
@@ -53,10 +100,22 @@ class NPCForm extends Component {
         );
       }
     );
-
-    if (formAction === 'create') {
-      createNpc(formattedData);
-    }
+    this.setState({ isSubmitting: true }, () => {
+      if (formAction !== 'edit') {
+        createNPC(formattedData)
+          .then(res => {
+            history.goBack();
+          })
+          .catch(err => alert(`Something went wrong: ${err}`));
+      } else {
+        editNPC(formattedData)
+          .then(res => {
+            onSubmit(res);
+            this.setState({ isSubmitting: false });
+          })
+          .catch(err => alert(`Something went wrong: ${err}`));
+      }
+    });
   };
 
   handleCloseRequest = () => {
@@ -85,6 +144,35 @@ class NPCForm extends Component {
     this.props.createTag(tagName);
   };
 
+  handleExistingDelete = (fileKey, type) => {
+    const currentFiles = { ...this.state[type] };
+    delete currentFiles[fileKey];
+    const deleteKeys = [...this.state[`delete${type}Keys`]];
+    deleteKeys.push(fileKey);
+    this.setState({ [type]: currentFiles, [`delete${type}Keys`]: deleteKeys });
+  };
+
+  generateFileList = stateName => {
+    return Object.keys(this.state[stateName]).map(key => {
+      const currentFile = this.state[stateName][key];
+      return (
+        <div key={`npc-${stateName}-${key}`}>
+          <span>
+            {currentFile.name || currentFile.fileName}
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="danger"
+              onClick={() => this.handleExistingDelete(key, stateName)}
+            >
+              <Glyphicon glyph="trash" />
+            </Button>
+          </span>
+        </div>
+      );
+    });
+  };
+
   render() {
     const {
       name,
@@ -104,7 +192,8 @@ class NPCForm extends Component {
       questIds,
       eventIds,
       npcIds,
-      physDescription
+      physDescription,
+      isSubmitting
     } = this.state;
     const {
       occupations,
@@ -121,6 +210,7 @@ class NPCForm extends Component {
     } = this.props;
     return (
       <div>
+        <Spinner show={isSubmitting} />
         <form onSubmit={this.onSubmit}>
           <Row>
             <Col xs={12} md={6}>
@@ -425,16 +515,11 @@ class NPCForm extends Component {
                     accept="image/png, image/jpeg, image/gif"
                     onChange={e => {
                       e.preventDefault();
-                      this.setState({ newImages: e.target.files[0] });
+                      this.setState({ newImages: e.target.files });
                     }}
                   />
-                  {Object.keys(newImages).map(imageKey => (
-                    <img
-                      key={`fileKey-${imageKey}`}
-                      src={newImages[imageKey]}
-                      alt={newImages[imageKey].name}
-                    />
-                  ))}
+                  {this.generateFileList('newImages')}
+                  {this.generateFileList('images')}
                 </FormGroup>
                 <FormGroup>
                   <ControlLabel htmlFor="#npc-attachedFiles">
@@ -450,28 +535,29 @@ class NPCForm extends Component {
                       this.setState({ newAttachedFiles: e.target.files });
                     }}
                   />
-                  {Object.keys(newAttachedFiles).map(fileKey => (
-                    <p key={`fileKey-${fileKey}`}>
-                      {newAttachedFiles[fileKey].name ||
-                        newAttachedFiles[fileKey].fileName}
-                    </p>
-                  ))}
+                  {this.generateFileList('newAttachedFiles')}
+                  {this.generateFileList('attachedFiles')}
                 </FormGroup>
               </Fieldset>
             </Col>
           </Row>
-          <Row className="padding-bottom-1 float-right">
-            <Col xs={12}>
-              <Button
-                className="margin-right-1"
-                type="submit"
-                bsStyle="primary"
-              >
-                Submit
-              </Button>
-              <Button bsStyle="danger" onClick={this.handleCloseRequest}>
-                Cancel
-              </Button>
+          <Row className="padding-bottom-1">
+            <Col xsOffset={6} xs={6}>
+              <Row>
+                <Col xs={6}>
+                  <button type="submit" className="button expanded">
+                    Submit
+                  </button>
+                </Col>
+                <Col xs={6}>
+                  <button
+                    className="button alert expanded"
+                    onClick={this.handleCloseRequest}
+                  >
+                    Cancel
+                  </button>
+                </Col>
+              </Row>
             </Col>
           </Row>
         </form>
@@ -481,12 +567,25 @@ class NPCForm extends Component {
 }
 
 NPCForm.defaultProps = {
+  npc: {
+    images: [],
+    npcIds: [],
+    placeIds: [],
+    noteIds: [],
+    eventIds: [],
+    questIds: [],
+    tagIds: [],
+    quirks: [],
+    values: [],
+    attachedFiles: []
+  },
   onCancel: () => {},
   formAction: 'create'
 };
 NPCForm.propTypes = {
+  npc: PropTypes.shape({}),
   onCancel: PropTypes.func,
-  createNpc: PropTypes.func.isRequired,
+  createNPC: PropTypes.func.isRequired,
   formAction: PropTypes.oneOf(['edit', 'create'])
 };
 
@@ -507,7 +606,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      createNpc: createNpc,
+      createNPC: createNPC,
+      editNPC: editNPC,
       createTag: createTag
     },
     dispatch

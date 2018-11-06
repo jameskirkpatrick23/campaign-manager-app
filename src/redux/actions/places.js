@@ -3,7 +3,11 @@ import database, { app } from '../../firebase';
 import firebase from 'firebase';
 import * as FloorActions from './floors';
 import * as NoteActions from './notes';
-import { generatePromiseArray } from './reusable';
+import {
+  generatePromiseArray,
+  generateFileDeletePromiseArray,
+  deleteNotes
+} from './reusable';
 //<editor-fold Types>
 
 export const updatePlaceTypesList = type => (dispatch, getState) => {
@@ -133,32 +137,6 @@ export const updatePlaceFloors = (placeId, floorId, dispatch) => {
   });
 };
 
-const generateFileDeletePromiseArray = (deleteKeys, currentArray) => {
-  const storageRef = app.storage().ref();
-  const promiseArray = [];
-  for (let i = 0; i < deleteKeys.length; i++) {
-    const newPromise = new Promise((resolve, reject) => {
-      const uploadRef = storageRef.child(
-        currentArray[parseInt(deleteKeys[i], 10)].storageRef
-      );
-      uploadRef
-        .delete()
-        .then(() => {
-          resolve();
-        })
-        .catch(err => reject(err));
-    });
-    promiseArray.push(newPromise);
-  }
-  return promiseArray;
-};
-
-const deleteNotes = noteIds => dispatch => {
-  noteIds.forEach(noteId => {
-    dispatch(NoteActions.deleteNote({ id: noteId }));
-  });
-};
-
 export const editPlace = placeData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   const currentPlace = getState().places.all[placeData.placeId];
@@ -178,7 +156,7 @@ export const editPlace = placeData => (dispatch, getState) => {
   );
   const deleteAttachedArray = generateFileDeletePromiseArray(
     deleteattachedFilesKeys,
-    currentPlace.images
+    currentPlace.attachedFiles
   );
   const newImagePromiseArray = generatePromiseArray(
     newImages,

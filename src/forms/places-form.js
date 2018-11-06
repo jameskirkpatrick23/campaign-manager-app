@@ -74,8 +74,7 @@ class PlacesForm extends Component {
       name: place.name || '',
       type: place.type || '',
       insideDescription: place.insideDescription || '',
-      outsideDescription: place.outsideDescription || '',
-      isSubmitting: place.isSubmitting || false
+      outsideDescription: place.outsideDescription || ''
     });
   }
 
