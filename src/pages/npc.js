@@ -16,28 +16,24 @@ import {
   Modal,
   Button
 } from 'react-bootstrap';
-import Floors from './floors';
-import PlaceForm from '../forms/places-form';
+import NPCForm from '../forms/npc-form';
 import Notes from './notes';
-import * as PlaceActions from '../redux/actions/places';
+import * as NPCActions from '../redux/actions/npcs';
 
-class Place extends Component {
+class NPC extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      place: {},
-      numRows: 1,
-      numCols: 1,
-      numFloors: 1,
-      placeFormOpen: false
+      npc: {},
+      npcFormOpen: false
     };
     this.findRelatedObjects = this.findRelatedObjects.bind(this);
-    this.renderLocationHistory = this.renderLocationHistory.bind(this);
-    this.handlePlaceDelete = this.handlePlaceDelete.bind(this);
+    this.renderDetails = this.renderDetails.bind(this);
+    this.handleNPCDelete = this.handleNPCDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
-    this.renderFloors = this.renderFloors.bind(this);
     this.renderPlaces = this.renderPlaces.bind(this);
-    this.getPlaceImage = this.getPlaceImage.bind(this);
+    this.getImage = this.getImage.bind(this);
+    this.renderNPCForm = this.renderNPCForm.bind(this);
   }
 
   findRelatedObjects = () => {
@@ -45,101 +41,113 @@ class Place extends Component {
   };
 
   componentWillMount = () => {
-    const placeId = this.props.match.params.place_id;
-    this.setState({ place: this.props.places[placeId] }, () => {
+    const npcId = this.props.match.params.npc_id;
+    this.setState({ npc: this.props.npcs[npcId] }, () => {
       this.findRelatedObjects(this.props);
     });
   };
 
   componentWillReceiveProps = nextProps => {
-    const placeId = nextProps.match.params.place_id;
-    const oldPlaceId = this.props.match.params.place_id;
-    const foundPlace = nextProps.places[placeId];
-    if (this.props.places !== nextProps.places || placeId !== oldPlaceId) {
-      this.setState({ place: foundPlace }, () => {
+    const npcId = nextProps.match.params.npc_id;
+    const oldNpcId = this.props.match.params.npc_id;
+    const foundNpc = nextProps.npcs[npcId];
+    if (this.props.npcs !== nextProps.npcs || npcId !== oldNpcId) {
+      this.setState({ npc: foundNpc }, () => {
         this.findRelatedObjects(nextProps);
       });
     }
     this.findRelatedObjects(nextProps);
   };
 
-  handlePlaceDelete = place => {
-    const { deletePlace, history } = this.props;
-    deletePlace(place);
+  handleNPCDelete = npc => {
+    const { deleteNpc, history } = this.props;
+    deleteNpc(npc);
     history.goBack();
   };
 
-  renderLocationHistory = () => {
-    const { place } = this.state;
+  renderDetails = () => {
+    const { npc } = this.state;
 
     return (
-      <Tab.Pane eventKey="location-history">
+      <Tab.Pane eventKey="info">
         <PanelGroup
           accordion
-          id={'history-whatever'}
-          defaultActiveKey="locationPanel"
+          id={'phys-description'}
+          defaultActiveKey="physDesc"
         >
           <Panel
-            id={'place-panel-location'}
+            id={'npc-panel-phys-description'}
             bsStyle="warning"
-            eventKey="locationPanel"
+            eventKey="physDesc"
           >
             <Panel.Heading>
               <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">Location</Panel.Title>
+                <Panel.Title componentClass="h3">
+                  Physical Description
+                </Panel.Title>
               </Panel.Toggle>
             </Panel.Heading>
             <Panel.Collapse>
               <Panel.Body>
-                <p>{place.location}</p>
+                <div>
+                  <strong>Gender: </strong>
+                  <p>{npc.gender}</p>
+                </div>
+                <div>
+                  <strong>Height: </strong>
+                  <p>{npc.height}</p>
+                </div>
+                <div>
+                  <strong>Weight: </strong>
+                  <p>{npc.weight}</p>
+                </div>
+                <div>
+                  <strong>Race: </strong>
+                  <p>{npc.race}</p>
+                </div>
+                <div>
+                  <strong>Occupation: </strong>
+                  <p>{npc.occupation}</p>
+                </div>
+                <div>
+                  <strong>Description: </strong>
+                  <p>{npc.physDescription}</p>
+                </div>
               </Panel.Body>
             </Panel.Collapse>
           </Panel>
           <Panel
-            id={'place-panel-history'}
+            id={'npc-panel-personality'}
             bsStyle="warning"
-            eventKey="historyPanel"
+            eventKey="personalityPanel"
           >
             <Panel.Heading>
               <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">History</Panel.Title>
+                <Panel.Title componentClass="h3">Personality</Panel.Title>
               </Panel.Toggle>
             </Panel.Heading>
             <Panel.Collapse>
               <Panel.Body>
-                <p>{place.history}</p>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-          <Panel
-            id={'place-panel-outside'}
-            bsStyle="warning"
-            eventKey="outsidePanel"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">Outside</Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
-                <p>{place.outsideDescription}</p>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-          <Panel
-            id={'place-panel-inside'}
-            bsStyle="warning"
-            eventKey="insidePanel"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">Inside</Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
-                <p>{place.insideDescription}</p>
+                <div>
+                  <strong>Alignment: </strong>
+                  <p>{npc.alignment}</p>
+                </div>
+                <div>
+                  <strong>Quirks: </strong>
+                  {npc.quirks.map(q => (
+                    <p key={q}>{q}</p>
+                  ))}
+                </div>
+                <div>
+                  <strong>Values: </strong>
+                  {npc.values.map(v => (
+                    <p key={v}>{v}</p>
+                  ))}
+                </div>
+                <div>
+                  <strong>Backstory: </strong>
+                  <p>{npc.backstory}</p>
+                </div>
               </Panel.Body>
             </Panel.Collapse>
           </Panel>
@@ -149,40 +157,37 @@ class Place extends Component {
   };
 
   renderImages = () => {
-    const { place } = this.state;
+    const { npc } = this.state;
     return (
       <Tab.Pane eventKey="images">
-        {place.images.length === 1 && (
-          <Image src={place.images[0].downloadUrl} responsive />
+        {npc.images.length === 1 && (
+          <Image src={npc.images[0].downloadUrl} responsive />
         )}
-        {place.images.length > 1 && (
+        {npc.images.length > 1 && (
           <Carousel interval={null}>
-            {place.images &&
-              place.images.map(image => {
+            {npc.images &&
+              npc.images.map(image => {
                 return (
-                  <Carousel.Item key={`place-image-${image.fileName}`}>
+                  <Carousel.Item key={`npc-image-${image.fileName}`}>
                     <Image src={image.downloadUrl} responsive />
                   </Carousel.Item>
                 );
               })}
-            {!place.images.length && (
-              <Image
-                src={require('../assets/placeholder-location.png')}
-                responsive
-              />
-            )}
           </Carousel>
+        )}
+        {!npc.images.length && (
+          <Image src={require('../assets/placeholder-npc.png')} responsive />
         )}
       </Tab.Pane>
     );
   };
 
   renderAttachedFiles = () => {
-    const { place } = this.state;
+    const { npc } = this.state;
     return (
       <Tab.Pane eventKey="attachedFiles">
-        {place.attachedFiles &&
-          place.attachedFiles.map(file => {
+        {npc.attachedFiles &&
+          npc.attachedFiles.map(file => {
             return (
               <div key={`${file.fileName}-${file.downloadUrl}`}>
                 <a href="#" onClick={() => window.open(file.downloadUrl)}>
@@ -195,15 +200,15 @@ class Place extends Component {
     );
   };
 
-  getPlaceImage = place => {
-    if (place.images.length) {
-      return place.images[0].downloadUrl;
+  getImage = npc => {
+    if (npc.images.length) {
+      return npc.images[0].downloadUrl;
     }
-    return require('../assets/placeholder-location.png');
+    return require('../assets/placeholder-npc.png');
   };
 
   renderPlaces = () => {
-    const { place } = this.state;
+    const { npc } = this.state;
     const { places, currentCampaign, history } = this.props;
     return (
       <Tab.Pane eventKey="places">
@@ -211,12 +216,12 @@ class Place extends Component {
           <h3>Related Places</h3>
         </Row>
         <Row>
-          {!place.placeIds.length && (
+          {!npc.placeIds.length && (
             <div>
               You have no related places. Please add some to see them here.
             </div>
           )}
-          {place.placeIds.map(placeKey => {
+          {npc.placeIds.map(placeKey => {
             const foundPlace = places[placeKey];
             const placeRoute = `/campaigns/${
               currentCampaign.id
@@ -236,7 +241,7 @@ class Place extends Component {
                     </Panel.Heading>
                     <Panel.Body className="padding-0">
                       <Image
-                        src={this.getPlaceImage(foundPlace)}
+                        src={this.getImage(foundPlace)}
                         className="place-image"
                       />
                     </Panel.Body>
@@ -249,41 +254,32 @@ class Place extends Component {
     );
   };
 
-  renderFloors = () => {
-    const { place } = this.state;
-    return (
-      <Tab.Pane eventKey="floors">
-        <Floors place={place} />
-      </Tab.Pane>
-    );
-  };
-
   renderNotes = () => {
-    const { place } = this.state;
+    const { npc } = this.state;
     return (
       <Tab.Pane eventKey="notes">
-        <Notes noteIds={place.noteIds} typeId={place.id} type="place" />
+        <Notes noteIds={npc.noteIds} typeId={npc.id} type="npc" />
       </Tab.Pane>
     );
   };
 
-  renderPlaceForm = () => {
-    const { place } = this.state;
+  renderNPCForm = () => {
+    const { npc, npcFormOpen } = this.state;
     return (
       <Modal
-        show={this.state.placeFormOpen}
-        onHide={this.hidePlaceForm}
+        show={npcFormOpen}
+        onHide={this.hideNPCForm}
         bsSize="lg"
-        aria-labelledby="place-modal-title-lg"
+        aria-labelledby="npc-modal-title-lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="place-modal-title-lg">Edit {place.name}</Modal.Title>
+          <Modal.Title id="npc-modal-title-lg">Edit {npc.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <PlaceForm
-            place={place}
-            onCancel={this.hidePlaceForm}
-            onSubmit={this.hidePlaceForm}
+          <NPCForm
+            npc={npc}
+            onCancel={this.hideNPCForm}
+            onSubmit={this.hideNPCForm}
             formAction={'edit'}
           />
         </Modal.Body>
@@ -291,13 +287,13 @@ class Place extends Component {
     );
   };
 
-  showPlaceForm = e => {
+  showNPCForm = e => {
     e.preventDefault();
-    this.setState({ placeFormOpen: true });
+    this.setState({ npcFormOpen: true });
   };
 
-  hidePlaceForm = () => {
-    this.setState({ placeFormOpen: false });
+  hideNPCForm = () => {
+    this.setState({ npcFormOpen: false });
   };
 
   renderPills = () => {
@@ -306,11 +302,8 @@ class Place extends Component {
         <NavItem eventKey="images">
           <Glyphicon glyph="picture" />
         </NavItem>
-        <NavItem eventKey="location-history">
+        <NavItem eventKey="info">
           <Glyphicon glyph="book" />
-        </NavItem>
-        <NavItem eventKey="floors">
-          <Glyphicon glyph="th-large" />
         </NavItem>
         <NavItem eventKey="notes">
           <Glyphicon glyph="comment" />
@@ -326,22 +319,22 @@ class Place extends Component {
   };
 
   render() {
-    const { place } = this.state;
-    if (!place) return null;
+    const { npc } = this.state;
+    if (!npc) return null;
     return (
       <Grid>
-        {this.renderPlaceForm()}
+        {this.renderNPCForm()}
         <Row>
           <Col xs={12}>
             <Panel bsStyle="info">
               <Panel.Heading>
                 <Panel.Title componentClass="h3">
-                  {place.name}
+                  {npc.name}
                   <Button
                     className="margin-left-1 vert-text-top"
                     bsSize="small"
                     bsStyle="warning"
-                    onClick={this.showPlaceForm}
+                    onClick={this.showNPCForm}
                   >
                     <Glyphicon glyph="pencil" />
                   </Button>
@@ -349,13 +342,13 @@ class Place extends Component {
                     className="margin-left-1 vert-text-top"
                     bsSize="small"
                     bsStyle="danger"
-                    onClick={() => this.handlePlaceDelete(place)}
+                    onClick={() => this.handleNPCDelete(npc)}
                   >
                     <Glyphicon glyph="trash" />
                   </Button>
                 </Panel.Title>
               </Panel.Heading>
-              <Tab.Container id="place-tabs" defaultActiveKey="images">
+              <Tab.Container id="npc-tabs" defaultActiveKey="images">
                 <Panel.Body>
                   <Row>
                     <Col xs={1}>{this.renderPills()}</Col>
@@ -365,8 +358,7 @@ class Place extends Component {
                     >
                       <Tab.Content animation>
                         {this.renderImages()}
-                        {this.renderLocationHistory()}
-                        {this.renderFloors()}
+                        {this.renderDetails()}
                         {this.renderNotes()}
                         {this.renderAttachedFiles()}
                         {this.renderPlaces()}
@@ -383,16 +375,17 @@ class Place extends Component {
   }
 }
 
-Place.defaultProps = {};
-Place.propTypes = {};
+NPC.defaultProps = {};
+NPC.propTypes = {};
 const mapStateToProps = state => ({
+  npcs: state.npcs.all,
   places: state.places.all,
   currentCampaign: state.campaigns.currentCampaign
 });
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      deletePlace: PlaceActions.deletePlace
+      deleteNPC: NPCActions.deleteNPC
     },
     dispatch
   );
@@ -400,4 +393,4 @@ const mapDispatchToProps = dispatch =>
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Place);
+)(NPC);

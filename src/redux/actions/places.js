@@ -3,6 +3,11 @@ import database, { app } from '../../firebase';
 import firebase from 'firebase';
 import * as FloorActions from './floors';
 import * as NoteActions from './notes';
+import {
+  generatePromiseArray,
+  generateFileDeletePromiseArray,
+  deleteNotes
+} from './reusable';
 //<editor-fold Types>
 
 export const updatePlaceTypesList = type => (dispatch, getState) => {
@@ -132,58 +137,6 @@ export const updatePlaceFloors = (placeId, floorId, dispatch) => {
   });
 };
 
-const generatePromiseArray = (collection, uid, type) => {
-  const storageRef = app.storage().ref();
-  return Object.keys(collection).map((key, index) => {
-    return new Promise((resolve, reject) => {
-      const ref = `${Date.now()}${index}`;
-      const currentUpload = collection[key];
-      const uploadRef = storageRef.child(`${uid}/places/${type}/${ref}`);
-      uploadRef
-        .put(currentUpload)
-        .then(snapshot => {
-          snapshot.ref
-            .getDownloadURL()
-            .then(url => {
-              resolve({
-                downloadUrl: url,
-                fileName: currentUpload.name,
-                storageRef: `${uid}/places/${type}/${ref}`
-              });
-            })
-            .catch(err => reject(err));
-        })
-        .catch(err => reject(err));
-    });
-  });
-};
-
-const generateFileDeletePromiseArray = (deleteKeys, currentArray) => {
-  const storageRef = app.storage().ref();
-  const promiseArray = [];
-  for (let i = 0; i < deleteKeys.length; i++) {
-    const newPromise = new Promise((resolve, reject) => {
-      const uploadRef = storageRef.child(
-        currentArray[parseInt(deleteKeys[i], 10)].storageRef
-      );
-      uploadRef
-        .delete()
-        .then(() => {
-          resolve();
-        })
-        .catch(err => reject(err));
-    });
-    promiseArray.push(newPromise);
-  }
-  return promiseArray;
-};
-
-const deleteNotes = noteIds => dispatch => {
-  noteIds.forEach(noteId => {
-    dispatch(NoteActions.deleteNote({ id: noteId }));
-  });
-};
-
 export const editPlace = placeData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   const currentPlace = getState().places.all[placeData.placeId];
@@ -203,17 +156,19 @@ export const editPlace = placeData => (dispatch, getState) => {
   );
   const deleteAttachedArray = generateFileDeletePromiseArray(
     deleteattachedFilesKeys,
-    currentPlace.images
+    currentPlace.attachedFiles
   );
   const newImagePromiseArray = generatePromiseArray(
     newImages,
     userUid,
-    'images'
+    'images',
+    'places'
   );
   const newAttachedFilePromiseArray = generatePromiseArray(
     newAttachedFiles,
     userUid,
-    'attachedFiles'
+    'attachedFiles',
+    'places'
   );
 
   let currentImages = Object.keys(images).map(key => images[key]);
@@ -296,12 +251,14 @@ export const createPlace = placeData => (dispatch, getState) => {
   const imagePromiseArray = generatePromiseArray(
     placeData.newImages,
     userUid,
-    'images'
+    'images',
+    'places'
   );
   const attachedFilePromiseArray = generatePromiseArray(
     placeData.newAttachedFiles,
     userUid,
-    'files'
+    'files',
+    'places'
   );
 
   dispatch({ type: constants.Place.CREATING_PLACE, data: placeData });

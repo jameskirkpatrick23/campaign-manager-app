@@ -1,405 +1,621 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import 'react-widgets/dist/css/react-widgets.css';
 import { Multiselect, DropdownList } from 'react-widgets';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import {
+  ControlLabel,
+  FormControl,
+  FormGroup,
+  Button,
+  Row,
+  Col,
+  Glyphicon
+} from 'react-bootstrap';
+import Fieldset from '../reusable-components/fieldset';
+import { createNPC, editNPC } from '../redux/actions/npcs';
+import { createTag } from '../redux/actions/tags';
+import Spinner from '../reusable-components/spinner';
 
 class NPCForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       name: '',
-      description: '',
-      personality: '',
+      physDescription: '',
+      backstory: '',
       height: '',
       weight: '',
       alignment: '',
-      clothing: '',
-      avatar: '',
       race: '',
       gender: '',
       occupation: '',
+      quirks: [],
       values: [],
-      attachedFiles: []
+      tagIds: [],
+      placeIds: [],
+      npcIds: [],
+      questIds: [],
+      eventIds: [],
+      images: {},
+      attachedFiles: {},
+      newImages: {},
+      newAttachedFiles: {},
+      deletenewImagesKeys: [],
+      deletenewAttachedFilesKeys: [],
+      deleteimagesKeys: [],
+      deleteattachedFilesKeys: [],
+      isSubmitting: false
     };
-    this.coreValues = [
-      'Authenticity',
-      'Achievement',
-      'Adventure',
-      'Authority',
-      'Autonomy',
-      'Balance',
-      'Beauty',
-      'Boldness',
-      'Compassion',
-      'Challenge',
-      'Citizenship',
-      'Community',
-      'Competency',
-      'Contribution',
-      'Creativity',
-      'Curiosity',
-      'Determination',
-      'Fairness',
-      'Faith',
-      'Fame',
-      'Friendships',
-      'Fun',
-      'Growth',
-      'Happiness',
-      'Honesty',
-      'Humor',
-      'Influence',
-      'Inner Harmony',
-      'Justice',
-      'Kindness',
-      'Knowledge',
-      'Leadership',
-      'Learning',
-      'Love',
-      'Loyalty',
-      'Meaningful Work',
-      'Openness',
-      'Optimism',
-      'Peace',
-      'Pleasure',
-      'Poise',
-      'Popularity',
-      'Recognition',
-      'Religion',
-      'Reputation',
-      'Respect',
-      'Responsibility',
-      'Security',
-      'Self-Respect',
-      'Service',
-      'Spirituality',
-      'Stability',
-      'Success',
-      'Status',
-      'Trustworthiness',
-      'Wealth',
-      'Wisdom'
-    ];
-    this.alignments = [
-      'Lawful Good',
-      'Lawful Neutral',
-      'Lawful Evil',
-      'Neutral Good',
-      'Neutral',
-      'Neutral Evil',
-      'Chaotic Good',
-      'Chaotic Neutral',
-      'Chaotic Evil'
-    ];
-    this.quirks = [
-      'Will not ever drink alcohol.',
-      'Can’t leave a bar without having a drink.',
-      'Treats his weapon like the love of his life.',
-      'Treats his steed or animal companion better than people.',
-      'Will not ride an animal.',
-      'Always makes religious gestures when leaving a temple even though he is not religious.',
-      'Fear of small creatures (mice/frogs/squirrels/birds/etc.).',
-      'Always answers questions with questions.',
-      'Prefers to sleep outside over sleepin inside buildings.',
-      'Only eats raw meat not cooked meat.',
-      'Takes trophies from all of his kills.',
-      'B.A. Baracus Syndrome – Refuses to fly via any means (flying creature/flying spell/flying vehicle/etc.).',
-      'Occasionally speaks in another language that no one understands (since it doesn’t truly exist).',
-      'Walks barefoot everywhere, does not use footwear.',
-      'Wears an excessive amount of gaudy jewelry.',
-      'Only wears one specific color of clothing.',
-      'Devotes intense study to a mundane topic (bird feathers/density of various liquids/temperature of caves/etc.).',
-      'Requires being pampered whenever available (hot baths at inns/massages while in town/fancy meals in restaurants/etc.).',
-      'Obsessed with creating a written chronicle of his journeys.',
-      'Obsessed with creating songs about his journeys.',
-      'Always sings songs when traveling from one destination to another.',
-      'Doesn’t like children and is incredibly awkward when dealing with them.',
-      'Doesn’t like to enter holy buildings (churches/holy temples/religious monasteries/etc.).',
-      'A specific weather condition (rain/snow/wind/etc.) incites the character to fight.',
-      'Can’t sleep in total darkness, needs some kind of lighting.',
-      'Excessively tips everyone (waitresses/bartenders/musicians/etc.).',
-      'Adds tattoos to his body for every new place he visits.',
-      'Will only ride one specific type of animal (horse/donkey/elephant/etc.).',
-      'Constantly murmurs religious incantations.',
-      'Doesn’t ever carry money on his person.',
-      'Leaves emergency stashes of supplies in every major area he goes to.',
-      'Doesn’t trust people who don’t remember his name.',
-      'Believes vegetables (or some other type of food) are poisonous.',
-      'Carves a scar or tattoos himself when he commits a major sin against his deity.',
-      'His laughter always sounds incredibly devious and evil (regardless of alignment).',
-      'Fond of headbutting anyone he gets in an argument with.',
-      'Meticulously collects a certain type of item (daggers/gems/old coins/scrolls/etc.).',
-      'Unusually short (or tall) for his race.',
-      'Unnatural eye or hair color for his race.',
-      'Denies the existence of a force of nature (wind/earthquakes/floods/etc.) and always explains it away as something else.',
-      'Accent that seems to change on a consistent basis.',
-      'Believes he has animal empathy but in reality has no special powers with animals.',
-      'Prays for every corpse, friend or foe, that he comes across.',
-      'Must apologize to anything, person or animal, before he kills it.',
-      'Carries a mundane item (spoon/shoelace/broken key/etc.) in his pocket at the ready, “Just in case…”.',
-      'Strongly believes some famous dead individual (setting’s version of Elvis) is still alive.',
-      'When time allows, always paints his face with “the colors of war” prior to combat.',
-      'Has a very odd nickname (Potato/Fingernail/Bub/etc.).',
-      'Looks incredibly awkward when fighting (always shoots gangster style/swings a sword funny/throws grenades “like a girl”/etc.).',
-      'Always breaks out in a dance when he wins, whether it is an argument, a fight, or a game of cards.',
-      'Constantly mixes up proverbs and sayings.',
-      'Cannot admit to being wrong even when shown proof of being wrong.',
-      'Constantly has a toothpick in his mouth, even when fighting.',
-      'Often smells of (his favorite food/cologne/something bad/etc.).',
-      'Always finishes his food first and asks other party members, “Are you going to finish that?”',
-      'Has a non-combat pet with him (mouse/ferret/small dog/etc.).',
-      'Uncomfortable in crowds of people.',
-      'Is constantly playing with something (yoyo/deck of cards/Rubik’s cube/etc.) when going about his daily business.',
-      'Carries a special coin with him everywhere that he uses to help him make decisions (heads or tails?).',
-      'Incredibly afraid of mirrors and will do anything to avoid them.',
-      'Always refers to himself in the third person.',
-      'Refuses to allow anyone to touch his smoking pipe, refuses to explain why, but will fight to the death over it.',
-      'Always speaks in a seductive voice (may or may not be aware of this).',
-      'Insists on being fashionable, even at times that it is extremely difficult to do so (fighting/sleeping/climbing a tree/crawling through mud/etc.).',
-      'Has nightmares about some very unusual thing (leprechauns/fireflies/koala bears/etc.).',
-      'Uses the services of prostitutes but insists afterward that they pay him.',
-      'Believes that he is the reincarnation of some famous person that died long ago.',
-      'Marty McFly Complex – Will take unnecessary risks or do dangerous acts if his courage is questioned, such as being called a chicken or coward.',
-      'No sense of humor – Responds to all jokes as if they’re serious statements.',
-      'Always blames an accident on someone else in the party.',
-      'Always refers to himself as “The Amazing _____!”',
-      'Cannot physically part with his primary weapon, or armor, or both.',
-      'Eats only with his hands, will not use utensils.',
-      'Constantly talks about his homeland and often relates everything being talked about back to something in his homeland.',
-      'Has an imaginary friend that he occasionally talks to.',
-      'Has a voice that doesn’t fit his body or personality (aka Mike Tyson’s voice).',
-      'Is very easily swayed by food (aka Scooby Doo).',
-      'Never curses or uses any deity’s name in vain and disapproves of those who do so.',
-      'Chews tobacco and has a habit of spitting everywhere he goes.',
-      'Can speak, but prefers to talk through innuendo or sign language.',
-      'Prays to whatever god he thinks fits the situation and will help him out.',
-      'Feels it is necessary to taunt all of his enemies, regardless of the situation or how dangerous the enemy is.',
-      'Only drinks one specific type of alcohol, believes all others are worthless.',
-      'Refers to his deity as “The Great One” and threatens violence to anyone who utters its name.',
-      'Was once horribly wronged by someone with a distinctive physical trait (blond hair/facial scar/green eyes/etc.) and now hates/suspects anyone with a similar trait.',
-      'Is really bad at lying.',
-      'Carves his name into something at every major location he goes to.',
-      'The Crocodile Hunter – Obsessed with the “beauty” of something that most people recoil in horror from (undead/dragons/werewolves/etc.).',
-      'Gives everyone he meets a nickname and calls them by that name. EVERYONE.',
-      'Has names for all of his pieces of equipment and speaks to them often.',
-      'Always wears a hat or a helmet, no matter what.',
-      'Makes his own sound effects while fighting.',
-      'Always finds an excuse to charge into a dangerous situation regardless of the consequences.',
-      'Uses circular logic for everything.',
-      'Is not religious, but suddenly becomes religious in life-threatening situations, only to revert back afterward to not being religious.',
-      'Obsessive about polishing, cleaning, and maintaining their gear.',
-      'Ends nearly every conversation with the phrase, “I should go now.”',
-      'Plays an instrument often and very poorly, but believes he is good at playing it.',
-      'Uses nautical terms freely and inaccurately throughout his conversations, even though he has never been to sea (or only a few times).',
-      'Allergic to something very unusual (undead/gryphons/baby powder/etc.) and begins to sneeze uncontrollably when he is within a short distance it.',
-      'Very sarcastic, especially when in life or death situations.'
-    ];
-    this.races = [
-      'Aarakocra',
-      'Aasimar',
-      'Adventurers League Compliant Races',
-      'Aetherborn',
-      'Aven',
-      'Bugbear',
-      'Centaur',
-      'Changeling',
-      'Dragonborn',
-      'Dwarf',
-      'Elf',
-      'Firbolg',
-      'Genasi',
-      'Gith',
-      'Gnome',
-      'Goblin',
-      'Goliath',
-      'Half-elf',
-      'Half-orc',
-      'Halfling',
-      'Hobgoblin',
-      'Human',
-      'Kalashtar',
-      'Kenku',
-      'Khenra',
-      'Kobold',
-      'Kor',
-      'Lizardfolk',
-      'Merfolk',
-      'Minotaur',
-      'Naga',
-      'Orc',
-      'Revenant',
-      'Shifter',
-      'Siren',
-      'Tabaxi',
-      'Tiefling',
-      'Tortle',
-      'Triton',
-      'Vampire',
-      'Vedalken',
-      'Warforged',
-      'Yuan-Ti Pureblood'
-    ];
+    this.onSubmit = this.onSubmit.bind(this);
   }
 
-  onSubmit() {}
+  componentWillMount() {
+    const { npc } = this.props;
+    const images = {};
+    const attachedFiles = {};
+    if (npc.images.length) {
+      npc.images.forEach((image, index) => {
+        images[index] = image;
+      });
+    }
+    if (npc.attachedFiles.length) {
+      npc.attachedFiles.forEach((attachedFile, index) => {
+        attachedFiles[index] = attachedFile;
+      });
+    }
+    this.setState({
+      images: images,
+      npcId: npc.id || '',
+      attachedFiles: attachedFiles,
+      npcIds: [...npc.npcIds] || [],
+      placeIds: [...npc.placeIds] || [],
+      noteIds: [...npc.noteIds] || [],
+      eventIds: [...npc.eventIds] || [],
+      questIds: [...npc.questIds] || [],
+      tagIds: [...npc.tagIds] || [],
+      name: npc.name || '',
+      physDescription: npc.physDescription || '',
+      backstory: npc.backstory || '',
+      height: npc.height || '',
+      weight: npc.weight || '',
+      quirks: [...npc.quirks] || [],
+      values: [...npc.values] || [],
+      alignment: npc.alignment || '',
+      race: npc.race || '',
+      gender: npc.gender || '',
+      occupation: npc.occupation || ''
+    });
+  }
 
-  createCollection() {}
+  onSubmit = e => {
+    e.preventDefault();
+    const { createNPC, formAction, history, onSubmit, editNPC } = this.props;
+    const formattedData = { ...this.state };
+    ['tagIds', 'placeIds', 'npcIds', 'questIds', 'eventIds'].forEach(
+      stateKey => {
+        formattedData[stateKey] = formattedData[stateKey].map(
+          item => item.value || item
+        );
+      }
+    );
+    this.setState({ isSubmitting: true }, () => {
+      if (formAction !== 'edit') {
+        createNPC(formattedData)
+          .then(res => {
+            history.goBack();
+          })
+          .catch(err => alert(`Something went wrong: ${err}`));
+      } else {
+        editNPC(formattedData)
+          .then(res => {
+            onSubmit(res);
+            this.setState({ isSubmitting: false });
+          })
+          .catch(err => alert(`Something went wrong: ${err}`));
+      }
+    });
+  };
+
+  handleCloseRequest = () => {
+    const { formAction, history, onCancel } = this.props;
+    formAction === 'create' ? history.goBack() : onCancel();
+  };
+
+  getValidationState = formKey => {
+    let length = 0;
+    switch (this.state[formKey].constructor) {
+      case Object:
+        length = Object.keys(this.state[formKey]).length;
+        break;
+      case String:
+      case Array:
+        length = this.state[formKey].length;
+        break;
+      default:
+        length = 0;
+    }
+    if (length > 0) return 'success';
+    return null;
+  };
+
+  createTag = tagName => {
+    this.props.createTag(tagName);
+  };
+
+  handleExistingDelete = (fileKey, type) => {
+    const currentFiles = { ...this.state[type] };
+    delete currentFiles[fileKey];
+    const deleteKeys = [...this.state[`delete${type}Keys`]];
+    deleteKeys.push(fileKey);
+    this.setState({ [type]: currentFiles, [`delete${type}Keys`]: deleteKeys });
+  };
+
+  generateFileList = stateName => {
+    return Object.keys(this.state[stateName]).map(key => {
+      const currentFile = this.state[stateName][key];
+      return (
+        <div key={`npc-${stateName}-${key}`}>
+          <span>
+            {currentFile.name || currentFile.fileName}
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="danger"
+              onClick={() => this.handleExistingDelete(key, stateName)}
+            >
+              <Glyphicon glyph="trash" />
+            </Button>
+          </span>
+        </div>
+      );
+    });
+  };
 
   render() {
     const {
       name,
-      description,
-      personality,
+      backstory,
       height,
       weight,
-      clothing,
-      avatar,
+      newImages,
       gender,
-      attachedFiles,
-      occupation
+      newAttachedFiles,
+      occupation,
+      alignment,
+      values,
+      race,
+      quirks,
+      tagIds,
+      placeIds,
+      questIds,
+      eventIds,
+      npcIds,
+      physDescription,
+      isSubmitting
     } = this.state;
+    const {
+      occupations,
+      races,
+      propQuirks,
+      propValues,
+      alignments,
+      genders,
+      tags,
+      places,
+      quests,
+      npcs,
+      events
+    } = this.props;
     return (
       <div>
-        <button
-          className="button"
-          onClick={this.createCollection('coreValues')}
-        >
-          Create Values
-        </button>
+        <Spinner show={isSubmitting} />
         <form onSubmit={this.onSubmit}>
-          <label htmlFor="#npc-quirks">
-            Quirks
-            <Multiselect
-              data={this.quirks}
-              caseSensitive={false}
-              minLength={3}
-              filter="contains"
-            />
-          </label>
-          <label htmlFor="#npc-name">
-            Name
-            <input
-              id="npc-name"
-              type="text"
-              value={name}
-              onChange={e => this.setState({ name: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-height">
-            Height in Feet
-            <input
-              id="npc-height"
-              type="text"
-              value={height}
-              onChange={e => this.setState({ height: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-occupation">
-            Occupation
-            <input
-              id="npc-occupation"
-              type="text"
-              value={occupation}
-              onChange={e => this.setState({ occupation: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-alignment">
-            Alignment
-            <DropdownList data={this.alignments} />
-          </label>
-          <label htmlFor="#npc-values">
-            Values
-            <Multiselect
-              data={this.coreValues}
-              caseSensitive={false}
-              minLength={1}
-              filter="contains"
-            />
-          </label>
-          <label htmlFor="#npc-race">
-            Race
-            <DropdownList
-              data={this.races}
-              caseSensitive={false}
-              minLength={1}
-              filter="contains"
-            />
-          </label>
-          <label htmlFor="#npc-gender">
-            Gender
-            <input
-              id="npc-gender"
-              type="text"
-              value={gender}
-              onChange={e => this.setState({ gender: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-weight">
-            Weight in pounds
-            <input
-              id="npc-weight"
-              type="number"
-              value={weight}
-              onChange={e => this.setState({ weight: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-description">
-            Description
-            <textarea
-              id="npc-description"
-              value={description}
-              onChange={e => this.setState({ description: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-clothing">
-            Clothing
-            <textarea
-              id="npc-clothing"
-              value={clothing}
-              onChange={e => this.setState({ clothing: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-personality">
-            Personality
-            <textarea
-              id="npc-personality"
-              value={personality}
-              onChange={e => this.setState({ personality: e.target.value })}
-            />
-          </label>
-          <label htmlFor="#npc-avatar">
-            Image
-            <input
-              id="npc-avatar"
-              type="file"
-              accept="image/png, image/jpeg, image/gif"
-              onChange={e => {
-                e.preventDefault();
-                this.setState({ avatar: e.target.files[0] });
-              }}
-            />
-            <img src={avatar} alt={avatar.name} />
-          </label>
-          <label htmlFor="#npc-avatar">
-            Attach Other Files
-            <input
-              id="npc-attachedFiles"
-              type="file"
-              multiple
-              accept="image/png, image/jpeg, image/svg, image/gif, application/xhtml+xml, application/xml, application/pdf"
-              onChange={e => {
-                e.preventDefault();
-                this.setState({ attachedFiles: e.target.files });
-              }}
-            />
-            {attachedFiles.map(file => file.name).join(' ')}
-          </label>
+          <Row>
+            <Col xs={12} md={6}>
+              <Fieldset label="General Information">
+                <FormGroup validationState={this.getValidationState('name')}>
+                  <ControlLabel htmlFor="#npc-name">Name</ControlLabel>
+                  <FormControl
+                    id="npc-name"
+                    type="text"
+                    value={name}
+                    required
+                    placeholder="Give this NPC a name"
+                    onChange={e => this.setState({ name: e.target.value })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState('occupation')}
+                >
+                  <ControlLabel htmlFor="npc-occupation">
+                    Occupation
+                  </ControlLabel>
+                  <DropdownList
+                    id="npc-occupation"
+                    containerClassName="form-control padding-left-0 font-static"
+                    data={Object.keys(occupations).map(
+                      o => occupations[o].name
+                    )}
+                    value={occupation}
+                    placeholder="Noble, Urchin, Smithy, Artisan, etc."
+                    onChange={dataItem =>
+                      this.setState({ occupation: dataItem })
+                    }
+                    caseSensitive={false}
+                    minLength={3}
+                    filter="contains"
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup validationState={this.getValidationState('race')}>
+                  <ControlLabel htmlFor="npc-race">Race</ControlLabel>
+                  <DropdownList
+                    id="npc-race"
+                    data={Object.keys(races).map(r => races[r].name)}
+                    containerClassName="form-control padding-left-0 font-static"
+                    value={race}
+                    minLength={2}
+                    filter="contains"
+                    placeholder="Human, Elf, Tiefling, Orc, etc."
+                    caseSensitive={false}
+                    onChange={dataItem => this.setState({ race: dataItem })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup validationState={this.getValidationState('gender')}>
+                  <ControlLabel htmlFor="npc-gender">Gender</ControlLabel>
+                  <DropdownList
+                    id="npc-gender"
+                    containerClassName="form-control padding-left-0 font-static"
+                    data={Object.keys(genders).map(g => genders[g].name)}
+                    value={gender}
+                    minLength={2}
+                    filter="contains"
+                    placeholder="What gender is this NPC"
+                    caseSensitive={false}
+                    onChange={dataItem => this.setState({ gender: dataItem })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+              </Fieldset>
+            </Col>
+            <Col xs={12} md={6}>
+              <Fieldset label="Physical Characteristics">
+                <FormGroup validationState={this.getValidationState('height')}>
+                  <ControlLabel htmlFor="#npc-height">Height</ControlLabel>
+                  <FormControl
+                    id="npc-height"
+                    type="text"
+                    value={height}
+                    required
+                    placeholder="How tall is this NPC"
+                    onChange={e => this.setState({ height: e.target.value })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup validationState={this.getValidationState('weight')}>
+                  <ControlLabel htmlFor="#npc-weight">Weight</ControlLabel>
+                  <FormControl
+                    id="npc-weight"
+                    type="text"
+                    value={weight}
+                    required
+                    placeholder="How heavy is this NPC"
+                    onChange={e => this.setState({ weight: e.target.value })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState('physDescription')}
+                >
+                  <ControlLabel htmlFor="#npc-physDescription">
+                    Physical Appearance
+                  </ControlLabel>
+                  <FormControl
+                    id="npc-physDescription"
+                    type="text"
+                    componentClass="textarea"
+                    value={physDescription}
+                    required
+                    placeholder="Describe how this NPC looks"
+                    onChange={e =>
+                      this.setState({ physDescription: e.target.value })
+                    }
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+              </Fieldset>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12} md={6}>
+              <Fieldset label="Personality Makeup">
+                <FormGroup
+                  validationState={this.getValidationState('alignment')}
+                >
+                  <ControlLabel htmlFor="npc-alignment">Alignment</ControlLabel>
+                  <DropdownList
+                    id="npc-alignment"
+                    data={Object.keys(alignments).map(a => alignments[a].name)}
+                    value={alignment}
+                    placeholder="Lawful, Chaotic, Good, Evil, Neutral"
+                    onChange={dataItem =>
+                      this.setState({ alignment: dataItem })
+                    }
+                  />
+                </FormGroup>
+                <FormGroup validationState={this.getValidationState('quirks')}>
+                  <ControlLabel htmlFor="#npc-quirks">Quirks</ControlLabel>
+                  <Multiselect
+                    id="npc-quirks"
+                    data={Object.keys(propQuirks).map(
+                      pq => propQuirks[pq].name
+                    )}
+                    containerClassName="form-control padding-left-0 font-static"
+                    value={quirks}
+                    caseSensitive={false}
+                    minLength={3}
+                    filter="contains"
+                    onChange={dataItems => this.setState({ quirks: dataItems })}
+                    placeholder="What quirks does this NPC have?"
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup validationState={this.getValidationState('values')}>
+                  <ControlLabel htmlFor="npc-values">Values</ControlLabel>
+                  <Multiselect
+                    id="npc-values"
+                    data={Object.keys(propValues).map(
+                      pv => propValues[pv].name
+                    )}
+                    containerClassName="form-control padding-left-0 font-static"
+                    value={values}
+                    placeholder="What values does this NPC hold?"
+                    onChange={dataItem => this.setState({ values: dataItem })}
+                    caseSensitive={false}
+                    minLength={2}
+                    filter="contains"
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState('backstory')}
+                >
+                  <ControlLabel htmlFor="#npc-backstory">
+                    Backstory
+                  </ControlLabel>
+                  <FormControl
+                    id="npc-backstory"
+                    type="text"
+                    componentClass="textarea"
+                    value={backstory}
+                    required
+                    placeholder="Describe the NPC's backstory"
+                    onChange={e => this.setState({ backstory: e.target.value })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+              </Fieldset>
+            </Col>
+            <Col xs={12} md={6}>
+              <Fieldset label="Related Info">
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-tags">Tags</ControlLabel>
+                  <Multiselect
+                    id="npc-tags"
+                    data={Object.keys(tags).map(key => ({
+                      name: tags[key].name,
+                      value: key
+                    }))}
+                    value={tagIds}
+                    allowCreate={'onFilter'}
+                    textField="name"
+                    valueField="value"
+                    onCreate={this.createTag}
+                    placeholder="Add tags to help you find related things later"
+                    caseSensitive={false}
+                    onChange={dataItems => this.setState({ tagIds: dataItems })}
+                    minLength={3}
+                    filter="contains"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-places">Places</ControlLabel>
+                  <Multiselect
+                    id="npc-places"
+                    data={Object.keys(places).map(key => ({
+                      name: places[key].name,
+                      value: key
+                    }))}
+                    value={placeIds}
+                    textField="name"
+                    valueField="value"
+                    placeholder="What places does this NPC interact in?"
+                    caseSensitive={false}
+                    onChange={dataItems =>
+                      this.setState({ placeIds: dataItems })
+                    }
+                    minLength={3}
+                    filter="contains"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-npcs">NPCs</ControlLabel>
+                  <Multiselect
+                    id="npc-npcs"
+                    data={Object.keys(npcs).map(key => ({
+                      name: npcs[key].name,
+                      value: key
+                    }))}
+                    value={npcIds}
+                    textField="name"
+                    valueField="value"
+                    placeholder="What npcs does this NPC interact with?"
+                    caseSensitive={false}
+                    onChange={dataItems => this.setState({ npcIds: dataItems })}
+                    minLength={3}
+                    filter="contains"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-quests">Quests</ControlLabel>
+                  <Multiselect
+                    id="npc-quests"
+                    data={Object.keys(quests).map(key => ({
+                      name: quests[key].name,
+                      value: key
+                    }))}
+                    value={questIds}
+                    textField="name"
+                    valueField="value"
+                    placeholder="What quests does this NPC have a role in?"
+                    caseSensitive={false}
+                    onChange={dataItems =>
+                      this.setState({ questIds: dataItems })
+                    }
+                    minLength={3}
+                    filter="contains"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-events">Events</ControlLabel>
+                  <Multiselect
+                    id="npc-events"
+                    data={Object.keys(events).map(key => ({
+                      name: events[key].name,
+                      value: key
+                    }))}
+                    value={eventIds}
+                    textField="name"
+                    valueField="value"
+                    placeholder="What events does this NPC have a role in?"
+                    caseSensitive={false}
+                    onChange={dataItems =>
+                      this.setState({ eventIds: dataItems })
+                    }
+                    minLength={3}
+                    filter="contains"
+                  />
+                </FormGroup>
+              </Fieldset>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12} md={6}>
+              <Fieldset label="Images and Files">
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-image">Image</ControlLabel>
+                  <input
+                    id="npc-image"
+                    type="file"
+                    multiple
+                    accept="image/png, image/jpeg, image/gif"
+                    onChange={e => {
+                      e.preventDefault();
+                      this.setState({ newImages: e.target.files });
+                    }}
+                  />
+                  {this.generateFileList('newImages')}
+                  {this.generateFileList('images')}
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-attachedFiles">
+                    Other Files
+                  </ControlLabel>
+                  <input
+                    id="npc-attachedFiles"
+                    type="file"
+                    multiple
+                    accept="image/png, image/jpeg, image/svg, image/gif, application/xhtml+xml, application/xml, application/pdf"
+                    onChange={e => {
+                      e.preventDefault();
+                      this.setState({ newAttachedFiles: e.target.files });
+                    }}
+                  />
+                  {this.generateFileList('newAttachedFiles')}
+                  {this.generateFileList('attachedFiles')}
+                </FormGroup>
+              </Fieldset>
+            </Col>
+          </Row>
+          <Row className="padding-bottom-1">
+            <Col xsOffset={6} xs={6}>
+              <Row>
+                <Col xs={6}>
+                  <button type="submit" className="button expanded">
+                    Submit
+                  </button>
+                </Col>
+                <Col xs={6}>
+                  <button
+                    className="button alert expanded"
+                    onClick={this.handleCloseRequest}
+                  >
+                    Cancel
+                  </button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
         </form>
       </div>
     );
   }
 }
 
-NPCForm.defaultProps = {};
-NPCForm.propTypes = {};
+NPCForm.defaultProps = {
+  npc: {
+    images: [],
+    npcIds: [],
+    placeIds: [],
+    noteIds: [],
+    eventIds: [],
+    questIds: [],
+    tagIds: [],
+    quirks: [],
+    values: [],
+    attachedFiles: []
+  },
+  onCancel: () => {},
+  formAction: 'create'
+};
+NPCForm.propTypes = {
+  npc: PropTypes.shape({}),
+  onCancel: PropTypes.func,
+  createNPC: PropTypes.func.isRequired,
+  formAction: PropTypes.oneOf(['edit', 'create'])
+};
 
-export default NPCForm;
+const mapStateToProps = state => ({
+  propValues: state.values.all,
+  occupations: state.occupations.all,
+  propQuirks: state.quirks.all,
+  genders: state.genders.all,
+  races: state.races.all,
+  tags: state.tags.all,
+  npcs: state.npcs.all,
+  places: state.places.all,
+  quests: state.quests.all,
+  events: state.events.all,
+  alignments: state.alignments.all
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      createNPC: createNPC,
+      editNPC: editNPC,
+      createTag: createTag
+    },
+    dispatch
+  );
+
+const FormContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NPCForm);
+
+export default FormContainer;

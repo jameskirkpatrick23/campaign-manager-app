@@ -1,5 +1,6 @@
 import * as constants from '../constants';
 import * as CampaignActions from '../actions/campaigns';
+import * as AdminActions from '../actions/administrative';
 export const loginUser = user => dispatch => {
   let scopedUserFields = {
     uid: user.uid,
@@ -10,6 +11,11 @@ export const loginUser = user => dispatch => {
     signinType: user.signinType
   };
   dispatch(CampaignActions.setCampaignListener(scopedUserFields));
+  ['values', 'alignments', 'quirks', 'occupations', 'races', 'genders'].forEach(
+    item => {
+      dispatch(AdminActions.loadCollection(item));
+    }
+  );
   return dispatch({ type: constants.Login.LOGIN_USER, user: scopedUserFields });
 };
 export const logoutUser = _user => {

@@ -9,6 +9,12 @@ import EventReducer from './events';
 import FloorReducer from './floors';
 import NoteReducer from './notes';
 import TileReducer from './tiles';
+import ValuesReducer from './values';
+import AlignmentsReducer from './alignments';
+import QuirksReducer from './quirks';
+import OccupationsReducer from './occupations';
+import RacesReducer from './races';
+import GendersReducer from './genders';
 
 export default combineReducers({
   login: LoginReducer,
@@ -20,5 +26,11 @@ export default combineReducers({
   events: EventReducer,
   floors: FloorReducer,
   notes: NoteReducer,
-  tiles: TileReducer
+  tiles: TileReducer,
+  values: ValuesReducer,
+  alignments: AlignmentsReducer,
+  quirks: QuirksReducer,
+  occupations: OccupationsReducer,
+  races: RacesReducer,
+  genders: GendersReducer
 });

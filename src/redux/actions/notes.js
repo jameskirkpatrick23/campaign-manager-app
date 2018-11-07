@@ -1,6 +1,7 @@
 import * as constants from '../constants';
 import database from '../../firebase';
 import * as PlaceActions from './places';
+import * as NPCActions from './npcs';
 import firebase from 'firebase';
 
 export const updateNotesList = note => (dispatch, getState) => {
@@ -14,6 +15,9 @@ const updateNoteParent = completedNote => {
     case 'place':
       PlaceActions.updatePlaceNotes(completedNote.id, completedNote.typeId);
       return;
+    case 'npc':
+      NPCActions.updateNPCNotes(completedNote.id, completedNote.typeId);
+      return;
     default:
       return true;
   }
@@ -23,6 +27,9 @@ const removeNoteFromParent = (parentId, type, noteId) => {
   switch (type) {
     case 'place':
       PlaceActions.removePlaceNotes(parentId, noteId);
+      return;
+    case 'npc':
+      NPCActions.removeNPCNotes(parentId, noteId);
       return;
     default:
       return true;

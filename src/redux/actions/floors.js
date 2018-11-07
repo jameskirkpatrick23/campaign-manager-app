@@ -3,7 +3,6 @@ import database, { app } from '../../firebase';
 import * as PlaceActions from './places';
 import firebase from 'firebase';
 import * as TileActions from './tiles';
-import { deleteTile } from './tiles';
 
 export const updateFloorsList = floor => (dispatch, getState) => {
   const updatedState = { ...getState().floors.all };
