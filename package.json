@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bootstrap": "^3.3.7",
+    "bootstrap": ">=4.1.2",
     "firebase": "^5.4.1",
     "form-serialize": "^0.7.2",
     "husky": "^0.14.3",
