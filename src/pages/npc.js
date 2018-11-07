@@ -258,7 +258,7 @@ class NPC extends Component {
     const { npc } = this.state;
     return (
       <Tab.Pane eventKey="notes">
-        <Notes noteIds={npc.noteIds} typeId={npc.id} type="npc" />
+        <Notes noteIds={npc.noteIds} typeId={npc.id} type="npcs" />
       </Tab.Pane>
     );
   };

@@ -149,8 +149,8 @@ class Notes extends Component {
     const { notes, noteIds } = this.props;
     return noteIds.filter(
       noteId =>
-        notes[noteId].description.includes(searchTerm) ||
-        notes[noteId].title.includes(searchTerm)
+        (notes[noteId] && notes[noteId].description.includes(searchTerm)) ||
+        (notes[noteId] && notes[noteId].title.includes(searchTerm))
     );
   };
 
@@ -264,7 +264,7 @@ Notes.defaultProps = {
 
 Notes.propTypes = {
   noteIds: PropTypes.arrayOf(PropTypes.string),
-  type: PropTypes.oneOf(['place', 'npc', 'quest']).isRequired,
+  type: PropTypes.oneOf(['places', 'npcs', 'quests']).isRequired,
   typeId: PropTypes.string.isRequired
 };
 
