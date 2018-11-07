@@ -1,8 +1,8 @@
 import * as constants from '../constants';
-import database, { app } from '../../firebase';
+import database from '../../firebase';
 import firebase from 'firebase';
 import * as FloorActions from './floors';
-import * as NoteActions from './notes';
+
 import {
   generatePromiseArray,
   generateFileDeletePromiseArray,

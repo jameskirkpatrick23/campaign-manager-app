@@ -5,7 +5,7 @@ import TileForm from '../forms/tile-form';
 import Tile from './tile';
 import { connect } from 'react-redux';
 
-class Tiles extends React.Component {
+class Tiles extends Component {
   constructor(props) {
     super(props);
     this.state = {

@@ -226,6 +226,7 @@ class NPC extends Component {
             const placeRoute = `/campaigns/${
               currentCampaign.id
             }/home/places/${placeKey}`;
+            if (!foundPlace) return null;
             if (foundPlace)
               return (
                 <Col xs={4} key={`place-${placeKey}`}>

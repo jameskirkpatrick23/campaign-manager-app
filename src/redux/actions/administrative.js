@@ -46,19 +46,19 @@ export const loadCollection = type => (dispatch, getState) => {
   });
 };
 
-export const createCollection = (collection, type) => (dispatch, getState) => {
-  collection.forEach(item => {
-    database
-      .collection(type)
-      .add({ name: item })
-      .then(res =>
-        dispatch(
-          updateCollectionList(
-            { id: res.id, name: item },
-            type,
-            constants[_.capitalize(type)][`SET_${_.toUpper(type)}_LIST`]
-          )
-        )
-      );
-  });
-};
+// export const createCollection = (collection, type) => (dispatch, getState) => {
+//   collection.forEach(item => {
+//     database
+//       .collection(type)
+//       .add({ name: item })
+//       .then(res =>
+//         dispatch(
+//           updateCollectionList(
+//             { id: res.id, name: item },
+//             type,
+//             constants[_.capitalize(type)][`SET_${_.toUpper(type)}_LIST`]
+//           )
+//         )
+//       );
+//   });
+// };

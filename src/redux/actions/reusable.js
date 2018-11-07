@@ -1,4 +1,4 @@
-import database, { app } from '../../firebase';
+import { app } from '../../firebase';
 import * as NoteActions from './notes';
 
 export const generatePromiseArray = (collection, uid, type, subclass) => {

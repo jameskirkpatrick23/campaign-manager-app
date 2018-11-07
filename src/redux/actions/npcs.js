@@ -1,5 +1,5 @@
 import { Npc } from '../constants';
-import database, { app } from '../../firebase';
+import database from '../../firebase';
 import firebase from 'firebase';
 import _ from 'lodash';
 import {
@@ -18,10 +18,6 @@ const removeNPCFromList = npcId => (dispatch, getState) => {
   const updatedState = { ...getState().npcs.all };
   delete updatedState[npcId];
   dispatch({ type: Npc.UPDATE_NPC_LIST, npcs: updatedState });
-};
-
-const setNPCList = npcs => dispatch => {
-  dispatch({ type: Npc.SET_NPC_LIST, npcs });
 };
 
 export const editNPC = npcData => (dispatch, getState) => {
