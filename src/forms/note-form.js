@@ -34,29 +34,36 @@ class NoteForm extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    if (this.props.formAction === 'create') {
-      this.props
-        .createNote({
-          ...this.state,
-          type: this.props.type,
-          typeId: this.props.typeId
-        })
+    const {
+      formAction,
+      type,
+      typeId,
+      onClose,
+      note,
+      createNote,
+      updateNote
+    } = this.props;
+    if (formAction === 'create') {
+      createNote({
+        ...this.state,
+        type: type,
+        typeId: typeId
+      })
         .then(() => {
-          this.props.onClose();
+          onClose();
         })
         .catch(err => {
           alert(err);
         });
     } else {
-      this.props
-        .updateNote({
-          ...this.state,
-          noteId: this.props.note.id,
-          type: this.props.type,
-          typeId: this.props.typeId
-        })
+      updateNote({
+        ...this.state,
+        noteId: note.id,
+        type: type,
+        typeId: typeId
+      })
         .then(() => {
-          this.props.onClose();
+          onClose();
         })
         .catch(err => {
           alert(err);
@@ -73,7 +80,7 @@ class NoteForm extends Component {
   render() {
     return (
       <div>
-        <form action="submit">
+        <form action="submit" onSubmit={e => this.onSubmit()}>
           <Row>
             <Col xs={12}>
               <FormGroup validationState={this.getValidationState('title')}>

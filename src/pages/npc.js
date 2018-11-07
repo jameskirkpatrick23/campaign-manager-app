@@ -25,7 +25,6 @@ class NPC extends Component {
     super(props);
     this.state = {
       npc: {},
-
       npcFormOpen: false
     };
     this.findRelatedObjects = this.findRelatedObjects.bind(this);

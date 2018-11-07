@@ -20,7 +20,7 @@ const removeNPCFromList = npcId => (dispatch, getState) => {
 };
 
 const setNPCList = npcs => dispatch => {
-  dispatch({ type: constants.Place.SET_NPC_LIST, npcs });
+  dispatch({ type: constants.Npc.SET_NPC_LIST, npcs });
 };
 
 export const editNPC = npcData => (dispatch, getState) => {
@@ -245,6 +245,36 @@ export const deleteNPC = npc => dispatch => {
         reject(
           `Failed to delete all the images and files for place ${err.message}`
         );
+      });
+  });
+};
+
+export const updateNPCNotes = (noteId, npcId) => {
+  return new Promise((resolve, reject) => {
+    database
+      .collection(`npcs`)
+      .doc(npcId)
+      .update({ noteIds: firebase.firestore.FieldValue.arrayUnion(noteId) })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+};
+
+export const removeNPCNotes = (npcId, noteId) => {
+  return new Promise((resolve, reject) => {
+    database
+      .collection(`npcs`)
+      .doc(npcId)
+      .update({ noteIds: firebase.firestore.FieldValue.arrayRemove(noteId) })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
       });
   });
 };
