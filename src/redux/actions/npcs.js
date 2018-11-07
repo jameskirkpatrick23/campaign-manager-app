@@ -30,16 +30,16 @@ export const editNPC = npcData => (dispatch, getState) => {
   const currentNPC = getState().npcs.all[npcData.npcId];
 
   const batch = database.batch();
-  const usedRef = database.collection('npcs').doc(npcData.id);
+  const usedRef = database.collection('npcs').doc(currentNPC.id);
   const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
 
   _.uniq([...currentNPC.placeIds, ...npcData.placeIds]).forEach(placeId => {
     const placeRef = database.collection('places').doc(placeId);
     if (!npcData.placeIds.includes(placeId)) {
       // delete if newData !include oldId
-      batch.update(placeRef, { npcIds: arrayRemove(npcData.id) });
+      batch.update(placeRef, { npcIds: arrayRemove(currentNPC.id) });
     } else {
-      batch.update(placeRef, { npcIds: arrayUnion(npcData.id) });
+      batch.update(placeRef, { npcIds: arrayUnion(currentNPC.id) });
     }
   });
 
@@ -47,9 +47,9 @@ export const editNPC = npcData => (dispatch, getState) => {
     const npcRef = database.collection('npcs').doc(npcId);
     if (!npcData.npcIds.includes(npcId)) {
       // delete if newData !include oldId
-      batch.update(npcRef, { npcIds: arrayRemove(npcData.id) });
+      batch.update(npcRef, { npcIds: arrayRemove(currentNPC.id) });
     } else {
-      batch.update(npcRef, { npcIds: arrayUnion(npcData.id) });
+      batch.update(npcRef, { npcIds: arrayUnion(currentNPC.id) });
     }
   });
 
