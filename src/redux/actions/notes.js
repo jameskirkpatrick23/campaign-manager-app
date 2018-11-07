@@ -25,13 +25,10 @@ export const createNote = noteData => (dispatch, getState) => {
   const ref = database.collection('notes').doc();
   const myId = ref.id;
   batch.set(ref, {
-    title: noteData.title,
-    description: noteData.description,
+    ...noteData,
     creatorId: getState().login.user.uid,
     createdAt: firebase.firestore.Timestamp.now(),
-    updatedAt: firebase.firestore.Timestamp.now(),
-    type: noteData.type,
-    typeId: noteData.typeId
+    updatedAt: firebase.firestore.Timestamp.now()
   });
   const parentRef = database.collection(noteData.type).doc(noteData.typeId);
   batch.update(parentRef, {
@@ -56,8 +53,7 @@ export const updateNote = noteData => dispatch => {
       .collection('notes')
       .doc(noteData.noteId)
       .update({
-        title: noteData.title,
-        description: noteData.description,
+        ...noteData,
         updatedAt: firebase.firestore.Timestamp.now()
       })
       .then(res => {
