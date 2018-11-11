@@ -60,8 +60,8 @@ class NPC extends Component {
   };
 
   handleNPCDelete = npc => {
-    const { deleteNpc, history } = this.props;
-    deleteNpc(npc);
+    const { deleteNPC, history } = this.props;
+    deleteNPC(npc);
     history.goBack();
   };
 

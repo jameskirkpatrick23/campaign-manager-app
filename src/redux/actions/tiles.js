@@ -54,17 +54,11 @@ export const createTile = tileData => (dispatch, getState) => {
       database
         .collection(`tiles`)
         .add({
-          floorId: tileData.floorId,
+          ...tileDataCopy,
           image: imageInformation,
           creatorId: getState().login.user.uid,
           createdAt: firebase.firestore.Timestamp.now(),
-          updatedAt: firebase.firestore.Timestamp.now(),
-          legend: tileData.legend,
-          description: tileData.description,
-          loot: tileData.loot,
-          skillChecks: tileData.skillChecks,
-          other: tileData.other,
-          objectiveIds: tileData.objectiveIds
+          updatedAt: firebase.firestore.Timestamp.now()
         })
         .then(res => {
           dispatch(updateTileParent({ ...tileData, id: res.id }, res, resolve));
@@ -99,12 +93,7 @@ export const updateTile = tileData => (dispatch, getState) => {
         .update({
           image: usedImageInfo,
           updatedAt: firebase.firestore.Timestamp.now(),
-          legend: tileData.legend,
-          description: tileData.description,
-          loot: tileData.loot,
-          skillChecks: tileData.skillChecks,
-          other: tileData.other,
-          objectiveIds: tileData.objectiveIds
+          ...tileData
         })
         .then(res => {
           resolve(res);

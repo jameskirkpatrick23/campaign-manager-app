@@ -1,7 +1,5 @@
 import * as constants from '../constants';
 import database from '../../firebase';
-import * as PlaceActions from './places';
-import * as NPCActions from './npcs';
 import firebase from 'firebase';
 
 export const updateNotesList = note => (dispatch, getState) => {
