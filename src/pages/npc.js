@@ -34,6 +34,7 @@ class NPC extends Component {
     this.renderPlaces = this.renderPlaces.bind(this);
     this.getImage = this.getImage.bind(this);
     this.renderNPCForm = this.renderNPCForm.bind(this);
+    this.renderNPCs = this.renderNPCs.bind(this);
   }
 
   findRelatedObjects = () => {
@@ -63,6 +64,54 @@ class NPC extends Component {
     const { deleteNPC, history } = this.props;
     deleteNPC(npc);
     history.goBack();
+  };
+
+  renderNPCs = () => {
+    const { npc } = this.state;
+    const { npcs, currentCampaign, history } = this.props;
+    return (
+      <Tab.Pane eventKey="npcs">
+        <Row>
+          <h3>Related NPCs</h3>
+        </Row>
+        <Row>
+          {!npc.npcIds.length && (
+            <div>
+              You have no related NPCs. Please add some to see them here.
+            </div>
+          )}
+          {npc.npcIds.map(npcKey => {
+            const foundNPC = npcs[npcKey];
+            const npcRoute = `/campaigns/${
+              currentCampaign.id
+            }/home/npcs/${npcKey}`;
+            if (!foundNPC) return null;
+            if (foundNPC)
+              return (
+                <Col xs={4} key={`npc-${npcKey}`}>
+                  <Panel
+                    bsStyle="warning"
+                    className="npc-card clickable"
+                    onClick={() => history.push(npcRoute)}
+                  >
+                    <Panel.Heading>
+                      <Panel.Title componentClass="h3">
+                        {foundNPC.name}
+                      </Panel.Title>
+                    </Panel.Heading>
+                    <Panel.Body className="padding-0">
+                      <Image
+                        src={this.getImage(foundNPC)}
+                        className="npc-image"
+                      />
+                    </Panel.Body>
+                  </Panel>
+                </Col>
+              );
+          })}
+        </Row>
+      </Tab.Pane>
+    );
   };
 
   renderDetails = () => {
@@ -312,6 +361,9 @@ class NPC extends Component {
         <NavItem eventKey="places">
           <Glyphicon glyph="globe" />
         </NavItem>
+        <NavItem eventKey="npcs">
+          <Glyphicon glyph="user" />
+        </NavItem>
         <NavItem eventKey="attachedFiles">
           <Glyphicon glyph="duplicate" />
         </NavItem>
@@ -363,6 +415,7 @@ class NPC extends Component {
                         {this.renderNotes()}
                         {this.renderAttachedFiles()}
                         {this.renderPlaces()}
+                        {this.renderNPCs()}
                       </Tab.Content>
                     </Col>
                   </Row>
