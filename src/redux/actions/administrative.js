@@ -33,7 +33,6 @@ export const loadCollection = (type, uid) => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     database
       .collection(type)
-      .where('collaboratorIds', 'array-contains', uid)
       .get()
       .then(querySnapshot => {
         database
