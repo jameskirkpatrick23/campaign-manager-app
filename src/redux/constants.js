@@ -68,7 +68,7 @@ export const Tile = {
   SET_TILES_LISTENER: 'SET_TILES_LISTENER'
 };
 
-export const Values = {
+export const Value = {
   UPDATING_VALUE: 'UPDATING_VALUE',
   DELETING_VALUE: 'DELETING_VALUE',
   CREATING_VALUE: 'CREATING_VALUE',
@@ -77,7 +77,7 @@ export const Values = {
   SET_VALUES_LISTENER: 'SET_VALUES_LISTENER'
 };
 
-export const Alignments = {
+export const Alignment = {
   UPDATING_ALIGNMENT: 'UPDATING_ALIGNMENT',
   DELETING_ALIGNMENT: 'DELETING_ALIGNMENT',
   CREATING_ALIGNMENT: 'CREATING_ALIGNMENT',
@@ -86,7 +86,7 @@ export const Alignments = {
   SET_ALIGNMENTS_LISTENER: 'SET_ALIGNMENTS_LISTENER'
 };
 
-export const Quirks = {
+export const Quirk = {
   UPDATING_QUIRK: 'UPDATING_QUIRK',
   DELETING_QUIRK: 'DELETING_QUIRK',
   CREATING_QUIRK: 'CREATING_QUIRK',
@@ -95,7 +95,7 @@ export const Quirks = {
   SET_QUIRKS_LISTENER: 'SET_QUIRKS_LISTENER'
 };
 
-export const Occupations = {
+export const Occupation = {
   UPDATING_OCCUPATION: 'UPDATING_OCCUPATION',
   DELETING_OCCUPATION: 'DELETING_OCCUPATION',
   CREATING_OCCUPATION: 'CREATING_OCCUPATION',
@@ -104,7 +104,7 @@ export const Occupations = {
   SET_OCCUPATIONS_LISTENER: 'SET_OCCUPATIONS_LISTENER'
 };
 
-export const Races = {
+export const Race = {
   UPDATING_RACE: 'UPDATING_RACE',
   DELETING_RACE: 'DELETING_RACE',
   CREATING_RACE: 'CREATING_RACE',
@@ -113,7 +113,7 @@ export const Races = {
   SET_RACES_LISTENER: 'SET_RACES_LISTENER'
 };
 
-export const Genders = {
+export const Gender = {
   UPDATING_GENDER: 'UPDATING_GENDER',
   DELETING_GENDER: 'DELETING_GENDER',
   CREATING_GENDER: 'CREATING_GENDER',

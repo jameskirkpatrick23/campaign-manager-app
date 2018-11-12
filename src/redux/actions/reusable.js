@@ -1,5 +1,4 @@
 import { app } from '../../firebase';
-import * as NoteActions from './notes';
 
 export const generatePromiseArray = (collection, uid, type, subclass) => {
   const storageRef = app.storage().ref();
@@ -45,10 +44,4 @@ export const generateFileDeletePromiseArray = (deleteKeys, currentArray) => {
     promiseArray.push(newPromise);
   }
   return promiseArray;
-};
-
-export const deleteNotes = noteIds => dispatch => {
-  noteIds.forEach(noteId => {
-    dispatch(NoteActions.deleteNote({ id: noteId }));
-  });
 };

@@ -60,8 +60,8 @@ class NPC extends Component {
   };
 
   handleNPCDelete = npc => {
-    const { deleteNpc, history } = this.props;
-    deleteNpc(npc);
+    const { deleteNPC, history } = this.props;
+    deleteNPC(npc);
     history.goBack();
   };
 
@@ -226,6 +226,7 @@ class NPC extends Component {
             const placeRoute = `/campaigns/${
               currentCampaign.id
             }/home/places/${placeKey}`;
+            if (!foundPlace) return null;
             if (foundPlace)
               return (
                 <Col xs={4} key={`place-${placeKey}`}>
@@ -258,7 +259,7 @@ class NPC extends Component {
     const { npc } = this.state;
     return (
       <Tab.Pane eventKey="notes">
-        <Notes noteIds={npc.noteIds} typeId={npc.id} type="npc" />
+        <Notes noteIds={npc.noteIds} typeId={npc.id} type="npcs" />
       </Tab.Pane>
     );
   };

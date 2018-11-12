@@ -1,31 +1,53 @@
-import * as constants from '../constants';
-import database, { app } from '../../firebase';
+import { Npc } from '../constants';
+import database from '../../firebase';
 import firebase from 'firebase';
+import _ from 'lodash';
 import {
   generatePromiseArray,
-  generateFileDeletePromiseArray,
-  deleteNotes
+  generateFileDeletePromiseArray
 } from './reusable';
+import { deleteNote } from './notes';
 
 export const updateNPCsList = npc => (dispatch, getState) => {
   const updatedState = { ...getState().npcs.all };
   updatedState[npc.id] = npc;
-  dispatch({ type: constants.Npc.UPDATE_NPC_LIST, npcs: updatedState });
+  dispatch({ type: Npc.UPDATE_NPC_LIST, npcs: updatedState });
 };
 
 const removeNPCFromList = npcId => (dispatch, getState) => {
   const updatedState = { ...getState().npcs.all };
   delete updatedState[npcId];
-  dispatch({ type: constants.Npc.UPDATE_NPC_LIST, npcs: updatedState });
-};
-
-const setNPCList = npcs => dispatch => {
-  dispatch({ type: constants.Npc.SET_NPC_LIST, npcs });
+  dispatch({ type: Npc.UPDATE_NPC_LIST, npcs: updatedState });
 };
 
 export const editNPC = npcData => (dispatch, getState) => {
+  dispatch({ type: Npc.UPDATE_NPC, data: npcData });
   const userUid = getState().login.user.uid;
   const currentNPC = getState().npcs.all[npcData.npcId];
+
+  const batch = database.batch();
+  const usedRef = database.collection('npcs').doc(currentNPC.id);
+  const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
+
+  _.uniq([...currentNPC.placeIds, ...npcData.placeIds]).forEach(placeId => {
+    const placeRef = database.collection('places').doc(placeId);
+    if (!npcData.placeIds.includes(placeId)) {
+      // delete if newData !include oldId
+      batch.update(placeRef, { npcIds: arrayRemove(currentNPC.id) });
+    } else {
+      batch.update(placeRef, { npcIds: arrayUnion(currentNPC.id) });
+    }
+  });
+
+  _.uniq([...currentNPC.npcIds, ...npcData.npcIds]).forEach(npcId => {
+    const npcRef = database.collection('npcs').doc(npcId);
+    if (!npcData.npcIds.includes(npcId)) {
+      // delete if newData !include oldId
+      batch.update(npcRef, { npcIds: arrayRemove(currentNPC.id) });
+    } else {
+      batch.update(npcRef, { npcIds: arrayUnion(currentNPC.id) });
+    }
+  });
 
   const {
     deleteimagesKeys,
@@ -61,7 +83,13 @@ export const editNPC = npcData => (dispatch, getState) => {
   let currentAttachedFiles = Object.keys(attachedFiles).map(
     key => attachedFiles[key]
   );
-  dispatch({ type: constants.Npc.UPDATE_NPC, data: npcData });
+  const usedData = { ...npcData };
+  delete usedData.newImages;
+  delete usedData.newAttachedFiles;
+  delete usedData.deleteattachedFilesKeys;
+  delete usedData.deleteimagesKeys;
+  delete usedData.deletenewAttachedFilesKeys;
+  delete usedData.deletenewImagesKeys;
 
   return new Promise((resolve, reject) => {
     // make all the new images
@@ -75,68 +103,64 @@ export const editNPC = npcData => (dispatch, getState) => {
                 currentAttachedFiles = currentAttachedFiles.concat(
                   resolvedFiles
                 );
-                new Promise(() => {
-                  database
-                    .collection(`npcs`)
-                    .doc(npcData.npcId)
-                    .update({
-                      name: npcData.name,
-                      physDescription: npcData.physDescription,
-                      backstory: npcData.backstory,
-                      height: npcData.height,
-                      weight: npcData.weight,
-                      alignment: npcData.alignment,
-                      race: npcData.race,
-                      gender: npcData.gender,
-                      occupation: npcData.occupation,
-                      quirks: npcData.quirks,
-                      values: npcData.values,
-                      tagIds: npcData.tagIds,
-                      npcIds: npcData.npcIds,
-                      questIds: npcData.questIds,
-                      placeIds: npcData.placeIds,
-                      updatedAt: firebase.firestore.Timestamp.now(),
-                      noteIds: npcData.noteIds,
-                      eventIds: npcData.eventIds,
-                      images: currentImages,
-                      attachedFiles: currentAttachedFiles
-                    })
-                    .then(res => {
-                      resolve(res);
-                    })
-                    .catch(error => {
-                      reject('Error writing document: ', error.message);
-                    });
-                }).catch(err => {
-                  reject(err.message);
+                batch.update(usedRef, {
+                  ...usedData,
+                  updatedAt: firebase.firestore.Timestamp.now(),
+                  images: currentImages,
+                  attachedFiles: currentAttachedFiles
                 });
+                batch
+                  .commit()
+                  .then(res => {
+                    resolve(res);
+                  })
+                  .catch(error => {
+                    reject(`Error writing document: ${error.message}`);
+                  });
               })
               .catch(err => {
                 reject(
-                  'Something went wrong while trying upload files:',
-                  err.message
+                  `Something went wrong while trying upload files: ${
+                    err.message
+                  }`
                 );
               });
           })
           .catch(err => {
             reject(
-              'Something went wrong while trying upload images:',
-              err.message
+              `Something went wrong while trying upload images: ${err.message}`
             );
           });
       })
       .catch(err => {
         reject(
-          'Something went wrong while trying upload images and files:',
-          err.message
+          `Something went wrong while trying upload images and files: ${
+            err.message
+          }`
         );
       });
   });
 };
 
 export const createNPC = npcData => (dispatch, getState) => {
+  dispatch({ type: Npc.CREATING_NPC, data: npcData });
   const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;
+
+  const batch = database.batch();
+  const usedRef = database.collection('npcs').doc();
+  const usedId = usedRef.id;
+  const { arrayUnion } = firebase.firestore.FieldValue;
+  const usedData = { ...npcData };
+
+  npcData.placeIds.forEach(placeId => {
+    const placeRef = database.collection('places').doc(placeId);
+    batch.update(placeRef, { npcIds: arrayUnion(usedId) });
+  });
+  npcData.npcIds.forEach(npcId => {
+    const npcRef = database.collection('npcs').doc(npcId);
+    batch.update(npcRef, { npcIds: arrayUnion(usedId) });
+  });
 
   const imagePromiseArray = generatePromiseArray(
     npcData.newImages,
@@ -151,93 +175,91 @@ export const createNPC = npcData => (dispatch, getState) => {
     'npcs'
   );
 
-  dispatch({ type: constants.Npc.CREATING_NPC, data: npcData });
   return new Promise((resolve, reject) => {
+    delete usedData.newImages;
+    delete usedData.newAttachedFiles;
+    delete usedData.deleteattachedFilesKeys;
+    delete usedData.deleteimagesKeys;
+    delete usedData.deletenewAttachedFilesKeys;
+    delete usedData.deletenewImagesKeys;
     return Promise.all(imagePromiseArray)
       .then(resolvedImages => {
-        const uploadedImages = resolvedImages;
         Promise.all(attachedFilePromiseArray)
           .then(resolvedFiles => {
-            const uploadedFiles = resolvedFiles;
-            new Promise(() => {
-              database
-                .collection(`npcs`)
-                .add({
-                  name: npcData.name,
-                  physDescription: npcData.physDescription,
-                  backstory: npcData.backstory,
-                  height: npcData.height,
-                  weight: npcData.weight,
-                  alignment: npcData.alignment,
-                  race: npcData.race,
-                  gender: npcData.gender,
-                  occupation: npcData.occupation,
-                  quirks: npcData.quirks,
-                  values: npcData.values,
-                  tagIds: npcData.tagIds,
-                  npcIds: npcData.npcIds,
-                  questIds: npcData.questIds,
-                  placeIds: npcData.placeIds,
-                  createdAt: firebase.firestore.Timestamp.now(),
-                  updatedAt: firebase.firestore.Timestamp.now(),
-                  noteIds: [],
-                  eventIds: npcData.eventIds,
-                  campaignIds: [currentCampaign.id],
-                  images: uploadedImages,
-                  attachedFiles: uploadedFiles,
-                  creatorId: userUid,
-                  collaboratorIds: []
-                })
-                .then(res => {
-                  resolve(res);
-                })
-                .catch(error => {
-                  reject('Error writing document: ', error.message);
-                });
-            }).catch(err => {
-              reject(
-                'Something went wrong while trying upload files:',
-                err.message
-              );
+            batch.set(usedRef, {
+              ...usedData,
+              createdAt: firebase.firestore.Timestamp.now(),
+              updatedAt: firebase.firestore.Timestamp.now(),
+              noteIds: [],
+              campaignIds: [currentCampaign.id],
+              images: resolvedImages,
+              attachedFiles: resolvedFiles,
+              creatorId: userUid,
+              collaboratorIds: []
             });
+            batch
+              .commit()
+              .then(res => {
+                resolve(res);
+              })
+              .catch(error => {
+                reject(`Error writing document: ${error.message}`);
+              });
           })
           .catch(err => {
             reject(
-              'Something went wrong while trying upload images:',
-              err.message
+              `Something went wrong while trying upload files: ${err.message}`
             );
           });
       })
       .catch(err => {
-        reject('Something went wrong while trying upload images:', err.message);
+        reject(
+          `Something went wrong while trying upload images: ${err.message}`
+        );
       });
   });
 };
 
 export const deleteNPC = npc => dispatch => {
-  const allImageKeys = Array.from(Array(npc.images.length).keys());
+  dispatch({ type: Npc.DELETING_NPC, id: npc.id });
+  const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
+  const batch = database.batch();
+  const usedRef = database.collection('npcs').doc(npc.id);
+  batch.delete(usedRef);
+  npc.noteIds.forEach(noteId => {
+    const noteRef = database.collection('notes').doc(noteId);
+    batch.delete(noteRef);
+    dispatch(deleteNote({ id: noteId }));
+  });
+  npc.placeIds.forEach(placeId => {
+    const placeRef = database.collection('places').doc(placeId);
+    batch.update(placeRef, { npcIds: arrayRemove(npc.id) });
+  });
+  npc.npcIds.forEach(npcId => {
+    const npcRef = database.collection('npcs').doc(npcId);
+    batch.update(npcRef, { npcIds: arrayUnion(npc.id) });
+  });
+
+  const allImageKeys = Array.from(new Array(npc.images.length).keys());
   const imagePromise = generateFileDeletePromiseArray(allImageKeys, npc.images);
-  const allFileKeys = Array.from(Array(npc.attachedFiles.length).keys());
+  const allFileKeys = Array.from(new Array(npc.attachedFiles.length).keys());
   const filePromise = generateFileDeletePromiseArray(
     allFileKeys,
     npc.attachedFiles
   );
-  dispatch({ type: constants.Npc.DELETING_NPC, id: npc.id });
+
   return new Promise((resolve, reject) => {
     Promise.all([...imagePromise, ...filePromise])
       .then(() => {
-        dispatch(deleteNotes(npc.noteIds));
-        dispatch(removeNPCFromList(npc.id));
-        database
-          .collection(`places`)
-          .doc(`${npc.id}`)
-          .delete()
+        batch
+          .commit()
           .then(res => {
+            dispatch(removeNPCFromList(npc.id));
             resolve(res);
           })
-          .catch(err => {
+          .catch(error => {
             reject(
-              `Something went wrong while trying to delete: ${err.message}`
+              `Something went wrong while trying to delete: ${error.message}`
             );
           });
       })
@@ -245,36 +267,6 @@ export const deleteNPC = npc => dispatch => {
         reject(
           `Failed to delete all the images and files for place ${err.message}`
         );
-      });
-  });
-};
-
-export const updateNPCNotes = (noteId, npcId) => {
-  return new Promise((resolve, reject) => {
-    database
-      .collection(`npcs`)
-      .doc(npcId)
-      .update({ noteIds: firebase.firestore.FieldValue.arrayUnion(noteId) })
-      .then(res => {
-        resolve(res);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
-};
-
-export const removeNPCNotes = (npcId, noteId) => {
-  return new Promise((resolve, reject) => {
-    database
-      .collection(`npcs`)
-      .doc(npcId)
-      .update({ noteIds: firebase.firestore.FieldValue.arrayRemove(noteId) })
-      .then(res => {
-        resolve(res);
-      })
-      .catch(err => {
-        reject(err);
       });
   });
 };

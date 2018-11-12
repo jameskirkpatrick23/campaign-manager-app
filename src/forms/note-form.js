@@ -80,7 +80,7 @@ class NoteForm extends Component {
   render() {
     return (
       <div>
-        <form action="submit" onSubmit={e => this.onSubmit()}>
+        <form action="submit" onSubmit={e => this.onSubmit(e)}>
           <Row>
             <Col xs={12}>
               <FormGroup validationState={this.getValidationState('title')}>

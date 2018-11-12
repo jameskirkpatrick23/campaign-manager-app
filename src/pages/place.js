@@ -262,7 +262,7 @@ class Place extends Component {
     const { place } = this.state;
     return (
       <Tab.Pane eventKey="notes">
-        <Notes noteIds={place.noteIds} typeId={place.id} type="place" />
+        <Notes noteIds={place.noteIds} typeId={place.id} type="places" />
       </Tab.Pane>
     );
   };

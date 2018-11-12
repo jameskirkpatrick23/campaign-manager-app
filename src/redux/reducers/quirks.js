@@ -4,11 +4,11 @@ const initialState = {
 };
 export default function QuirksReducer(state = initialState, action) {
   switch (action.type) {
-    case constants.Quirks.SET_QUIRKS_LIST:
+    case constants.Quirk.SET_QUIRKS_LIST:
       return Object.assign({}, state, {
         all: action.quirks
       });
-    case constants.Quirks.UPDATE_QUIRK_LIST:
+    case constants.Quirk.UPDATE_QUIRK_LIST:
       return Object.assign({}, state, {
         all: action.quirks
       });

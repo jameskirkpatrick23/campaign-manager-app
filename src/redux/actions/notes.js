@@ -1,39 +1,11 @@
 import * as constants from '../constants';
 import database from '../../firebase';
-import * as PlaceActions from './places';
-import * as NPCActions from './npcs';
 import firebase from 'firebase';
 
 export const updateNotesList = note => (dispatch, getState) => {
   const updatedState = { ...getState().notes.all };
   updatedState[note.id] = { ...note, createdAt: note.createdAt.toDate() };
   dispatch({ type: constants.Note.UPDATE_NOTE_LIST, notes: updatedState });
-};
-
-const updateNoteParent = completedNote => {
-  switch (completedNote.type) {
-    case 'place':
-      PlaceActions.updatePlaceNotes(completedNote.id, completedNote.typeId);
-      return;
-    case 'npc':
-      NPCActions.updateNPCNotes(completedNote.id, completedNote.typeId);
-      return;
-    default:
-      return true;
-  }
-};
-
-const removeNoteFromParent = (parentId, type, noteId) => {
-  switch (type) {
-    case 'place':
-      PlaceActions.removePlaceNotes(parentId, noteId);
-      return;
-    case 'npc':
-      NPCActions.removeNPCNotes(parentId, noteId);
-      return;
-    default:
-      return true;
-  }
 };
 
 const removeNoteFromList = noteId => (dispatch, getState) => {
@@ -47,37 +19,39 @@ const removeNoteFromList = noteId => (dispatch, getState) => {
 
 export const createNote = noteData => (dispatch, getState) => {
   dispatch({ type: constants.Note.CREATING_NOTE, note: noteData });
+  const batch = database.batch();
+  const ref = database.collection('notes').doc();
+  const myId = ref.id;
+  batch.set(ref, {
+    ...noteData,
+    creatorId: getState().login.user.uid,
+    createdAt: firebase.firestore.Timestamp.now(),
+    updatedAt: firebase.firestore.Timestamp.now()
+  });
+  const parentRef = database.collection(noteData.type).doc(noteData.typeId);
+  batch.update(parentRef, {
+    noteIds: firebase.firestore.FieldValue.arrayUnion(myId)
+  });
   return new Promise((resolve, reject) => {
-    database
-      .collection(`notes`)
-      .add({
-        title: noteData.title,
-        description: noteData.description,
-        creatorId: getState().login.user.uid,
-        createdAt: firebase.firestore.Timestamp.now(),
-        updatedAt: firebase.firestore.Timestamp.now(),
-        type: noteData.type,
-        typeId: noteData.typeId
-      })
+    batch
+      .commit()
       .then(res => {
         resolve(res);
-        updateNoteParent({ ...noteData, id: res.id });
       })
       .catch(error => {
-        reject('Error writing document: ', error.message);
+        reject(`Error writing document: ${error.message}`);
       });
   });
 };
 
-export const updateNote = noteData => (dispatch, getState) => {
+export const updateNote = noteData => dispatch => {
   dispatch({ type: constants.Note.UPDATING_NOTE, note: noteData });
   return new Promise((resolve, reject) => {
     database
       .collection('notes')
       .doc(noteData.noteId)
       .update({
-        title: noteData.title,
-        description: noteData.description,
+        ...noteData,
         updatedAt: firebase.firestore.Timestamp.now()
       })
       .then(res => {
@@ -89,21 +63,23 @@ export const updateNote = noteData => (dispatch, getState) => {
   });
 };
 
-export const deleteNote = note => (dispatch, getState) => {
+export const deleteNote = note => dispatch => {
   dispatch({ type: constants.Note.DELETING_NOTE, note });
-
   const foundNote = { ...note }; //we want a copy because we are going to delete the redux stores
+  const batch = database.batch();
+  const noteRef = database.collection('notes').doc(foundNote.id);
+  batch.delete(noteRef);
+  const parentRef = database.collection(foundNote.type).doc(foundNote.typeId);
+  batch.update(parentRef, {
+    noteIds: firebase.firestore.FieldValue.arrayRemove(foundNote.id)
+  });
+
   return new Promise((resolve, reject) => {
-    database
-      .collection('notes')
-      .doc(foundNote.id)
-      .delete()
+    batch
+      .commit()
       .then(res => {
-        resolve(res);
-        dispatch(
-          removeNoteFromParent(foundNote.typeId, foundNote.type, foundNote.id)
-        );
         dispatch(removeNoteFromList(foundNote.id));
+        resolve(res);
       })
       .catch(error => {
         reject('Error writing document: ', error.message);

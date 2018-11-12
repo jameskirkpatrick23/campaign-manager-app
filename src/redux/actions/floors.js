@@ -1,5 +1,5 @@
 import * as constants from '../constants';
-import database, { app } from '../../firebase';
+import database from '../../firebase';
 import * as PlaceActions from './places';
 import firebase from 'firebase';
 import * as TileActions from './tiles';
@@ -19,7 +19,7 @@ const removeFloorFromList = floorId => (dispatch, getState) => {
   });
 };
 
-export const updateTiles = (floor, newTiles) => (_dispatch, _getState) => {
+export const updateTiles = (floor, newTiles) => () => {
   return new Promise((resolve, reject) => {
     database
       .collection(`floors`)
@@ -69,12 +69,9 @@ export const updateFloor = floorData => (dispatch, getState) => {
       .collection(`floors`)
       .doc(floorData.floorId)
       .update({
-        cols: floorData.numCols,
-        rows: floorData.numRows,
-        description: floorData.description,
+        ...floorData,
         questIds: [],
         updatedAt: firebase.firestore.Timestamp.now(),
-        name: floorData.name,
         tiles: newTiles //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
       })
       .then(res => {
@@ -94,29 +91,25 @@ export const createFloor = floorData => (dispatch, getState) => {
       tiles[`${i}${j}`] = {};
     }
   }
+  const { arrayUnion } = firebase.firestore.FieldValue;
+  const batch = database.batch();
+  const usedRef = database.collection('floors').doc();
+  const usedId = usedRef.id;
+  batch.set({
+    ...floorData,
+    questIds: [],
+    createdAt: firebase.firestore.Timestamp.now(),
+    tiles, //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
+    creatorId: userUid,
+    collaboratorIds: []
+  });
+  const placeRef = database.collection('places').doc(usedId);
+  batch.update(placeRef, { floorIds: arrayUnion(usedId) });
   return new Promise((resolve, reject) => {
-    database
-      .collection(`floors`)
-      .add({
-        placeId: floorData.placeId,
-        cols: floorData.numCols,
-        rows: floorData.numRows,
-        description: floorData.description,
-        questIds: [],
-        createdAt: firebase.firestore.Timestamp.now(),
-        name: floorData.name,
-        tiles, //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
-        creatorId: userUid,
-        collaboratorIds: []
-      })
+    batch
+      .commit()
       .then(res => {
-        PlaceActions.updatePlaceFloors(floorData.placeId, res.id, dispatch)
-          .then(placeResolve => {
-            resolve(res);
-          })
-          .catch(err => {
-            reject(err);
-          });
+        resolve(res);
       })
       .catch(error => {
         reject('Error writing document: ', error.message);
@@ -124,28 +117,10 @@ export const createFloor = floorData => (dispatch, getState) => {
   });
 };
 
-const removeFloorFromPlace = (floorId, place) => {
-  return new Promise((resolve, reject) => {
-    if (!place) resolve();
-    database
-      .collection('places')
-      .doc(place.id)
-      .update({
-        floorIds: firebase.firestore.FieldValue.arrayRemove(floorId)
-      })
-      .then(res => {
-        resolve(res);
-      })
-      .catch(error => {
-        reject(`Unable to remove floor from place ${error.message}`);
-      });
-  });
-};
-
 const getUsedTiles = (floor, allTiles) => {
   const tiles = [];
-  const rows = Array.from(Array(floor.rows).keys());
-  const cols = Array.from(Array(floor.cols).keys());
+  const rows = Array.from(new Array(floor.rows).keys());
+  const cols = Array.from(new Array(floor.cols).keys());
   rows.forEach(row => {
     cols.forEach(col => {
       let floorTile = floor.tiles[`${row}${col}`];
@@ -160,38 +135,35 @@ export const deleteFloor = floorId => (dispatch, getState) => {
   const allTiles = getState().tiles.all;
   const usedTiles = getUsedTiles(usedFloor, allTiles);
   const deletePromises = generateDeleteTilePromises(usedTiles, dispatch);
+  const { arrayRemove } = firebase.firestore.FieldValue;
+  const batch = database.batch();
+  const floorRef = database.collection('floors').doc(floorId);
+  batch.delete(floorRef);
+  if (getState().places.all[usedFloor.placeId]) {
+    const placeRef = database.collection('places').doc(usedFloor.placeId);
+    batch.update(placeRef, { floorIds: arrayRemove(usedFloor.id) });
+  }
   return new Promise((resolve, reject) => {
     Promise.all(deletePromises)
-      .then(allPromRes => {
-        database
-          .collection('floors')
-          .doc(floorId)
-          .delete()
+      .then(() => {
+        batch
+          .commit()
           .then(response => {
-            removeFloorFromPlace(
-              floorId,
-              getState().places.all[usedFloor.placeId]
-            )
-              .then(re => {
-                dispatch(removeFloorFromList(floorId));
-                resolve(response);
-              })
-              .catch(er => {
-                reject(
-                  `Something went wrong removing the floor from the place ${
-                    er.message
-                  }`
-                );
-              });
+            dispatch(removeFloorFromList(floorId));
+            resolve(response);
           })
-          .catch(error => {
+          .catch(er => {
             reject(
-              `Something went wrong while deleting the floor ${error.message}`
+              `Something went wrong removing the floor from the place ${
+                er.message
+              }`
             );
           });
       })
-      .catch(allPromErr => {
-        reject(`Something went wrong deleting the tiles ${allPromErr.message}`);
+      .catch(error => {
+        reject(
+          `Something went wrong while deleting the floor ${error.message}`
+        );
       });
   });
 };

@@ -4,11 +4,11 @@ const initialState = {
 };
 export default function RacesReducer(state = initialState, action) {
   switch (action.type) {
-    case constants.Races.SET_RACES_LIST:
+    case constants.Race.SET_RACES_LIST:
       return Object.assign({}, state, {
         all: action.races
       });
-    case constants.Races.UPDATE_RACE_LIST:
+    case constants.Race.UPDATE_RACE_LIST:
       return Object.assign({}, state, {
         all: action.races
       });

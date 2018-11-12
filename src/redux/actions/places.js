@@ -1,12 +1,13 @@
 import * as constants from '../constants';
-import database, { app } from '../../firebase';
+import database from '../../firebase';
 import firebase from 'firebase';
-import * as FloorActions from './floors';
-import * as NoteActions from './notes';
+import { deleteFloor } from './floors';
+import { deleteNote } from './notes';
+import _ from 'lodash';
+
 import {
   generatePromiseArray,
-  generateFileDeletePromiseArray,
-  deleteNotes
+  generateFileDeletePromiseArray
 } from './reusable';
 //<editor-fold Types>
 
@@ -18,19 +19,33 @@ export const updatePlaceTypesList = type => (dispatch, getState) => {
 
 export const createPlaceType = typeName => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
-    database
-      .collection(`placeTypes`)
-      .add({
-        name: typeName,
-        creatorId: getState().login.user.uid,
-        collaboratorIds: []
-      })
-      .then(res => {
-        dispatch({ type: 'CREATED_PLACE_TYPE', typeName });
-        resolve(res);
-      })
-      .catch(function(error) {
-        reject('Error writing document: ', error);
+    const myId = getState().login.user.uid;
+    const ref = database.collection(`placeTypes`);
+    ref
+      .orderByChild('name')
+      .equalTo(typeName)
+      .once('value', snapshot => {
+        if (snapshot.exists()) {
+          ref
+            .doc(snapshot.val())
+            .update({
+              collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
+            });
+        } else {
+          ref
+            .add({
+              name: typeName,
+              creatorId: myId,
+              collaboratorIds: []
+            })
+            .then(res => {
+              dispatch({ type: 'CREATED_OCCUPATION', typeName });
+              resolve(res);
+            })
+            .catch(error => {
+              reject('Error writing document: ', error);
+            });
+        }
       });
   });
 };
@@ -73,15 +88,25 @@ const removePlaceFromList = placeId => (dispatch, getState) => {
   dispatch({ type: constants.Place.UPDATE_PLACE_LIST, places: updatedState });
 };
 
-const deleteFloors = place => dispatch => {
-  place.floorIds.forEach(floorId => {
-    dispatch(FloorActions.deleteFloor(floorId));
-  });
-};
-
 export const deletePlace = place => dispatch => {
-  const usedPlace = { ...place };
-  const allImageKeys = Array.from(Array(place.images.length).keys());
+  const allImageKeys = Array.from(new Array(place.images.length).keys());
+  const { arrayRemove } = firebase.firestore.FieldValue;
+  const batch = database.batch;
+  const usedRef = database.collection('places').doc(place.id);
+  batch.delete(usedRef);
+  place.noteIds.forEach(noteId => {
+    const noteRef = database.collection('notes').doc(noteId);
+    batch.delete(noteRef);
+    dispatch(deleteNote({ id: noteId }));
+  });
+  place.npcIds.forEach(npcId => {
+    const npcRef = database.collection('npcs').doc(npcId);
+    batch.update(npcRef, { placeIds: arrayRemove(place.id) });
+  });
+  place.placeIds.forEach(placeId => {
+    const placeRef = database.collection('places').doc(placeId);
+    batch.update(placeRef, { placeIds: arrayRemove(place.id) });
+  });
   const imagePromise = generateFileDeletePromiseArray(
     allImageKeys,
     place.images
@@ -95,14 +120,13 @@ export const deletePlace = place => dispatch => {
   return new Promise((resolve, reject) => {
     Promise.all([...imagePromise, ...filePromise])
       .then(() => {
-        dispatch(deleteNotes(place.noteIds));
         dispatch(removePlaceFromList(place.id));
-        dispatch(deleteFloors(usedPlace));
-        database
-          .collection(`places`)
-          .doc(`${place.id}`)
-          .delete()
+        batch
+          .commit()
           .then(res => {
+            place.floorIds.forEach(floorId => {
+              dispatch(deleteFloor(floorId));
+            });
             resolve(res);
           })
           .catch(err => {
@@ -119,28 +143,9 @@ export const deletePlace = place => dispatch => {
   });
 };
 
-export const updatePlaceFloors = (placeId, floorId, dispatch) => {
-  return new Promise((resolve, reject) => {
-    database
-      .collection('places')
-      .doc(placeId)
-      .update({
-        floorIds: firebase.firestore.FieldValue.arrayUnion(floorId)
-      })
-      .then(res => {
-        dispatch({ type: constants.Place.UPDATE_PLACE, placeId });
-        resolve(res);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
-};
-
 export const editPlace = placeData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   const currentPlace = getState().places.all[placeData.placeId];
-
   const {
     deleteimagesKeys,
     deleteattachedFilesKeys,
@@ -149,6 +154,10 @@ export const editPlace = placeData => (dispatch, getState) => {
     images,
     attachedFiles
   } = placeData;
+  const { arrayUnion, arrayRemove } = firebase.firestore.FieldValue;
+
+  const batch = database.batch();
+  const usedRef = database.collection(`places`).doc(placeData.placeId);
 
   const deleteImageArray = generateFileDeletePromiseArray(
     deleteimagesKeys,
@@ -171,11 +180,39 @@ export const editPlace = placeData => (dispatch, getState) => {
     'places'
   );
 
+  _.uniq([...currentPlace.placeIds, ...placeData.placeIds]).forEach(placeId => {
+    const placeRef = database.collection('places').doc(placeId);
+    if (!placeData.placeIds.includes(placeId)) {
+      // delete if newData !include oldId
+      batch.update(placeRef, { placeIds: arrayRemove(currentPlace.id) });
+    } else {
+      batch.update(placeRef, { placeIds: arrayUnion(currentPlace.id) });
+    }
+  });
+
+  _.uniq([...currentPlace.npcIds, ...placeData.npcIds]).forEach(npcId => {
+    const npcRef = database.collection('npcs').doc(npcId);
+    if (!placeData.npcIds.includes(npcId)) {
+      // delete if newData !include oldId
+      batch.update(npcRef, { npcIds: arrayRemove(currentPlace.id) });
+    } else {
+      batch.update(npcRef, { npcIds: arrayUnion(currentPlace.id) });
+    }
+  });
+
   let currentImages = Object.keys(images).map(key => images[key]);
   let currentAttachedFiles = Object.keys(attachedFiles).map(
     key => attachedFiles[key]
   );
   dispatch({ type: constants.Place.UPDATE_PLACE, data: placeData });
+
+  const usedData = { ...placeData };
+  delete usedData.newImages;
+  delete usedData.newAttachedFiles;
+  delete usedData.deleteattachedFilesKeys;
+  delete usedData.deleteimagesKeys;
+  delete usedData.deletenewAttachedFilesKeys;
+  delete usedData.deletenewImagesKeys;
 
   return new Promise((resolve, reject) => {
     // make all the new images
@@ -189,56 +226,40 @@ export const editPlace = placeData => (dispatch, getState) => {
                 currentAttachedFiles = currentAttachedFiles.concat(
                   resolvedFiles
                 );
-                new Promise(() => {
-                  database
-                    .collection(`places`)
-                    .doc(placeData.placeId)
-                    .update({
-                      name: placeData.name,
-                      type: placeData.type,
-                      location: placeData.location,
-                      history: placeData.history,
-                      insideDescription: placeData.insideDescription,
-                      outsideDescription: placeData.outsideDescription,
-                      tagIds: placeData.tagIds,
-                      npcIds: placeData.npcIds,
-                      questIds: placeData.questIds,
-                      placeIds: placeData.placeIds,
-                      updatedAt: firebase.firestore.Timestamp.now(),
-                      floorIds: placeData.floorIds,
-                      noteIds: placeData.noteIds,
-                      eventIds: placeData.eventIds,
-                      images: currentImages,
-                      attachedFiles: currentAttachedFiles
-                    })
-                    .then(res => {
-                      resolve(res);
-                    })
-                    .catch(error => {
-                      reject('Error writing document: ', error.message);
-                    });
-                }).catch(err => {
-                  reject(err.message);
+                batch.update(usedRef, {
+                  ...usedData,
+                  updatedAt: firebase.firestore.Timestamp.now(),
+                  images: currentImages,
+                  attachedFiles: currentAttachedFiles
                 });
+                batch
+                  .commit()
+                  .then(res => {
+                    resolve(res);
+                  })
+                  .catch(error => {
+                    reject(`Error writing document: ${error.message}`);
+                  });
               })
               .catch(err => {
                 reject(
-                  'Something went wrong while trying upload files:',
-                  err.message
+                  `Something went wrong while trying upload files: ${
+                    err.message
+                  }`
                 );
               });
           })
           .catch(err => {
             reject(
-              'Something went wrong while trying upload images:',
-              err.message
+              `Something went wrong while trying upload images: ${err.message}`
             );
           });
       })
       .catch(err => {
         reject(
-          'Something went wrong while trying upload images and files:',
-          err.message
+          `Something went wrong while trying upload images and files: ${
+            err.message
+          }`
         );
       });
   });
@@ -247,6 +268,19 @@ export const editPlace = placeData => (dispatch, getState) => {
 export const createPlace = placeData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;
+  const { arrayUnion } = firebase.firestore.FieldValue;
+  const batch = database.batch();
+  const usedRef = database.collection('places').ref();
+  const usedId = usedRef.id;
+
+  placeData.placeIds.forEach(placeId => {
+    const placeRef = database.collection('places').doc(placeId);
+    batch.update(placeRef, { placeIds: arrayUnion(usedId) });
+  });
+  placeData.npcIds.forEach(npcId => {
+    const npcRef = database.collection('npcs').doc(npcId);
+    batch.update(npcRef, { placeIds: arrayUnion(usedId) });
+  });
 
   const imagePromiseArray = generatePromiseArray(
     placeData.newImages,
@@ -260,92 +294,51 @@ export const createPlace = placeData => (dispatch, getState) => {
     'files',
     'places'
   );
+  const usedData = { ...placeData };
+  delete usedData.newImages;
+  delete usedData.newAttachedFiles;
+  delete usedData.deleteattachedFilesKeys;
+  delete usedData.deleteimagesKeys;
+  delete usedData.deletenewAttachedFilesKeys;
+  delete usedData.deletenewImagesKeys;
 
   dispatch({ type: constants.Place.CREATING_PLACE, data: placeData });
   return new Promise((resolve, reject) => {
     return Promise.all(imagePromiseArray)
       .then(resolvedImages => {
-        const uploadedImages = resolvedImages;
         Promise.all(attachedFilePromiseArray)
           .then(resolvedFiles => {
-            const uploadedFiles = resolvedFiles;
-            new Promise(() => {
-              database
-                .collection(`places`)
-                .add({
-                  name: placeData.name,
-                  type: placeData.type,
-                  location: placeData.location,
-                  history: placeData.history,
-                  insideDescription: placeData.insideDescription,
-                  outsideDescription: placeData.outsideDescription,
-                  tagIds: placeData.tagIds,
-                  npcIds: placeData.npcIds,
-                  questIds: placeData.questIds,
-                  placeIds: placeData.placeIds,
-                  createdAt: firebase.firestore.Timestamp.now(),
-                  updatedAt: firebase.firestore.Timestamp.now(),
-                  floorIds: [],
-                  noteIds: [],
-                  eventIds: placeData.eventIds,
-                  campaignIds: [currentCampaign.id],
-                  images: uploadedImages,
-                  attachedFiles: uploadedFiles,
-                  creatorId: userUid,
-                  collaboratorIds: []
-                })
-                .then(res => {
-                  resolve(res);
-                })
-                .catch(error => {
-                  reject('Error writing document: ', error);
-                });
-            }).catch(err => {
-              console.error(
-                'Something went wrong while trying upload files:',
-                err
-              );
+            batch.set(usedRef, {
+              ...usedData,
+              floorIds: [],
+              noteIds: [],
+              createdAt: firebase.firestore.Timestamp.now(),
+              updatedAt: firebase.firestore.Timestamp.now(),
+              campaignIds: [currentCampaign.id],
+              images: resolvedImages,
+              attachedFiles: resolvedFiles,
+              creatorId: userUid,
+              collaboratorIds: []
             });
+            batch
+              .commit()
+              .then(res => {
+                resolve(res);
+              })
+              .catch(error => {
+                reject('Error writing document: ', error);
+              });
           })
           .catch(err => {
             console.error(
-              'Something went wrong while trying upload images:',
-              err
+              `Something went wrong while trying upload images: ${err.message}`
             );
           });
       })
       .catch(err => {
-        console.error('Something went wrong while trying upload images:', err);
-      });
-  });
-};
-
-export const updatePlaceNotes = (noteId, placeId) => {
-  return new Promise((resolve, reject) => {
-    database
-      .collection(`places`)
-      .doc(placeId)
-      .update({ noteIds: firebase.firestore.FieldValue.arrayUnion(noteId) })
-      .then(res => {
-        resolve(res);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
-};
-
-export const removePlaceNotes = (placeId, noteId) => {
-  return new Promise((resolve, reject) => {
-    database
-      .collection(`places`)
-      .doc(placeId)
-      .update({ noteIds: firebase.firestore.FieldValue.arrayRemove(noteId) })
-      .then(res => {
-        resolve(res);
-      })
-      .catch(err => {
-        reject(err);
+        console.error(
+          `Something went wrong while trying upload images: ${err.message}`
+        );
       });
   });
 };
