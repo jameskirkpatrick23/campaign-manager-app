@@ -13,7 +13,7 @@ export const loginUser = user => dispatch => {
   dispatch(CampaignActions.setCampaignListener(scopedUserFields));
   ['values', 'alignments', 'quirks', 'occupations', 'races', 'genders'].forEach(
     item => {
-      dispatch(AdminActions.loadCollection(item));
+      dispatch(AdminActions.loadCollection(item, user.uid));
     }
   );
   return dispatch({ type: constants.Login.LOGIN_USER, user: scopedUserFields });

@@ -16,6 +16,10 @@ import {
 import Fieldset from '../reusable-components/fieldset';
 import { createNPC, editNPC } from '../redux/actions/npcs';
 import { createTag } from '../redux/actions/tags';
+import { createRace } from '../redux/actions/races';
+import { createOccupation } from '../redux/actions/occupations';
+import { createValue } from '../redux/actions/values';
+import { createQuirk } from '../redux/actions/quirks';
 import Spinner from '../reusable-components/spinner';
 
 class NPCForm extends Component {
@@ -144,6 +148,22 @@ class NPCForm extends Component {
     this.props.createTag(tagName);
   };
 
+  createRace = tagName => {
+    this.props.createRace(tagName);
+  };
+
+  createOccupation = tagName => {
+    this.props.createOccupation(tagName);
+  };
+
+  createValue = tagName => {
+    this.props.createValue(tagName);
+  };
+
+  createQuirk = tagName => {
+    this.props.createQuirk(tagName);
+  };
+
   handleExistingDelete = (fileKey, type) => {
     const currentFiles = { ...this.state[type] };
     delete currentFiles[fileKey];
@@ -179,9 +199,7 @@ class NPCForm extends Component {
       backstory,
       height,
       weight,
-      newImages,
       gender,
-      newAttachedFiles,
       occupation,
       alignment,
       values,
@@ -244,8 +262,10 @@ class NPCForm extends Component {
                     onChange={dataItem =>
                       this.setState({ occupation: dataItem })
                     }
+                    allowCreate={'onFilter'}
+                    onCreate={this.createOccupation}
                     caseSensitive={false}
-                    minLength={3}
+                    minLength={1}
                     filter="contains"
                   />
                   <FormControl.Feedback />
@@ -257,7 +277,9 @@ class NPCForm extends Component {
                     data={Object.keys(races).map(r => races[r].name)}
                     containerClassName="form-control padding-left-0 font-static"
                     value={race}
-                    minLength={2}
+                    minLength={1}
+                    allowCreate={'onFilter'}
+                    onCreate={this.createRace}
                     filter="contains"
                     placeholder="Human, Elf, Tiefling, Orc, etc."
                     caseSensitive={false}
@@ -272,7 +294,7 @@ class NPCForm extends Component {
                     containerClassName="form-control padding-left-0 font-static"
                     data={Object.keys(genders).map(g => genders[g].name)}
                     value={gender}
-                    minLength={2}
+                    minLength={1}
                     filter="contains"
                     placeholder="What gender is this NPC"
                     caseSensitive={false}
@@ -356,8 +378,10 @@ class NPCForm extends Component {
                     )}
                     containerClassName="form-control padding-left-0 font-static"
                     value={quirks}
+                    allowCreate={'onFilter'}
+                    onCreate={this.createQuirk}
                     caseSensitive={false}
-                    minLength={3}
+                    minLength={1}
                     filter="contains"
                     onChange={dataItems => this.setState({ quirks: dataItems })}
                     placeholder="What quirks does this NPC have?"
@@ -373,10 +397,12 @@ class NPCForm extends Component {
                     )}
                     containerClassName="form-control padding-left-0 font-static"
                     value={values}
+                    allowCreate={'onFilter'}
+                    onCreate={this.createValue}
                     placeholder="What values does this NPC hold?"
                     onChange={dataItem => this.setState({ values: dataItem })}
                     caseSensitive={false}
-                    minLength={2}
+                    minLength={1}
                     filter="contains"
                   />
                   <FormControl.Feedback />
@@ -418,7 +444,7 @@ class NPCForm extends Component {
                     placeholder="Add tags to help you find related things later"
                     caseSensitive={false}
                     onChange={dataItems => this.setState({ tagIds: dataItems })}
-                    minLength={3}
+                    minLength={1}
                     filter="contains"
                   />
                 </FormGroup>
@@ -438,7 +464,7 @@ class NPCForm extends Component {
                     onChange={dataItems =>
                       this.setState({ placeIds: dataItems })
                     }
-                    minLength={3}
+                    minLength={1}
                     filter="contains"
                   />
                 </FormGroup>
@@ -456,7 +482,7 @@ class NPCForm extends Component {
                     placeholder="What npcs does this NPC interact with?"
                     caseSensitive={false}
                     onChange={dataItems => this.setState({ npcIds: dataItems })}
-                    minLength={3}
+                    minLength={1}
                     filter="contains"
                   />
                 </FormGroup>
@@ -476,7 +502,7 @@ class NPCForm extends Component {
                     onChange={dataItems =>
                       this.setState({ questIds: dataItems })
                     }
-                    minLength={3}
+                    minLength={1}
                     filter="contains"
                   />
                 </FormGroup>
@@ -496,7 +522,7 @@ class NPCForm extends Component {
                     onChange={dataItems =>
                       this.setState({ eventIds: dataItems })
                     }
-                    minLength={3}
+                    minLength={1}
                     filter="contains"
                   />
                 </FormGroup>
@@ -608,7 +634,11 @@ const mapDispatchToProps = dispatch =>
     {
       createNPC: createNPC,
       editNPC: editNPC,
-      createTag: createTag
+      createTag: createTag,
+      createQuirk: createQuirk,
+      createRace: createRace,
+      createValue: createValue,
+      createOccupation: createOccupation
     },
     dispatch
   );

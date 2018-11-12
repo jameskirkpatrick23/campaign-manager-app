@@ -19,19 +19,33 @@ export const updatePlaceTypesList = type => (dispatch, getState) => {
 
 export const createPlaceType = typeName => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
-    database
-      .collection(`placeTypes`)
-      .add({
-        name: typeName,
-        creatorId: getState().login.user.uid,
-        collaboratorIds: []
-      })
-      .then(res => {
-        dispatch({ type: 'CREATED_PLACE_TYPE', typeName });
-        resolve(res);
-      })
-      .catch(function(error) {
-        reject('Error writing document: ', error);
+    const myId = getState().login.user.uid;
+    const ref = database.collection(`placeTypes`);
+    ref
+      .orderByChild('name')
+      .equalTo(typeName)
+      .once('value', snapshot => {
+        if (snapshot.exists()) {
+          ref
+            .doc(snapshot.val())
+            .update({
+              collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
+            });
+        } else {
+          ref
+            .add({
+              name: typeName,
+              creatorId: myId,
+              collaboratorIds: []
+            })
+            .then(res => {
+              dispatch({ type: 'CREATED_OCCUPATION', typeName });
+              resolve(res);
+            })
+            .catch(error => {
+              reject('Error writing document: ', error);
+            });
+        }
       });
   });
 };

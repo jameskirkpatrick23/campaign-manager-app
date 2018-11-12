@@ -29,18 +29,26 @@ export const updateCollectionList = (item, type, constant) => (
   dispatch({ type: constant, [type]: updatedState });
 };
 
-export const loadCollection = type => (dispatch, getState) => {
+export const loadCollection = (type, uid) => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     database
       .collection(type)
+      .where('collaboratorIds', 'array-contains', uid)
       .get()
       .then(querySnapshot => {
-        let items = {};
-        querySnapshot.forEach(doc => {
-          items[doc.id] = { ...doc.data(), id: doc.id };
-        });
-        dispatch(eval(`set${_.capitalize(type)}List`)(items));
-        resolve(items);
+        database
+          .collection(type)
+          .where('creatorId', '==', uid)
+          .get()
+          .then(snap => {
+            let items = {};
+            _.uniq([...querySnapshot, ...snap]).forEach(doc => {
+              items[doc.id] = { ...doc.data(), id: doc.id };
+            });
+            dispatch(eval(`set${_.capitalize(type)}List`)(items));
+            resolve(items);
+          })
+          .catch(err => reject(err));
       })
       .catch(err => reject(err));
   });
