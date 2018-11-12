@@ -14,10 +14,10 @@ export const createValue = valueName => (dispatch, getState) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`values`);
     ref
-      .orderByChild('name')
-      .equalTo(valueName)
-      .once('value', snapshot => {
-        if (snapshot.exists()) {
+      .where('name', '==', valueName)
+      .get()
+      .then(snapshot => {
+        if (!snapshot.empty) {
           ref.doc(snapshot.val()).update({
             collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
           });
@@ -26,6 +26,7 @@ export const createValue = valueName => (dispatch, getState) => {
             .add({
               name: valueName,
               creatorId: myId,
+              default: false,
               collaboratorIds: []
             })
             .then(res => {

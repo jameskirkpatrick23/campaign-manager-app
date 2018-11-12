@@ -14,10 +14,10 @@ export const createQuirk = quirkName => (dispatch, getState) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`quirks`);
     ref
-      .orderByChild('name')
-      .equalTo(quirkName)
-      .once('value', snapshot => {
-        if (snapshot.exists()) {
+      .where('name', '==', quirkName)
+      .get()
+      .then(snapshot => {
+        if (!snapshot.empty) {
           ref.doc(snapshot.val()).update({
             collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
           });
@@ -26,6 +26,7 @@ export const createQuirk = quirkName => (dispatch, getState) => {
             .add({
               name: quirkName,
               creatorId: myId,
+              default: false,
               collaboratorIds: []
             })
             .then(res => {

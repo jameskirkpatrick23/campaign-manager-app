@@ -17,10 +17,10 @@ export const createOccupation = occupationName => (dispatch, getState) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`occupations`);
     ref
-      .orderByChild('name')
-      .equalTo(occupationName)
-      .once('value', snapshot => {
-        if (snapshot.exists()) {
+      .where('name', '==', occupationName)
+      .get()
+      .then(snapshot => {
+        if (!snapshot.empty) {
           ref.doc(snapshot.val()).update({
             collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
           });
@@ -29,6 +29,7 @@ export const createOccupation = occupationName => (dispatch, getState) => {
             .add({
               name: occupationName,
               creatorId: myId,
+              default: false,
               collaboratorIds: []
             })
             .then(res => {

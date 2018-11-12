@@ -1,4 +1,4 @@
-const coreValues = [
+export const values = [
   'Authenticity',
   'Achievement',
   'Adventure',
@@ -58,7 +58,7 @@ const coreValues = [
   'Wealth',
   'Wisdom'
 ];
-const alignments = [
+export const alignments = [
   'Lawful Good',
   'Lawful Neutral',
   'Lawful Evil',
@@ -69,7 +69,7 @@ const alignments = [
   'Chaotic Neutral',
   'Chaotic Evil'
 ];
-const quirks = [
+export const quirks = [
   'Will not ever drink alcohol.',
   'Can’t leave a bar without having a drink.',
   'Treats his weapon like the love of his life.',
@@ -172,8 +172,8 @@ const quirks = [
   'Allergic to something very unusual (undead/gryphons/baby powder/etc.) and begins to sneeze uncontrollably when he is within a short distance it.',
   'Very sarcastic, especially when in life or death situations.'
 ];
-const genders = ['Male', 'Female', 'Other', 'Not Applicable', 'Fluid'];
-const races = [
+export const genders = ['Male', 'Female', 'Other', 'Not Applicable', 'Fluid'];
+export const races = [
   'Aasimar',
   'Aetherborn',
   'Aven',
@@ -441,7 +441,7 @@ const races = [
   'Wolf',
   'Worg'
 ];
-const occupations = [
+export const occupations = [
   'Actor',
   'Advocate (Lawyer)',
   'Alchemist',

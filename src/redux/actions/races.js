@@ -14,10 +14,10 @@ export const createRace = raceName => (dispatch, getState) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`races`);
     ref
-      .orderByChild('name')
-      .equalTo(raceName)
-      .once('value', snapshot => {
-        if (snapshot.exists()) {
+      .where('name', '==', raceName)
+      .get()
+      .then(snapshot => {
+        if (!snapshot.empty) {
           ref.doc(snapshot.val()).update({
             collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
           });
@@ -26,6 +26,7 @@ export const createRace = raceName => (dispatch, getState) => {
             .add({
               name: raceName,
               creatorId: myId,
+              default: false,
               collaboratorIds: []
             })
             .then(res => {
