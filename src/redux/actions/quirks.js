@@ -1,12 +1,12 @@
 import database from '../../firebase';
-import { Quirks } from '../constants';
+import { Quirk } from '../constants';
 
 import firebase from 'firebase';
 
 export const updateQuirksList = quirk => (dispatch, getState) => {
   const updatedState = { ...getState().quirks.all };
   updatedState[quirk.id] = quirk;
-  dispatch({ type: Quirks.UPDATE_QUIRK_LIST, quirks: updatedState });
+  dispatch({ type: Quirk.UPDATE_QUIRK_LIST, quirks: updatedState });
 };
 
 export const createQuirk = quirkName => (dispatch, getState) => {
@@ -18,11 +18,9 @@ export const createQuirk = quirkName => (dispatch, getState) => {
       .equalTo(quirkName)
       .once('value', snapshot => {
         if (snapshot.exists()) {
-          ref
-            .doc(snapshot.val())
-            .update({
-              collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
-            });
+          ref.doc(snapshot.val()).update({
+            collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
+          });
         } else {
           ref
             .add({

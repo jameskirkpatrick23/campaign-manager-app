@@ -3,22 +3,22 @@ import database, { app } from '../../firebase';
 import _ from 'lodash';
 
 const setValuesList = values => dispatch => {
-  dispatch({ type: constants.Values.SET_VALUES_LIST, values });
+  dispatch({ type: constants.Value.SET_VALUES_LIST, values });
 };
 const setAlignmentsList = alignments => dispatch => {
-  dispatch({ type: constants.Alignments.SET_ALIGNMENTS_LIST, alignments });
+  dispatch({ type: constants.Alignment.SET_ALIGNMENTS_LIST, alignments });
 };
 const setQuirksList = quirks => dispatch => {
-  dispatch({ type: constants.Quirks.SET_QUIRKS_LIST, quirks });
+  dispatch({ type: constants.Quirk.SET_QUIRKS_LIST, quirks });
 };
 const setOccupationsList = occupations => dispatch => {
-  dispatch({ type: constants.Occupations.SET_OCCUPATIONS_LIST, occupations });
+  dispatch({ type: constants.Occupation.SET_OCCUPATIONS_LIST, occupations });
 };
 const setRacesList = races => dispatch => {
-  dispatch({ type: constants.Races.SET_RACES_LIST, races });
+  dispatch({ type: constants.Race.SET_RACES_LIST, races });
 };
 const setGendersList = genders => dispatch => {
-  dispatch({ type: constants.Genders.SET_GENDERS_LIST, genders });
+  dispatch({ type: constants.Gender.SET_GENDERS_LIST, genders });
 };
 export const updateCollectionList = (item, type, constant) => (
   dispatch,

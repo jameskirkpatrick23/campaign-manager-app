@@ -4,11 +4,11 @@ const initialState = {
 };
 export default function AlignmentsReducer(state = initialState, action) {
   switch (action.type) {
-    case constants.Alignments.SET_ALIGNMENTS_LIST:
+    case constants.Alignment.SET_ALIGNMENTS_LIST:
       return Object.assign({}, state, {
         all: action.alignments
       });
-    case constants.Alignments.UPDATE_ALIGNMENT_LIST:
+    case constants.Alignment.UPDATE_ALIGNMENT_LIST:
       return Object.assign({}, state, {
         all: action.alignments
       });

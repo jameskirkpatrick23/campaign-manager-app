@@ -4,11 +4,11 @@ const initialState = {
 };
 export default function ValuesReducer(state = initialState, action) {
   switch (action.type) {
-    case constants.Values.SET_VALUES_LIST:
+    case constants.Value.SET_VALUES_LIST:
       return Object.assign({}, state, {
         all: action.values
       });
-    case constants.Values.UPDATE_VALUES_LIST:
+    case constants.Value.UPDATE_VALUES_LIST:
       return Object.assign({}, state, {
         all: action.values
       });

@@ -1,5 +1,5 @@
 import database from '../../firebase';
-import { Occupations } from '../constants';
+import { Occupation } from '../constants';
 
 import firebase from 'firebase';
 
@@ -7,7 +7,7 @@ export const updateOccupationsList = occupation => (dispatch, getState) => {
   const updatedState = { ...getState().occupations.all };
   updatedState[occupation.id] = occupation;
   dispatch({
-    type: Occupations.UPDATE_OCCUPATION_LIST,
+    type: Occupation.UPDATE_OCCUPATION_LIST,
     occupations: updatedState
   });
 };
@@ -21,11 +21,9 @@ export const createOccupation = occupationName => (dispatch, getState) => {
       .equalTo(occupationName)
       .once('value', snapshot => {
         if (snapshot.exists()) {
-          ref
-            .doc(snapshot.val())
-            .update({
-              collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
-            });
+          ref.doc(snapshot.val()).update({
+            collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
+          });
         } else {
           ref
             .add({

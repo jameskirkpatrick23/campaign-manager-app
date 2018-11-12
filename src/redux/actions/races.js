@@ -1,12 +1,12 @@
 import database from '../../firebase';
-import { Races } from '../constants';
+import { Race } from '../constants';
 
 import firebase from 'firebase';
 
 export const updateRacesList = race => (dispatch, getState) => {
   const updatedState = { ...getState().races.all };
   updatedState[race.id] = race;
-  dispatch({ type: Races.UPDATE_RACE_LIST, races: updatedState });
+  dispatch({ type: Race.UPDATE_RACE_LIST, races: updatedState });
 };
 
 export const createRace = raceName => (dispatch, getState) => {
@@ -18,11 +18,9 @@ export const createRace = raceName => (dispatch, getState) => {
       .equalTo(raceName)
       .once('value', snapshot => {
         if (snapshot.exists()) {
-          ref
-            .doc(snapshot.val())
-            .update({
-              collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
-            });
+          ref.doc(snapshot.val()).update({
+            collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
+          });
         } else {
           ref
             .add({
