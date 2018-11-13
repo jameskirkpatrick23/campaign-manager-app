@@ -1,5 +1,5 @@
 import React from 'react';
-import { app } from '../firebase';
+import { app } from '../firebaseDB';
 import { withRouter } from 'react-router-dom';
 
 class Signup extends React.Component {

@@ -1,5 +1,5 @@
 import * as constants from '../constants';
-import database, { app } from '../../firebase';
+import database, { app } from '../../firebaseDB';
 import _ from 'lodash';
 
 const setValuesList = values => dispatch => {

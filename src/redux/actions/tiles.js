@@ -1,5 +1,5 @@
 import * as constants from '../constants';
-import database, { app } from '../../firebase';
+import database, { app } from '../../firebaseDB';
 import * as FloorActions from './floors';
 import firebase from 'firebase';
 

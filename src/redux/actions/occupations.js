@@ -1,4 +1,4 @@
-import database from '../../firebase';
+import database from '../../firebaseDB';
 import { Occupation } from '../constants';
 
 import firebase from 'firebase';

@@ -1,5 +1,5 @@
 import * as constants from '../constants';
-import database, { app } from '../../firebase';
+import database, { app } from '../../firebaseDB';
 import * as PlacesActions from './places';
 import * as TagActions from './tags';
 import * as NPCActions from './npcs';

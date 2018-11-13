@@ -1,5 +1,5 @@
 import * as constants from '../constants';
-import database from '../../firebase';
+import database from '../../firebaseDB';
 import firebase from 'firebase';
 import { deleteFloor } from './floors';
 import { deleteNote } from './notes';
@@ -26,11 +26,9 @@ export const createPlaceType = typeName => (dispatch, getState) => {
       .equalTo(typeName)
       .once('value', snapshot => {
         if (snapshot.exists()) {
-          ref
-            .doc(snapshot.val())
-            .update({
-              collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
-            });
+          ref.doc(snapshot.val()).update({
+            collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
+          });
         } else {
           ref
             .add({

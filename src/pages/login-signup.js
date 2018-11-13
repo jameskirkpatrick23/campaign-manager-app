@@ -1,6 +1,6 @@
 import React from 'react';
 import firebase from 'firebase';
-import { app } from '../firebase';
+import { app } from '../firebaseDB';
 import { withRouter } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';

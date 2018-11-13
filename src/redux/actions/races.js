@@ -1,4 +1,4 @@
-import database from '../../firebase';
+import database from '../../firebaseDB';
 import { Race } from '../constants';
 
 import firebase from 'firebase';

@@ -16,26 +16,26 @@ import {
   Modal,
   Button
 } from 'react-bootstrap';
-import NPCForm from '../forms/npc-form';
+import QuestForm from '../forms/quest-form';
 import Notes from './notes';
-import * as NPCActions from '../redux/actions/npcs';
+import * as QuestActions from '../redux/actions/quests';
 
-class NPC extends Component {
+class Quest extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      npc: {},
-      npcFormOpen: false
+      quest: {},
+      questFormOpen: false
     };
     this.findRelatedObjects = this.findRelatedObjects.bind(this);
     this.renderDetails = this.renderDetails.bind(this);
-    this.handleNPCDelete = this.handleNPCDelete.bind(this);
+    this.handleQuestDelete = this.handleQuestDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderPlaces = this.renderPlaces.bind(this);
     this.getImage = this.getImage.bind(this);
-    this.renderNPCForm = this.renderNPCForm.bind(this);
-    this.renderNPCs = this.renderNPCs.bind(this);
+    this.renderQuestForm = this.renderQuestForm.bind(this);
     this.renderQuests = this.renderQuests.bind(this);
+    this.renderNPCs = this.renderNPCs.bind(this);
   }
 
   findRelatedObjects = () => {
@@ -43,32 +43,32 @@ class NPC extends Component {
   };
 
   componentWillMount = () => {
-    const npcId = this.props.match.params.npc_id;
-    this.setState({ npc: this.props.npcs[npcId] }, () => {
+    const questId = this.props.match.params.quest_id;
+    this.setState({ quest: this.props.quests[questId] }, () => {
       this.findRelatedObjects(this.props);
     });
   };
 
   componentWillReceiveProps = nextProps => {
-    const npcId = nextProps.match.params.npc_id;
-    const oldNpcId = this.props.match.params.npc_id;
-    const foundNpc = nextProps.npcs[npcId];
-    if (this.props.npcs !== nextProps.npcs || npcId !== oldNpcId) {
-      this.setState({ npc: foundNpc }, () => {
+    const questId = nextProps.match.params.quest_id;
+    const oldQuestId = this.props.match.params.quest_id;
+    const foundQuest = nextProps.quests[questId];
+    if (this.props.quests !== nextProps.quests || questId !== oldQuestId) {
+      this.setState({ quest: foundQuest }, () => {
         this.findRelatedObjects(nextProps);
       });
     }
     this.findRelatedObjects(nextProps);
   };
 
-  handleNPCDelete = npc => {
-    const { deleteNPC, history } = this.props;
-    deleteNPC(npc);
+  handleQuestDelete = quest => {
+    const { deleteQuest, history } = this.props;
+    deleteQuest(quest);
     history.goBack();
   };
 
   renderNPCs = () => {
-    const { npc } = this.state;
+    const { quest } = this.state;
     const { npcs, currentCampaign, history } = this.props;
     return (
       <Tab.Pane eventKey="npcs">
@@ -76,24 +76,24 @@ class NPC extends Component {
           <h3>Related NPCs</h3>
         </Row>
         <Row>
-          {!npc.npcIds.length && (
+          {!quest.npcIds.length && (
             <div>
               You have no related NPCs. Please add some to see them here.
             </div>
           )}
-          {npc.npcIds.map(npcKey => {
+          {quest.npcIds.map(npcKey => {
             const foundNPC = npcs[npcKey];
-            const npcRoute = `/campaigns/${
+            const questRoute = `/campaigns/${
               currentCampaign.id
             }/home/npcs/${npcKey}`;
             if (!foundNPC) return null;
             if (foundNPC)
               return (
-                <Col xs={4} key={`npc-${npcKey}`}>
+                <Col xs={4} key={`quest-${npcKey}`}>
                   <Panel
                     bsStyle="warning"
-                    className="npc-card clickable"
-                    onClick={() => history.push(npcRoute)}
+                    className="quest-card clickable"
+                    onClick={() => history.push(questRoute)}
                   >
                     <Panel.Heading>
                       <Panel.Title componentClass="h3">
@@ -103,7 +103,7 @@ class NPC extends Component {
                     <Panel.Body className="padding-0">
                       <Image
                         src={this.getImage(foundNPC, 'npc')}
-                        className="npc-image"
+                        className="quest-image"
                       />
                     </Panel.Body>
                   </Panel>
@@ -116,7 +116,7 @@ class NPC extends Component {
   };
 
   renderQuests = () => {
-    const { npc } = this.state;
+    const { quest } = this.state;
     const { quests, currentCampaign, history } = this.props;
     return (
       <Tab.Pane eventKey="quests">
@@ -124,12 +124,12 @@ class NPC extends Component {
           <h3>Related Quests</h3>
         </Row>
         <Row>
-          {!npc.questIds.length && (
+          {!quest.questIds.length && (
             <div>
-              You have no related quests. Please add some to see them here.
+              You have no related Quests. Please add some to see them here.
             </div>
           )}
-          {npc.questIds.map(questKey => {
+          {quest.questIds.map(questKey => {
             const foundQuest = quests[questKey];
             const questRoute = `/campaigns/${
               currentCampaign.id
@@ -137,7 +137,7 @@ class NPC extends Component {
             if (!foundQuest) return null;
             if (foundQuest)
               return (
-                <Col xs={4} key={`npc-${questKey}`}>
+                <Col xs={4} key={`quest-${questKey}`}>
                   <Panel
                     bsStyle="warning"
                     className="quest-card clickable"
@@ -151,7 +151,7 @@ class NPC extends Component {
                     <Panel.Body className="padding-0">
                       <Image
                         src={this.getImage(foundQuest, 'quest')}
-                        className="npc-image"
+                        className="quest-image"
                       />
                     </Panel.Body>
                   </Panel>
@@ -164,128 +164,50 @@ class NPC extends Component {
   };
 
   renderDetails = () => {
-    const { npc } = this.state;
+    const { quest } = this.state;
 
     return (
       <Tab.Pane eventKey="info">
-        <PanelGroup
-          accordion
-          id={'phys-description'}
-          defaultActiveKey="physDesc"
-        >
-          <Panel
-            id={'npc-panel-phys-description'}
-            bsStyle="warning"
-            eventKey="physDesc"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">
-                  Physical Description
-                </Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
-                <div>
-                  <strong>Gender: </strong>
-                  <p>{npc.gender}</p>
-                </div>
-                <div>
-                  <strong>Height: </strong>
-                  <p>{npc.height}</p>
-                </div>
-                <div>
-                  <strong>Weight: </strong>
-                  <p>{npc.weight}</p>
-                </div>
-                <div>
-                  <strong>Race: </strong>
-                  <p>{npc.race}</p>
-                </div>
-                <div>
-                  <strong>Occupation: </strong>
-                  <p>{npc.occupation}</p>
-                </div>
-                <div>
-                  <strong>Description: </strong>
-                  <p>{npc.physDescription}</p>
-                </div>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-          <Panel
-            id={'npc-panel-personality'}
-            bsStyle="warning"
-            eventKey="personalityPanel"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">Personality</Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
-                <div>
-                  <strong>Alignment: </strong>
-                  <p>{npc.alignment}</p>
-                </div>
-                <div>
-                  <strong>Quirks: </strong>
-                  {npc.quirks.map(q => (
-                    <p key={q}>{q}</p>
-                  ))}
-                </div>
-                <div>
-                  <strong>Values: </strong>
-                  {npc.values.map(v => (
-                    <p key={v}>{v}</p>
-                  ))}
-                </div>
-                <div>
-                  <strong>Backstory: </strong>
-                  <p>{npc.backstory}</p>
-                </div>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-        </PanelGroup>
+        <p>Rewards: {quest.rewards}</p>
+        <p>Status: {quest.status}</p>
+        <p>Description: {quest.description}</p>
+        <p>Objectives: </p>
       </Tab.Pane>
     );
   };
 
   renderImages = () => {
-    const { npc } = this.state;
+    const { quest } = this.state;
     return (
       <Tab.Pane eventKey="images">
-        {npc.images.length === 1 && (
-          <Image src={npc.images[0].downloadUrl} responsive />
+        {quest.images.length === 1 && (
+          <Image src={quest.images[0].downloadUrl} responsive />
         )}
-        {npc.images.length > 1 && (
+        {quest.images.length > 1 && (
           <Carousel interval={null}>
-            {npc.images &&
-              npc.images.map(image => {
+            {quest.images &&
+              quest.images.map(image => {
                 return (
-                  <Carousel.Item key={`npc-image-${image.fileName}`}>
+                  <Carousel.Item key={`quest-image-${image.fileName}`}>
                     <Image src={image.downloadUrl} responsive />
                   </Carousel.Item>
                 );
               })}
           </Carousel>
         )}
-        {!npc.images.length && (
-          <Image src={require('../assets/placeholder-npc.png')} responsive />
+        {!quest.images.length && (
+          <Image src={require('../assets/placeholder-quest.png')} responsive />
         )}
       </Tab.Pane>
     );
   };
 
   renderAttachedFiles = () => {
-    const { npc } = this.state;
+    const { quest } = this.state;
     return (
       <Tab.Pane eventKey="attachedFiles">
-        {npc.attachedFiles &&
-          npc.attachedFiles.map(file => {
+        {quest.attachedFiles &&
+          quest.attachedFiles.map(file => {
             return (
               <div key={`${file.fileName}-${file.downloadUrl}`}>
                 <a href="#" onClick={() => window.open(file.downloadUrl)}>
@@ -306,7 +228,7 @@ class NPC extends Component {
   };
 
   renderPlaces = () => {
-    const { npc } = this.state;
+    const { quest } = this.state;
     const { places, currentCampaign, history } = this.props;
     return (
       <Tab.Pane eventKey="places">
@@ -314,12 +236,12 @@ class NPC extends Component {
           <h3>Related Places</h3>
         </Row>
         <Row>
-          {!npc.placeIds.length && (
+          {!quest.placeIds.length && (
             <div>
               You have no related places. Please add some to see them here.
             </div>
           )}
-          {npc.placeIds.map(placeKey => {
+          {quest.placeIds.map(placeKey => {
             const foundPlace = places[placeKey];
             const placeRoute = `/campaigns/${
               currentCampaign.id
@@ -354,31 +276,31 @@ class NPC extends Component {
   };
 
   renderNotes = () => {
-    const { npc } = this.state;
+    const { quest } = this.state;
     return (
       <Tab.Pane eventKey="notes">
-        <Notes noteIds={npc.noteIds} typeId={npc.id} type="npcs" />
+        <Notes noteIds={quest.noteIds} typeId={quest.id} type="quests" />
       </Tab.Pane>
     );
   };
 
-  renderNPCForm = () => {
-    const { npc, npcFormOpen } = this.state;
+  renderQuestForm = () => {
+    const { quest, questFormOpen } = this.state;
     return (
       <Modal
-        show={npcFormOpen}
-        onHide={this.hideNPCForm}
+        show={questFormOpen}
+        onHide={this.hideQuestForm}
         bsSize="lg"
-        aria-labelledby="npc-modal-title-lg"
+        aria-labelledby="quest-modal-title-lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="npc-modal-title-lg">Edit {npc.name}</Modal.Title>
+          <Modal.Title id="quest-modal-title-lg">Edit {quest.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <NPCForm
-            npc={npc}
-            onCancel={this.hideNPCForm}
-            onSubmit={this.hideNPCForm}
+          <QuestForm
+            quest={quest}
+            onCancel={this.hideQuestForm}
+            onSubmit={this.hideQuestForm}
             formAction={'edit'}
           />
         </Modal.Body>
@@ -386,13 +308,13 @@ class NPC extends Component {
     );
   };
 
-  showNPCForm = e => {
+  showQuestForm = e => {
     e.preventDefault();
-    this.setState({ npcFormOpen: true });
+    this.setState({ questFormOpen: true });
   };
 
-  hideNPCForm = () => {
-    this.setState({ npcFormOpen: false });
+  hideQuestForm = () => {
+    this.setState({ questFormOpen: false });
   };
 
   renderPills = () => {
@@ -424,22 +346,22 @@ class NPC extends Component {
   };
 
   render() {
-    const { npc } = this.state;
-    if (!npc) return null;
+    const { quest } = this.state;
+    if (!quest) return null;
     return (
       <Grid>
-        {this.renderNPCForm()}
+        {this.renderQuestForm()}
         <Row>
           <Col xs={12}>
             <Panel bsStyle="info">
               <Panel.Heading>
                 <Panel.Title componentClass="h3">
-                  {npc.name}
+                  {quest.name}
                   <Button
                     className="margin-left-1 vert-text-top"
                     bsSize="small"
                     bsStyle="warning"
-                    onClick={this.showNPCForm}
+                    onClick={this.showQuestForm}
                   >
                     <Glyphicon glyph="pencil" />
                   </Button>
@@ -447,13 +369,13 @@ class NPC extends Component {
                     className="margin-left-1 vert-text-top"
                     bsSize="small"
                     bsStyle="danger"
-                    onClick={() => this.handleNPCDelete(npc)}
+                    onClick={() => this.handleQuestDelete(quest)}
                   >
                     <Glyphicon glyph="trash" />
                   </Button>
                 </Panel.Title>
               </Panel.Heading>
-              <Tab.Container id="npc-tabs" defaultActiveKey="images">
+              <Tab.Container id="quest-tabs" defaultActiveKey="images">
                 <Panel.Body>
                   <Row>
                     <Col xs={1}>{this.renderPills()}</Col>
@@ -482,18 +404,18 @@ class NPC extends Component {
   }
 }
 
-NPC.defaultProps = {};
-NPC.propTypes = {};
+Quest.defaultProps = {};
+Quest.propTypes = {};
 const mapStateToProps = state => ({
-  npcs: state.npcs.all,
   quests: state.quests.all,
+  npcs: state.npcs.all,
   places: state.places.all,
   currentCampaign: state.campaigns.currentCampaign
 });
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      deleteNPC: NPCActions.deleteNPC
+      deleteQuest: QuestActions.deleteQuest
     },
     dispatch
   );
@@ -501,4 +423,4 @@ const mapDispatchToProps = dispatch =>
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(NPC);
+)(Quest);

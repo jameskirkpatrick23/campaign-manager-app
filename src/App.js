@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import { Route, Link, withRouter } from 'react-router-dom';
 import routes from './routes';
-import { app } from './firebase';
+import { app } from './firebaseDB';
 import Logo from './assets/Logo-Inverse.svg';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';

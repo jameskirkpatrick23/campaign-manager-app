@@ -1,5 +1,5 @@
 import * as constants from '../constants';
-import database from '../../firebase';
+import database from '../../firebaseDB';
 import firebase from 'firebase';
 
 export const updateNotesList = note => (dispatch, getState) => {

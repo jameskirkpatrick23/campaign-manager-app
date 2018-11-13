@@ -1,5 +1,5 @@
 import { Npc } from '../constants';
-import database from '../../firebase';
+import database from '../../firebaseDB';
 import firebase from 'firebase';
 import _ from 'lodash';
 import {
@@ -32,7 +32,6 @@ export const editNPC = npcData => (dispatch, getState) => {
   _.uniq([...currentNPC.placeIds, ...npcData.placeIds]).forEach(placeId => {
     const placeRef = database.collection('places').doc(placeId);
     if (!npcData.placeIds.includes(placeId)) {
-      // delete if newData !include oldId
       batch.update(placeRef, { npcIds: arrayRemove(currentNPC.id) });
     } else {
       batch.update(placeRef, { npcIds: arrayUnion(currentNPC.id) });
@@ -42,10 +41,18 @@ export const editNPC = npcData => (dispatch, getState) => {
   _.uniq([...currentNPC.npcIds, ...npcData.npcIds]).forEach(npcId => {
     const npcRef = database.collection('npcs').doc(npcId);
     if (!npcData.npcIds.includes(npcId)) {
-      // delete if newData !include oldId
       batch.update(npcRef, { npcIds: arrayRemove(currentNPC.id) });
     } else {
       batch.update(npcRef, { npcIds: arrayUnion(currentNPC.id) });
+    }
+  });
+
+  _.uniq([...currentNPC.questIds, ...npcData.questIds]).forEach(qusetId => {
+    const questRef = database.collection('npcs').doc(qusetId);
+    if (!npcData.questIds.includes(qusetId)) {
+      batch.update(questRef, { npcIds: arrayRemove(currentNPC.id) });
+    } else {
+      batch.update(questRef, { npcIds: arrayUnion(currentNPC.id) });
     }
   });
 
