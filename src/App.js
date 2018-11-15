@@ -10,9 +10,12 @@ import * as LoginActions from './redux/actions/login';
 import * as CampaignActions from './redux/actions/campaigns';
 import Breadcrumbs from './reusable-components/navigation-breadcrumbs';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import ReactGA from 'react-ga';
 
 class App extends Component {
   componentWillMount() {
+    ReactGA.initialize('UA-129283951-1');
+    ReactGA.pageview('/');
     if (this.props.isLoggedIn) {
       this.props.fetchCampaigns(this.props.currentUser).then(() => {
         this.props.setCampaignListener(this.props.currentUser);

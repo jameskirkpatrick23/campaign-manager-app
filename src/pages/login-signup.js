@@ -4,6 +4,7 @@ import { app } from '../firebaseDB';
 import { withRouter } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import ReactGA from 'react-ga';
 import * as LoginActions from '../redux/actions/login';
 
 class Login extends React.Component {
@@ -14,6 +15,10 @@ class Login extends React.Component {
   }
 
   signInWithFacebook = () => {
+    ReactGA.event({
+      category: 'Login',
+      action: 'Login with Facebook'
+    });
     const provider = new firebase.auth.FacebookAuthProvider();
     provider.addScope('user_friends');
     provider.addScope('user_photos');
@@ -42,6 +47,10 @@ class Login extends React.Component {
 
   signInWithGoogle = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
+    ReactGA.event({
+      category: 'Login',
+      action: 'Login with Google'
+    });
     app
       .auth()
       .signInWithPopup(provider)
