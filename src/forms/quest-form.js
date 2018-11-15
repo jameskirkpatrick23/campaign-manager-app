@@ -11,6 +11,8 @@ import {
   Button,
   Row,
   Col,
+  Checkbox,
+  InputGroup,
   Glyphicon
 } from 'react-bootstrap';
 import Fieldset from '../reusable-components/fieldset';
@@ -31,6 +33,7 @@ class QuestForm extends Component {
       npcIds: [],
       questIds: [],
       eventIds: [],
+      objectives: [],
       images: {},
       attachedFiles: {},
       newImages: {},
@@ -42,6 +45,8 @@ class QuestForm extends Component {
       isSubmitting: false
     };
     this.onSubmit = this.onSubmit.bind(this);
+    this.updateObjective = this.updateObjective.bind(this);
+    this.addObjective = this.addObjective.bind(this);
   }
 
   componentWillMount() {
@@ -62,6 +67,7 @@ class QuestForm extends Component {
       images: images,
       questId: quest.id || '',
       attachedFiles: attachedFiles,
+      objectives: quest.objectives ? [...quest.objectives] : [],
       npcIds: [...quest.npcIds] || [],
       placeIds: [...quest.placeIds] || [],
       noteIds: [...quest.noteIds] || [],
@@ -165,6 +171,18 @@ class QuestForm extends Component {
     });
   };
 
+  updateObjective = (index, state, value) => {
+    let objs = [...this.state.objectives];
+    objs[index][state] = value;
+    this.setState({ objectives: objs });
+  };
+
+  addObjective = () => {
+    let objs = [...this.state.objectives];
+    objs.push({ complete: false, name: '' });
+    this.setState({ objectives: objs });
+  };
+
   render() {
     const {
       name,
@@ -176,6 +194,7 @@ class QuestForm extends Component {
       npcIds,
       eventIds,
       questIds,
+      objectives,
       isSubmitting
     } = this.state;
     const { tags, places, quests, npcs, events } = this.props;
@@ -357,10 +376,48 @@ class QuestForm extends Component {
           </Row>
           <Row>
             <Col xs={12} md={6}>
+              <Fieldset label="Objectives">
+                <Button bsStyle="info" onClick={this.addObjective}>
+                  Add Objective
+                </Button>
+                <FormGroup>
+                  <ControlLabel htmlFor="#quest-objectives">
+                    Objectives
+                  </ControlLabel>
+                  {objectives.map((obj, idx) => {
+                    return (
+                      <InputGroup key={`quest-objective-${idx}`}>
+                        <Checkbox
+                          checked={obj.complete}
+                          onChange={e =>
+                            this.updateObjective(
+                              idx,
+                              'complete',
+                              e.target.checked
+                            )
+                          }
+                        />
+                        <FormControl
+                          type="text"
+                          value={obj.name}
+                          onChange={e =>
+                            this.updateObjective(idx, 'name', e.target.value)
+                          }
+                          placeholder="Add an objective for the players to complete"
+                        />
+                      </InputGroup>
+                    );
+                  })}
+                </FormGroup>
+              </Fieldset>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12} md={6}>
               <Fieldset label="Images and Files">
                 <FormGroup>
                   <ControlLabel htmlFor="#quest-image">Image</ControlLabel>
-                  <input
+                  <FormControl
                     id="quest-image"
                     type="file"
                     multiple
@@ -377,7 +434,7 @@ class QuestForm extends Component {
                   <ControlLabel htmlFor="#quest-attachedFiles">
                     Other Files
                   </ControlLabel>
-                  <input
+                  <FormControl
                     id="quest-attachedFiles"
                     type="file"
                     multiple
@@ -420,6 +477,7 @@ class QuestForm extends Component {
 
 QuestForm.defaultProps = {
   quest: {
+    objectives: [],
     images: [],
     npcIds: [],
     placeIds: [],

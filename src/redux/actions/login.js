@@ -1,3 +1,4 @@
+import database from '../../firebaseDB';
 import * as constants from '../constants';
 import * as CampaignActions from '../actions/campaigns';
 import * as AdminActions from '../actions/administrative';
@@ -10,6 +11,17 @@ export const loginUser = user => dispatch => {
     phoneNUmber: user.phoneNumber,
     signinType: user.signinType
   };
+  const ref = database.collection(`users`);
+  ref
+    .where('uid', '==', user.uid)
+    .get()
+    .then(snapshot => {
+      if (!snapshot.empty) {
+        ref.doc(snapshot.val()).update(scopedUserFields);
+      } else {
+        ref.add(scopedUserFields);
+      }
+    });
   dispatch(CampaignActions.setCampaignListener(scopedUserFields));
   ['values', 'alignments', 'quirks', 'occupations', 'races', 'genders'].forEach(
     item => {

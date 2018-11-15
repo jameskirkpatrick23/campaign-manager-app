@@ -22,10 +22,10 @@ export const createPlaceType = typeName => (dispatch, getState) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`placeTypes`);
     ref
-      .orderByChild('name')
-      .equalTo(typeName)
-      .once('value', snapshot => {
-        if (snapshot.exists()) {
+      .where('name', '==', typeName)
+      .get()
+      .then(snapshot => {
+        if (!snapshot.empty) {
           ref.doc(snapshot.val()).update({
             collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
           });
