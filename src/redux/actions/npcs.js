@@ -31,7 +31,7 @@ export const editNPC = npcData => (dispatch, getState) => {
   const currentNPC = getState().npcs.all[npcData.npcId];
 
   const batch = database.batch();
-  const usedRef = database.collection('npcs').doc(currentNPC.id);
+  const usedRef = database.collection('npcs').doc(npcData.npcId);
   const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
 
   _.uniq([...currentNPC.placeIds, ...npcData.placeIds]).forEach(placeId => {
@@ -53,7 +53,7 @@ export const editNPC = npcData => (dispatch, getState) => {
   });
 
   _.uniq([...currentNPC.questIds, ...npcData.questIds]).forEach(qusetId => {
-    const questRef = database.collection('npcs').doc(qusetId);
+    const questRef = database.collection('quests').doc(qusetId);
     if (!npcData.questIds.includes(qusetId)) {
       batch.update(questRef, { npcIds: arrayRemove(currentNPC.id) });
     } else {
