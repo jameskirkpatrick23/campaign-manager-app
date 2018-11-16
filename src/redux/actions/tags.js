@@ -1,6 +1,7 @@
 import * as constants from '../constants';
 import database from '../../firebaseDB';
 import firebase from 'firebase';
+import ReactGA from 'react-ga';
 
 //<editor-fold Tags>
 
@@ -11,6 +12,10 @@ export const updateTagList = tag => (dispatch, getState) => {
 };
 
 export const createTag = tagName => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Tags',
+    action: 'Create Tag'
+  });
   return new Promise((resolve, reject) => {
     database
       .collection(`tags`)

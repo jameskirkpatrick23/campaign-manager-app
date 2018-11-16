@@ -1,5 +1,6 @@
 import database from '../../firebaseDB';
 import { Race } from '../constants';
+import ReactGA from 'react-ga';
 
 import firebase from 'firebase';
 
@@ -10,6 +11,10 @@ export const updateRacesList = race => (dispatch, getState) => {
 };
 
 export const createRace = raceName => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Races',
+    action: 'Create Race'
+  });
   return new Promise((resolve, reject) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`races`);

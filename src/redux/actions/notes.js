@@ -1,6 +1,7 @@
 import * as constants from '../constants';
 import database from '../../firebaseDB';
 import firebase from 'firebase';
+import ReactGA from 'react-ga';
 
 export const updateNotesList = note => (dispatch, getState) => {
   const updatedState = { ...getState().notes.all };
@@ -18,6 +19,10 @@ const removeNoteFromList = noteId => (dispatch, getState) => {
 };
 
 export const createNote = noteData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Notes',
+    action: 'Create Note'
+  });
   dispatch({ type: constants.Note.CREATING_NOTE, note: noteData });
   const batch = database.batch();
   const ref = database.collection('notes').doc();
@@ -45,6 +50,10 @@ export const createNote = noteData => (dispatch, getState) => {
 };
 
 export const updateNote = noteData => dispatch => {
+  ReactGA.event({
+    category: 'Notes',
+    action: 'Update Note'
+  });
   dispatch({ type: constants.Note.UPDATING_NOTE, note: noteData });
   return new Promise((resolve, reject) => {
     database
@@ -64,6 +73,10 @@ export const updateNote = noteData => dispatch => {
 };
 
 export const deleteNote = note => dispatch => {
+  ReactGA.event({
+    category: 'Notes',
+    action: 'Delete Note'
+  });
   dispatch({ type: constants.Note.DELETING_NOTE, note });
   const foundNote = { ...note }; //we want a copy because we are going to delete the redux stores
   const batch = database.batch();

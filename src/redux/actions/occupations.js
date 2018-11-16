@@ -1,6 +1,6 @@
 import database from '../../firebaseDB';
 import { Occupation } from '../constants';
-
+import ReactGA from 'react-ga';
 import firebase from 'firebase';
 
 export const updateOccupationsList = occupation => (dispatch, getState) => {
@@ -13,6 +13,10 @@ export const updateOccupationsList = occupation => (dispatch, getState) => {
 };
 
 export const createOccupation = occupationName => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Occupations',
+    action: 'Create Occupation'
+  });
   return new Promise((resolve, reject) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`occupations`);

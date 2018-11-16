@@ -1,3 +1,4 @@
+import ReactGA from 'react-ga';
 import * as constants from '../constants';
 import database from '../../firebaseDB';
 import firebase from 'firebase';
@@ -18,6 +19,10 @@ export const updatePlaceTypesList = type => (dispatch, getState) => {
 };
 
 export const createPlaceType = typeName => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'PlaceTypes',
+    action: 'Create Place Type'
+  });
   return new Promise((resolve, reject) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`placeTypes`);
@@ -87,6 +92,10 @@ const removePlaceFromList = placeId => (dispatch, getState) => {
 };
 
 export const deletePlace = place => dispatch => {
+  ReactGA.event({
+    category: 'Places',
+    action: 'Delete Place'
+  });
   const allImageKeys = Array.from(new Array(place.images.length).keys());
   const { arrayRemove } = firebase.firestore.FieldValue;
   const batch = database.batch;
@@ -142,6 +151,10 @@ export const deletePlace = place => dispatch => {
 };
 
 export const editPlace = placeData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Places',
+    action: 'Edit Place'
+  });
   const userUid = getState().login.user.uid;
   const currentPlace = getState().places.all[placeData.placeId];
   const {
@@ -264,6 +277,10 @@ export const editPlace = placeData => (dispatch, getState) => {
 };
 
 export const createPlace = placeData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Places',
+    action: 'Create Place'
+  });
   const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;
   const { arrayUnion } = firebase.firestore.FieldValue;

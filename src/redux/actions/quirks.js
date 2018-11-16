@@ -1,6 +1,6 @@
 import database from '../../firebaseDB';
 import { Quirk } from '../constants';
-
+import ReactGA from 'react-ga';
 import firebase from 'firebase';
 
 export const updateQuirksList = quirk => (dispatch, getState) => {
@@ -10,6 +10,10 @@ export const updateQuirksList = quirk => (dispatch, getState) => {
 };
 
 export const createQuirk = quirkName => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Quirks',
+    action: 'Create Quirk'
+  });
   return new Promise((resolve, reject) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`quirks`);

@@ -1,6 +1,6 @@
 import database from '../../firebaseDB';
 import { Value } from '../constants';
-
+import ReactGA from 'react-ga';
 import firebase from 'firebase';
 
 export const updateValuesList = value => (dispatch, getState) => {
@@ -10,6 +10,10 @@ export const updateValuesList = value => (dispatch, getState) => {
 };
 
 export const createValue = valueName => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Values',
+    action: 'Create Value'
+  });
   return new Promise((resolve, reject) => {
     const myId = getState().login.user.uid;
     const ref = database.collection(`values`);

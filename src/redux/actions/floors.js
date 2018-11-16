@@ -1,3 +1,4 @@
+import ReactGA from 'react-ga';
 import * as constants from '../constants';
 import database from '../../firebaseDB';
 import * as PlaceActions from './places';
@@ -20,6 +21,10 @@ const removeFloorFromList = floorId => (dispatch, getState) => {
 };
 
 export const updateTiles = (floor, newTiles) => () => {
+  ReactGA.event({
+    category: 'Floors',
+    action: 'Rearrange Tiles'
+  });
   return new Promise((resolve, reject) => {
     database
       .collection(`floors`)
@@ -38,6 +43,10 @@ export const updateTiles = (floor, newTiles) => () => {
 };
 
 export const updateFloor = floorData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Floors',
+    action: 'Update Floor'
+  });
   const currentFloorCopy = getState().floors.all[floorData.floorId];
   const allTiles = getState().tiles.all;
   const tiles = { ...currentFloorCopy.tiles };
@@ -84,6 +93,10 @@ export const updateFloor = floorData => (dispatch, getState) => {
 };
 
 export const createFloor = floorData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Floors',
+    action: 'Create Floor'
+  });
   const userUid = getState().login.user.uid;
   const tiles = {};
   for (let i = 0; i < floorData.numRows; i++) {
@@ -131,6 +144,10 @@ const getUsedTiles = (floor, allTiles) => {
 };
 
 export const deleteFloor = floorId => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Floors',
+    action: 'Delete Floor'
+  });
   const usedFloor = { ...getState().floors.all[floorId] };
   const allTiles = getState().tiles.all;
   const usedTiles = getUsedTiles(usedFloor, allTiles);

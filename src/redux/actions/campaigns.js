@@ -1,3 +1,4 @@
+import ReactGA from 'react-ga';
 import * as constants from '../constants';
 import database, { app } from '../../firebaseDB';
 import * as PlacesActions from './places';
@@ -173,6 +174,10 @@ const removeCampaignFromList = campaignId => (dispatch, getState) => {
 
 export const deleteCampaign = campaign => dispatch => {
   dispatch({ type: constants.Campaign.DELETING_CAMPAIGN, id: campaign.id });
+  ReactGA.event({
+    category: 'Campaigns',
+    action: 'Delete Campaign'
+  });
   return new Promise((resolve, reject) => {
     database
       .collection('campaigns')
@@ -192,6 +197,10 @@ export const deleteCampaign = campaign => dispatch => {
 export const createCampaign = campaignData => (dispatch, getState) => {
   const storageRef = app.storage().ref();
   dispatch({ type: constants.Campaign.CREATING_CAMPAIGN, data: campaignData });
+  ReactGA.event({
+    category: 'Campaigns',
+    action: 'Create Campaign'
+  });
   return new Promise((resolve, reject) => {
     if (campaignData.image) {
       const imagesRef = storageRef.child(

@@ -3,6 +3,7 @@ import { Quest } from '../constants';
 import database from '../../firebaseDB';
 import firebase from 'firebase';
 import _ from 'lodash';
+import ReactGA from 'react-ga';
 import {
   generateFileDeletePromiseArray,
   generatePromiseArray
@@ -22,6 +23,10 @@ const removeQuestFromList = questId => (dispatch, getState) => {
 };
 
 export const editQuest = questData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Quests',
+    action: 'Edit Quest'
+  });
   dispatch({ type: Quest.UPDATE_QUEST, data: questData });
   const userUid = getState().login.user.uid;
   const currentQuest = getState().quests.all[questData.questId];
@@ -154,6 +159,10 @@ export const editQuest = questData => (dispatch, getState) => {
 };
 
 export const createQuest = questData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Quests',
+    action: 'Create Quest'
+  });
   dispatch({ type: Quest.CREATING_QUEST, data: questData });
   const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;
@@ -236,6 +245,10 @@ export const createQuest = questData => (dispatch, getState) => {
 };
 
 export const deleteQuest = quest => dispatch => {
+  ReactGA.event({
+    category: 'Quests',
+    action: 'Delete Quest'
+  });
   dispatch({ type: Quest.DELETING_QUEST, id: quest.id });
   const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
   const batch = database.batch();

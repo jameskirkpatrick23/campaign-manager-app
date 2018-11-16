@@ -2,6 +2,7 @@ import * as constants from '../constants';
 import database, { app } from '../../firebaseDB';
 import * as FloorActions from './floors';
 import firebase from 'firebase';
+import ReactGA from 'react-ga';
 
 export const updateTileList = tile => (dispatch, getState) => {
   const updatedState = { ...getState().tiles.all };
@@ -40,6 +41,10 @@ const removeTileFromList = tileId => (dispatch, getState) => {
 };
 
 export const createTile = tileData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Tiles',
+    action: 'Create Tile'
+  });
   dispatch({ type: constants.Tile.CREATING_TILE, tile: tileData });
   return new Promise((resolve, reject) => {
     uploadImage(
@@ -71,6 +76,10 @@ export const createTile = tileData => (dispatch, getState) => {
 };
 
 export const updateTile = tileData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Tiles',
+    action: 'Update Tile'
+  });
   dispatch({ type: constants.Tile.UPDATING_TILE, tile: tileData });
   const currentTile = getState().tiles.all[tileData.id];
   return new Promise((resolve, reject) => {
@@ -106,6 +115,10 @@ export const updateTile = tileData => (dispatch, getState) => {
 };
 
 export const deleteTile = tile => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'Tiles',
+    action: 'Delete Tile'
+  });
   dispatch({ type: constants.Tile.DELETING_TILE, tile });
   const storageRef = app.storage().ref();
   const foundTile = { ...tile }; //we want a copy because we are going to delete the redux stores

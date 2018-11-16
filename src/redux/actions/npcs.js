@@ -1,3 +1,4 @@
+import ReactGA from 'react-ga';
 import { Npc } from '../constants';
 import database from '../../firebaseDB';
 import firebase from 'firebase';
@@ -21,6 +22,10 @@ const removeNPCFromList = npcId => (dispatch, getState) => {
 };
 
 export const editNPC = npcData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'NPCs',
+    action: 'Edit NPC'
+  });
   dispatch({ type: Npc.UPDATE_NPC, data: npcData });
   const userUid = getState().login.user.uid;
   const currentNPC = getState().npcs.all[npcData.npcId];
@@ -150,6 +155,10 @@ export const editNPC = npcData => (dispatch, getState) => {
 };
 
 export const createNPC = npcData => (dispatch, getState) => {
+  ReactGA.event({
+    category: 'NPCs',
+    action: 'Create NPC'
+  });
   dispatch({ type: Npc.CREATING_NPC, data: npcData });
   const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;
@@ -228,6 +237,10 @@ export const createNPC = npcData => (dispatch, getState) => {
 };
 
 export const deleteNPC = npc => dispatch => {
+  ReactGA.event({
+    category: 'NPCs',
+    action: 'Delete NPC'
+  });
   dispatch({ type: Npc.DELETING_NPC, id: npc.id });
   const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
   const batch = database.batch();
