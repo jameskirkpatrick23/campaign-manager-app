@@ -116,13 +116,13 @@ export const deletePlace = place => dispatch => {
   });
   placeData.questIds.forEach(questId => {
     const questRef = database.collection('quests').doc(questId);
-    batch.update(questRef, { placeIds: arrayRemove(usedId) });
+    batch.update(questRef, { placeIds: arrayRemove(place.id) });
   });
   const imagePromise = generateFileDeletePromiseArray(
     allImageKeys,
     place.images
   );
-  const allFileKeys = Array.from(Array(place.attachedFiles.length).keys());
+  const allFileKeys = Array.from(new Array(place.attachedFiles.length).keys());
   const filePromise = generateFileDeletePromiseArray(
     allFileKeys,
     place.attachedFiles
