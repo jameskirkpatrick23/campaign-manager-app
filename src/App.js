@@ -16,6 +16,7 @@ class App extends Component {
   componentWillMount() {
     ReactGA.initialize('UA-129283951-1');
     ReactGA.pageview('/');
+    this.props.history.listen(location => ReactGA.pageview(location.pathname));
     if (this.props.isLoggedIn) {
       this.props.fetchCampaigns(this.props.currentUser).then(() => {
         this.props.setCampaignListener(this.props.currentUser);
