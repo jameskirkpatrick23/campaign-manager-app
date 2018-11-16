@@ -177,6 +177,10 @@ export const createNPC = npcData => (dispatch, getState) => {
     const npcRef = database.collection('npcs').doc(npcId);
     batch.update(npcRef, { npcIds: arrayUnion(usedId) });
   });
+  npcData.questIds.forEach(questId => {
+    const questRef = database.collection('quests').doc(questId);
+    batch.update(questRef, { npcIds: arrayUnion(usedId) });
+  });
 
   const imagePromiseArray = generatePromiseArray(
     npcData.newImages,
@@ -242,7 +246,7 @@ export const deleteNPC = npc => dispatch => {
     action: 'Delete NPC'
   });
   dispatch({ type: Npc.DELETING_NPC, id: npc.id });
-  const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
+  const { arrayRemove } = firebase.firestore.FieldValue;
   const batch = database.batch();
   const usedRef = database.collection('npcs').doc(npc.id);
   batch.delete(usedRef);
@@ -257,7 +261,11 @@ export const deleteNPC = npc => dispatch => {
   });
   npc.npcIds.forEach(npcId => {
     const npcRef = database.collection('npcs').doc(npcId);
-    batch.update(npcRef, { npcIds: arrayUnion(npc.id) });
+    batch.update(npcRef, { npcIds: arrayRemove(npc.id) });
+  });
+  npc.questIds.forEach(questId => {
+    const npcRef = database.collection('quests').doc(questId);
+    batch.update(npcRef, { npcIds: arrayRemove(npc.id) });
   });
 
   const allImageKeys = Array.from(new Array(npc.images.length).keys());

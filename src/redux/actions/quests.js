@@ -183,7 +183,7 @@ export const createQuest = questData => (dispatch, getState) => {
   });
   questData.npcIds.forEach(npcId => {
     const npcRef = database.collection('npcs').doc(npcId);
-    batch.update(npcRef, { npcIds: arrayUnion(usedId) });
+    batch.update(npcRef, { questIds: arrayUnion(usedId) });
   });
 
   const imagePromiseArray = generatePromiseArray(
@@ -250,7 +250,7 @@ export const deleteQuest = quest => dispatch => {
     action: 'Delete Quest'
   });
   dispatch({ type: Quest.DELETING_QUEST, id: quest.id });
-  const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
+  const { arrayRemove } = firebase.firestore.FieldValue;
   const batch = database.batch();
   const usedRef = database.collection('quests').doc(quest.id);
   batch.delete(usedRef);
@@ -265,11 +265,11 @@ export const deleteQuest = quest => dispatch => {
   });
   quest.questIds.forEach(questId => {
     const questRef = database.collection('quests').doc(questId);
-    batch.update(questRef, { questIds: arrayUnion(quest.id) });
+    batch.update(questRef, { questIds: arrayRemove(quest.id) });
   });
   quest.npcIds.forEach(npcId => {
     const npcRef = database.collection('npcs').doc(npcId);
-    batch.update(npcRef, { questIds: arrayUnion(quest.id) });
+    batch.update(npcRef, { questIds: arrayRemove(quest.id) });
   });
   const allImageKeys = Array.from(new Array(quest.images.length).keys());
   const imagePromise = generateFileDeletePromiseArray(

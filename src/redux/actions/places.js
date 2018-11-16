@@ -114,6 +114,10 @@ export const deletePlace = place => dispatch => {
     const placeRef = database.collection('places').doc(placeId);
     batch.update(placeRef, { placeIds: arrayRemove(place.id) });
   });
+  placeData.questIds.forEach(questId => {
+    const questRef = database.collection('quests').doc(questId);
+    batch.update(questRef, { placeIds: arrayRemove(usedId) });
+  });
   const imagePromise = generateFileDeletePromiseArray(
     allImageKeys,
     place.images
@@ -211,6 +215,16 @@ export const editPlace = placeData => (dispatch, getState) => {
     }
   });
 
+  _.uniq([...currentPlace.questIds, ...placeData.questIds]).forEach(questId => {
+    const questRef = database.collection('quests').doc(questId);
+    if (!placeData.questIds.includes(questId)) {
+      // delete if newData !include oldId
+      batch.update(questRef, { npcIds: arrayRemove(currentPlace.id) });
+    } else {
+      batch.update(questRef, { npcIds: arrayUnion(currentPlace.id) });
+    }
+  });
+
   let currentImages = Object.keys(images).map(key => images[key]);
   let currentAttachedFiles = Object.keys(attachedFiles).map(
     key => attachedFiles[key]
@@ -296,7 +310,10 @@ export const createPlace = placeData => (dispatch, getState) => {
     const npcRef = database.collection('npcs').doc(npcId);
     batch.update(npcRef, { placeIds: arrayUnion(usedId) });
   });
-
+  placeData.questIds.forEach(questId => {
+    const questRef = database.collection('quests').doc(questId);
+    batch.update(questRef, { placeIds: arrayUnion(usedId) });
+  });
   const imagePromiseArray = generatePromiseArray(
     placeData.newImages,
     userUid,
