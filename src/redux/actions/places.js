@@ -114,7 +114,7 @@ export const deletePlace = place => dispatch => {
     const placeRef = database.collection('places').doc(placeId);
     batch.update(placeRef, { placeIds: arrayRemove(place.id) });
   });
-  placeData.questIds.forEach(questId => {
+  place.questIds.forEach(questId => {
     const questRef = database.collection('quests').doc(questId);
     batch.update(questRef, { placeIds: arrayRemove(place.id) });
   });
