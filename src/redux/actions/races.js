@@ -1,8 +1,5 @@
-import database from '../../firebaseDB';
 import { Race } from '../constants';
-import ReactGA from 'react-ga';
-
-import firebase from 'firebase';
+import { createAncillaryObject } from './reusable';
 
 export const updateRacesList = race => (dispatch, getState) => {
   const updatedState = { ...getState().races.all };
@@ -10,38 +7,6 @@ export const updateRacesList = race => (dispatch, getState) => {
   dispatch({ type: Race.UPDATE_RACE_LIST, races: updatedState });
 };
 
-export const createRace = raceName => (dispatch, getState) => {
-  ReactGA.event({
-    category: 'Races',
-    action: 'Create Race'
-  });
-  return new Promise((resolve, reject) => {
-    const myId = getState().login.user.uid;
-    const ref = database.collection(`races`);
-    ref
-      .where('name', '==', raceName)
-      .get()
-      .then(snapshot => {
-        if (!snapshot.empty) {
-          ref.doc(snapshot.val()).update({
-            collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
-          });
-        } else {
-          ref
-            .add({
-              name: raceName,
-              creatorId: myId,
-              default: false,
-              collaboratorIds: []
-            })
-            .then(res => {
-              dispatch({ type: 'CREATED_RACE', raceName });
-              resolve(res);
-            })
-            .catch(error => {
-              reject('Error writing document: ', error);
-            });
-        }
-      });
-  });
+export const createRace = raceName => dispatch => {
+  dispatch(createAncillaryObject(raceName, 'race'));
 };

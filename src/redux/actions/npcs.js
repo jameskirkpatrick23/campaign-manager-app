@@ -2,12 +2,15 @@ import ReactGA from 'react-ga';
 import { Npc } from '../constants';
 import database from '../../firebaseDB';
 import firebase from 'firebase';
-import _ from 'lodash';
 import {
-  generatePromiseArray,
-  generateFileDeletePromiseArray
+  generateImagePromises,
+  handleFileChanges,
+  deleteConnected,
+  generateDeleteKeys,
+  stripExcessData,
+  updateConnected,
+  conditionallyUpdateConnected
 } from './reusable';
-import { deleteNote } from './notes';
 
 export const updateNPCsList = npc => (dispatch, getState) => {
   const updatedState = { ...getState().npcs.all };
@@ -32,94 +35,29 @@ export const editNPC = npcData => (dispatch, getState) => {
 
   const batch = database.batch();
   const usedRef = database.collection('npcs').doc(npcData.npcId);
-  const { arrayRemove, arrayUnion } = firebase.firestore.FieldValue;
-
-  _.uniq([...currentNPC.placeIds, ...npcData.placeIds]).forEach(placeId => {
-    const placeRef = database.collection('places').doc(placeId);
-    if (!npcData.placeIds.includes(placeId)) {
-      batch.update(placeRef, { npcIds: arrayRemove(currentNPC.id) });
-    } else {
-      batch.update(placeRef, { npcIds: arrayUnion(currentNPC.id) });
-    }
-  });
-
-  _.uniq([...currentNPC.npcIds, ...npcData.npcIds]).forEach(npcId => {
-    const npcRef = database.collection('npcs').doc(npcId);
-    if (!npcData.npcIds.includes(npcId)) {
-      batch.update(npcRef, { npcIds: arrayRemove(currentNPC.id) });
-    } else {
-      batch.update(npcRef, { npcIds: arrayUnion(currentNPC.id) });
-    }
-  });
-
-  _.uniq([...currentNPC.questIds, ...npcData.questIds]).forEach(qusetId => {
-    const questRef = database.collection('quests').doc(qusetId);
-    if (!npcData.questIds.includes(qusetId)) {
-      batch.update(questRef, { npcIds: arrayRemove(currentNPC.id) });
-    } else {
-      batch.update(questRef, { npcIds: arrayUnion(currentNPC.id) });
-    }
-  });
-
-  const {
-    deleteimagesKeys,
-    deleteattachedFilesKeys,
-    newImages,
-    newAttachedFiles,
-    images,
-    attachedFiles
-  } = npcData;
-
-  const deleteImageArray = generateFileDeletePromiseArray(
-    deleteimagesKeys,
-    currentNPC.images
-  );
-  const deleteAttachedArray = generateFileDeletePromiseArray(
-    deleteattachedFilesKeys,
-    currentNPC.attachedFiles
-  );
-  const newImagePromiseArray = generatePromiseArray(
-    newImages,
-    userUid,
-    'images',
-    'npcs'
-  );
-  const newAttachedFilePromiseArray = generatePromiseArray(
-    newAttachedFiles,
-    userUid,
-    'attachedFiles',
-    'npcs'
-  );
-
-  let currentImages = Object.keys(images).map(key => images[key]);
-  let currentAttachedFiles = Object.keys(attachedFiles).map(
-    key => attachedFiles[key]
-  );
+  conditionallyUpdateConnected(currentNPC, npcData, batch);
   const usedData = { ...npcData };
-  delete usedData.newImages;
-  delete usedData.newAttachedFiles;
-  delete usedData.deleteattachedFilesKeys;
-  delete usedData.deleteimagesKeys;
-  delete usedData.deletenewAttachedFilesKeys;
-  delete usedData.deletenewImagesKeys;
+  stripExcessData(usedData);
+  const fileChanges = handleFileChanges(npcData, currentNPC, userUid);
 
   return new Promise((resolve, reject) => {
     // make all the new images
-    return Promise.all(newImagePromiseArray)
+    return Promise.all(fileChanges.newImagePromiseArray)
       .then(resolvedImages => {
-        Promise.all(newAttachedFilePromiseArray)
+        Promise.all(fileChanges.newAttachedFilePromiseArray)
           .then(resolvedFiles => {
-            Promise.all([...deleteImageArray, ...deleteAttachedArray])
+            Promise.all([
+              ...fileChanges.deleteImageArray,
+              ...fileChanges.deleteAttachedArray
+            ])
               .then(() => {
-                currentImages = currentImages.concat(resolvedImages);
-                currentAttachedFiles = currentAttachedFiles.concat(
-                  resolvedFiles
-                );
                 batch.update(usedRef, {
                   ...usedData,
                   updatedAt: firebase.firestore.Timestamp.now(),
-                  images: currentImages,
-                  attachedFiles: currentAttachedFiles
+                  images: fileChanges.currentImages.concat(resolvedImages),
+                  attachedFiles: fileChanges.currentAttachedFiles.concat(
+                    resolvedFiles
+                  )
                 });
                 batch
                   .commit()
@@ -165,46 +103,17 @@ export const createNPC = npcData => (dispatch, getState) => {
 
   const batch = database.batch();
   const usedRef = database.collection('npcs').doc();
-  const usedId = usedRef.id;
-  const { arrayUnion } = firebase.firestore.FieldValue;
-  const usedData = { ...npcData };
+  const usedData = { ...npcData, id: usedRef.id };
 
-  npcData.placeIds.forEach(placeId => {
-    const placeRef = database.collection('places').doc(placeId);
-    batch.update(placeRef, { npcIds: arrayUnion(usedId) });
-  });
-  npcData.npcIds.forEach(npcId => {
-    const npcRef = database.collection('npcs').doc(npcId);
-    batch.update(npcRef, { npcIds: arrayUnion(usedId) });
-  });
-  npcData.questIds.forEach(questId => {
-    const questRef = database.collection('quests').doc(questId);
-    batch.update(questRef, { npcIds: arrayUnion(usedId) });
-  });
+  updateConnected(usedData, 'npcIds', batch);
 
-  const imagePromiseArray = generatePromiseArray(
-    npcData.newImages,
-    userUid,
-    'images',
-    'npcs'
-  );
-  const attachedFilePromiseArray = generatePromiseArray(
-    npcData.newAttachedFiles,
-    userUid,
-    'files',
-    'npcs'
-  );
+  const newFiles = generateImagePromises(npcData, userUid, 'npcs');
 
   return new Promise((resolve, reject) => {
-    delete usedData.newImages;
-    delete usedData.newAttachedFiles;
-    delete usedData.deleteattachedFilesKeys;
-    delete usedData.deleteimagesKeys;
-    delete usedData.deletenewAttachedFilesKeys;
-    delete usedData.deletenewImagesKeys;
-    return Promise.all(imagePromiseArray)
+    stripExcessData(usedData);
+    return Promise.all(newFiles.imagePromiseArray)
       .then(resolvedImages => {
-        Promise.all(attachedFilePromiseArray)
+        Promise.all(newFiles.attachedFilePromiseArray)
           .then(resolvedFiles => {
             batch.set(usedRef, {
               ...usedData,
@@ -246,38 +155,14 @@ export const deleteNPC = npc => dispatch => {
     action: 'Delete NPC'
   });
   dispatch({ type: Npc.DELETING_NPC, id: npc.id });
-  const { arrayRemove } = firebase.firestore.FieldValue;
   const batch = database.batch();
   const usedRef = database.collection('npcs').doc(npc.id);
   batch.delete(usedRef);
-  npc.noteIds.forEach(noteId => {
-    const noteRef = database.collection('notes').doc(noteId);
-    batch.delete(noteRef);
-    dispatch(deleteNote({ id: noteId }));
-  });
-  npc.placeIds.forEach(placeId => {
-    const placeRef = database.collection('places').doc(placeId);
-    batch.update(placeRef, { npcIds: arrayRemove(npc.id) });
-  });
-  npc.npcIds.forEach(npcId => {
-    const npcRef = database.collection('npcs').doc(npcId);
-    batch.update(npcRef, { npcIds: arrayRemove(npc.id) });
-  });
-  npc.questIds.forEach(questId => {
-    const npcRef = database.collection('quests').doc(questId);
-    batch.update(npcRef, { npcIds: arrayRemove(npc.id) });
-  });
-
-  const allImageKeys = Array.from(new Array(npc.images.length).keys());
-  const imagePromise = generateFileDeletePromiseArray(allImageKeys, npc.images);
-  const allFileKeys = Array.from(new Array(npc.attachedFiles.length).keys());
-  const filePromise = generateFileDeletePromiseArray(
-    allFileKeys,
-    npc.attachedFiles
-  );
+  dispatch(deleteConnected(npc, 'npcIds', batch));
+  const filePromises = generateDeleteKeys(npc);
 
   return new Promise((resolve, reject) => {
-    Promise.all([...imagePromise, ...filePromise])
+    Promise.all(filePromises)
       .then(() => {
         batch
           .commit()

@@ -1,7 +1,5 @@
-import database from '../../firebaseDB';
 import { Value } from '../constants';
-import ReactGA from 'react-ga';
-import firebase from 'firebase';
+import { createAncillaryObject } from './reusable';
 
 export const updateValuesList = value => (dispatch, getState) => {
   const updatedState = { ...getState().values.all };
@@ -9,38 +7,6 @@ export const updateValuesList = value => (dispatch, getState) => {
   dispatch({ type: Value.UPDATE_VALUE_LIST, values: updatedState });
 };
 
-export const createValue = valueName => (dispatch, getState) => {
-  ReactGA.event({
-    category: 'Values',
-    action: 'Create Value'
-  });
-  return new Promise((resolve, reject) => {
-    const myId = getState().login.user.uid;
-    const ref = database.collection(`values`);
-    ref
-      .where('name', '==', valueName)
-      .get()
-      .then(snapshot => {
-        if (!snapshot.empty) {
-          ref.doc(snapshot.val()).update({
-            collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
-          });
-        } else {
-          ref
-            .add({
-              name: valueName,
-              creatorId: myId,
-              default: false,
-              collaboratorIds: []
-            })
-            .then(res => {
-              dispatch({ type: 'CREATED_VALUE', valueName });
-              resolve(res);
-            })
-            .catch(error => {
-              reject('Error writing document: ', error);
-            });
-        }
-      });
-  });
+export const createValue = valueName => dispatch => {
+  dispatch(createAncillaryObject(valueName, 'value'));
 };
