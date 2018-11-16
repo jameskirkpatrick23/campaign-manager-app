@@ -258,6 +258,109 @@ class Place extends Component {
     );
   };
 
+  renderNPCs = () => {
+    const { place } = this.state;
+    const { npcs, currentCampaign, history } = this.props;
+    return (
+      <Tab.Pane eventKey="npcs">
+        <Row>
+          <h3>Related NPCs</h3>
+        </Row>
+        <Row>
+          {!place.npcIds.length && (
+            <div>
+              You have no related NPCs. Please add some to see them here.
+            </div>
+          )}
+          {place.npcIds.map(npcKey => {
+            const foundNPC = npcs[npcKey];
+            const npcRoute = `/campaigns/${
+              currentCampaign.id
+            }/home/npcs/${npcKey}`;
+            if (!foundNPC) return null;
+            if (foundNPC)
+              return (
+                <Col xs={4} key={`npc-${npcKey}`}>
+                  <Panel
+                    bsStyle="warning"
+                    className="npc-card clickable"
+                    onClick={() => history.push(npcRoute)}
+                  >
+                    <Panel.Heading>
+                      <Panel.Title componentClass="h3">
+                        {foundNPC.name}
+                      </Panel.Title>
+                    </Panel.Heading>
+                    <Panel.Body className="padding-0">
+                      <Image
+                        src={this.getImage(foundNPC, 'npc')}
+                        className="npc-image"
+                      />
+                    </Panel.Body>
+                  </Panel>
+                </Col>
+              );
+          })}
+        </Row>
+      </Tab.Pane>
+    );
+  };
+
+  getImage = (item, type) => {
+    if (item.images.length) {
+      return item.images[0].downloadUrl;
+    }
+    return require(`../assets/placeholder-${type}.png`);
+  };
+
+  renderQuests = () => {
+    const { place } = this.state;
+    const { quests, currentCampaign, history } = this.props;
+    return (
+      <Tab.Pane eventKey="quests">
+        <Row>
+          <h3>Related Quests</h3>
+        </Row>
+        <Row>
+          {!place.questIds.length && (
+            <div>
+              You have no related quests. Please add some to see them here.
+            </div>
+          )}
+          {place.questIds.map(questKey => {
+            const foundQuest = quests[questKey];
+            const questRoute = `/campaigns/${
+              currentCampaign.id
+            }/home/quests/${questKey}`;
+            if (!foundQuest) return null;
+            if (foundQuest)
+              return (
+                <Col xs={4} key={`npc-${questKey}`}>
+                  <Panel
+                    bsStyle="warning"
+                    className="quest-card clickable"
+                    onClick={() => history.push(questRoute)}
+                  >
+                    <Panel.Heading>
+                      <Panel.Title componentClass="h3">
+                        {foundQuest.name}
+                      </Panel.Title>
+                    </Panel.Heading>
+                    <Panel.Body className="padding-0">
+                      <Image
+                        src={this.getImage(foundQuest, 'quest')}
+                        className="npc-image"
+                      />
+                    </Panel.Body>
+                  </Panel>
+                </Col>
+              );
+          })}
+        </Row>
+      </Tab.Pane>
+    );
+  };
+
   renderNotes = () => {
     const { place } = this.state;
     return (
@@ -318,6 +421,12 @@ class Place extends Component {
         <NavItem eventKey="places">
           <Glyphicon glyph="globe" />
         </NavItem>
+        <NavItem eventKey="npcs">
+          <Glyphicon glyph="user" />
+        </NavItem>
+        <NavItem eventKey="quests">
+          <Glyphicon glyph="tower" />
+        </NavItem>
         <NavItem eventKey="attachedFiles">
           <Glyphicon glyph="duplicate" />
         </NavItem>
@@ -370,6 +479,8 @@ class Place extends Component {
                         {this.renderNotes()}
                         {this.renderAttachedFiles()}
                         {this.renderPlaces()}
+                        {this.renderNPCs()}
+                        {this.renderQuests()}
                       </Tab.Content>
                     </Col>
                   </Row>
@@ -387,6 +498,8 @@ Place.defaultProps = {};
 Place.propTypes = {};
 const mapStateToProps = state => ({
   places: state.places.all,
+  npcs: state.npcs.all,
+  quests: state.quests.all,
   currentCampaign: state.campaigns.currentCampaign
 });
 const mapDispatchToProps = dispatch =>

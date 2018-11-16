@@ -2,8 +2,17 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button, Glyphicon, Row, Col } from 'react-bootstrap';
+import {
+  Button,
+  Glyphicon,
+  Row,
+  Col,
+  FormGroup,
+  FormControl,
+  ControlLabel
+} from 'react-bootstrap';
 import * as PlaceActions from '../redux/actions/places';
+import Fieldset from '../reusable-components/fieldset';
 import * as TagActions from '../redux/actions/tags';
 import { Multiselect, DropdownList } from 'react-widgets';
 import Spinner from '../reusable-components/spinner';
@@ -35,10 +44,9 @@ class PlacesForm extends Component {
       isSubmitting: false
     };
     this.createPlaceType = this.createPlaceType.bind(this);
-    this.handleImageUpload = this.handleImageUpload.bind(this);
-    this.handleExtraFileUpload = this.handleExtraFileUpload.bind(this);
     this.handleCloseRequest = this.handleCloseRequest.bind(this);
     this.handleExistingDelete = this.handleExistingDelete.bind(this);
+    this.getValidationState = this.getValidationState.bind(this);
     this.generateFileList = this.generateFileList.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.createTag = this.createTag.bind(this);
@@ -88,10 +96,13 @@ class PlacesForm extends Component {
     } = this.props;
     e.preventDefault();
     const formattedData = { ...this.state };
-    formattedData.placeIds = formattedData.placeIds.map(
-      item => item.value || item
+    ['tagIds', 'placeIds', 'npcIds', 'questIds', 'eventIds'].forEach(
+      stateKey => {
+        formattedData[stateKey] = formattedData[stateKey].map(
+          item => item.value || item
+        );
+      }
     );
-    formattedData.tagIds = formattedData.tagIds.map(item => item.value || item);
     this.setState({ isSubmitting: true }, () => {
       if (formAction !== 'edit') {
         createPlace(formattedData)
@@ -128,14 +139,21 @@ class PlacesForm extends Component {
     this.props.createTag(tagName);
   };
 
-  handleImageUpload = e => {
-    e.preventDefault();
-    this.setState({ newImages: e.target.files });
-  };
-
-  handleExtraFileUpload = e => {
-    e.preventDefault();
-    this.setState({ newAttachedFiles: e.target.files });
+  getValidationState = formKey => {
+    let length = 0;
+    switch (this.state[formKey].constructor) {
+      case Object:
+        length = Object.keys(this.state[formKey]).length;
+        break;
+      case String:
+      case Array:
+        length = this.state[formKey].length;
+        break;
+      default:
+        length = 0;
+    }
+    if (length > 0) return 'success';
+    return null;
   };
 
   handleExistingDelete = (fileKey, type) => {
@@ -187,253 +205,257 @@ class PlacesForm extends Component {
       <div>
         <Spinner show={isSubmitting} />
         <form onSubmit={this.onSubmit}>
-          {/*<editor-fold Name and Types>*/}
           <Row>
-            <Col xs={6}>
-              <label htmlFor="#place-name">
-                Name
-                <input
-                  id="place-name"
-                  type="text"
-                  placeholder="Give the place a meaningful name"
-                  value={name}
-                  required
-                  onChange={e => this.setState({ name: e.target.value })}
-                />
-              </label>
+            <Col xs={12} md={6}>
+              <Fieldset label="General Information">
+                <FormGroup validationState={this.getValidationState('name')}>
+                  <ControlLabel htmlFor="#place-name">Name</ControlLabel>
+                  <FormControl
+                    id="place-name"
+                    type="text"
+                    value={name}
+                    required
+                    placeholder="Give this place a name"
+                    onChange={e => this.setState({ name: e.target.value })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup validationState={this.getValidationState('type')}>
+                  <ControlLabel htmlFor="#place-type">Type</ControlLabel>
+                  <DropdownList
+                    id="place-type"
+                    data={Object.keys(placeTypes).map(
+                      key => placeTypes[key].name
+                    )}
+                    value={type}
+                    containerClassName="form-control padding-left-0 font-static"
+                    placeholder="Town, City, Underground Cavern, Castle Dungeon, etc."
+                    allowCreate={'onFilter'}
+                    onCreate={this.createPlaceType}
+                    onChange={dataItem => this.setState({ type: dataItem })}
+                    caseSensitive={false}
+                    minLength={3}
+                    filter="contains"
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState('location')}
+                >
+                  <ControlLabel htmlFor="#place-location">
+                    Location
+                  </ControlLabel>
+                  <FormControl
+                    id="place-location"
+                    type="text"
+                    componentClass="textarea"
+                    value={location}
+                    required
+                    placeholder="Where is this place located?"
+                    onChange={e => this.setState({ location: e.target.value })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+              </Fieldset>
             </Col>
-            <Col xs={6}>
-              <label htmlFor="#place-type">
-                Type
-                <DropdownList
-                  id="place-type"
-                  data={Object.keys(placeTypes).map(
-                    key => placeTypes[key].name
+            <Col xs={12} md={6}>
+              <Fieldset label="Descriptive Information">
+                <FormGroup
+                  validationState={this.getValidationState('insideDescription')}
+                >
+                  <ControlLabel htmlFor="#place-inside-description">
+                    Inside Description
+                  </ControlLabel>
+                  <FormControl
+                    id="place-inside-description"
+                    type="text"
+                    componentClass="textarea"
+                    value={insideDescription}
+                    required
+                    placeholder="What do the characters see, hear, smell, and even taste when they look inside this place..."
+                    onChange={e =>
+                      this.setState({ insideDescription: e.target.value })
+                    }
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState(
+                    'outsideDescription'
                   )}
-                  value={type}
-                  placeholder="Town, City, Underground Cavern, Castle Dungeon, etc."
-                  allowCreate={'onFilter'}
-                  onCreate={this.createPlaceType}
-                  onChange={dataItem => this.setState({ type: dataItem })}
-                  caseSensitive={false}
-                  minLength={3}
-                  filter="contains"
-                />
-              </label>
+                >
+                  <ControlLabel htmlFor="#place-outside-description">
+                    Outside Description
+                  </ControlLabel>
+                  <FormControl
+                    id="place-outside-description"
+                    type="text"
+                    componentClass="textarea"
+                    value={outsideDescription}
+                    required
+                    placeholder="What do the characters see, hear, smell, and even taste when they look at this place from the outside..."
+                    onChange={e =>
+                      this.setState({ outsideDescription: e.target.value })
+                    }
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+                <FormGroup validationState={this.getValidationState('history')}>
+                  <ControlLabel htmlFor="#place-history">History</ControlLabel>
+                  <FormControl
+                    id="place-history"
+                    type="text"
+                    componentClass="textarea"
+                    value={history}
+                    required
+                    placeholder="How did this place come to be, what happened here in the past"
+                    onChange={e => this.setState({ history: e.target.value })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
+              </Fieldset>
             </Col>
           </Row>
-          {/*</editor-fold>*/}
-          {/*<editor-fold Location, Inside, and Outside Descriptions>*/}
-          <Row>
-            <Col xs={12}>
-              <label htmlFor="#place-location">
-                Location
-                <textarea
-                  id="place-location"
-                  placeholder="Where is this place located?"
-                  value={location}
-                  onChange={e => this.setState({ location: e.target.value })}
-                />
-              </label>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={12}>
-              <label htmlFor="#place-inside-description">
-                Inside Description
-                <textarea
-                  id="place-inside-description"
-                  placeholder="What do the characters see, hear, smell, and even taste when they look inside this place..."
-                  value={insideDescription}
-                  onChange={e =>
-                    this.setState({ insideDescription: e.target.value })
-                  }
-                />
-              </label>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={12}>
-              <label htmlFor="#place-outside-description">
-                Outside Description
-                <textarea
-                  id="place-outside-description"
-                  placeholder="What do the characters see, hear, smell, and even taste when they look at this place from the outside..."
-                  value={outsideDescription}
-                  onChange={e =>
-                    this.setState({ outsideDescription: e.target.value })
-                  }
-                />
-              </label>
-            </Col>
-          </Row>
-          {/*</editor-fold>*/}
-          {/*<editor-fold History>*/}
-          <Row>
-            <Col xs={12}>
-              <label htmlFor="#place-history">
-                History
-                <textarea
-                  id="place-history"
-                  placeholder="How did this place come to be, what happened here in the past"
-                  value={history}
-                  onChange={e => this.setState({ history: e.target.value })}
-                />
-              </label>
-            </Col>
-          </Row>
-          {/*</editor-fold>*/}
-          {/*<editor-fold People and Places>*/}
           <Row className="padding-bottom-1">
-            <Col xs={6}>
-              <label htmlFor="#place-places">
-                Places
-                <Multiselect
-                  id="place-places"
-                  data={Object.keys(places).map(key => ({
-                    name: places[key].name,
-                    value: key
-                  }))}
-                  value={placeIds}
-                  placeholder="Is this place related to others you created?"
-                  textField="name"
-                  valueField="value"
-                  allowCreate={false}
-                  onChange={dataItems => this.setState({ placeIds: dataItems })}
-                  caseSensitive={false}
-                  minLength={3}
-                  filter="contains"
-                />
-              </label>
+            <Col xs={12} md={6}>
+              <Fieldset label="Related Info">
+                <FormGroup>
+                  <ControlLabel htmlFor="#place-tags">Tags</ControlLabel>
+                  <Multiselect
+                    id="place-tags"
+                    data={Object.keys(tags).map(key => ({
+                      name: tags[key].name,
+                      value: key
+                    }))}
+                    value={tagIds}
+                    allowCreate={'onFilter'}
+                    textField="name"
+                    valueField="value"
+                    onCreate={this.createTag}
+                    placeholder="Add tags to help you find related things later"
+                    caseSensitive={false}
+                    onChange={dataItems => this.setState({ tagIds: dataItems })}
+                    minLength={1}
+                    filter="contains"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#place-places">Places</ControlLabel>
+                  <Multiselect
+                    id="place-places"
+                    data={Object.keys(places).map(key => ({
+                      name: places[key].name,
+                      value: key
+                    }))}
+                    value={placeIds}
+                    textField="name"
+                    valueField="value"
+                    placeholder="What places are related to this place?"
+                    caseSensitive={false}
+                    onChange={dataItems =>
+                      this.setState({ placeIds: dataItems })
+                    }
+                    minLength={1}
+                    filter="contains"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#place-npcs">NPCs</ControlLabel>
+                  <Multiselect
+                    id="place-npcs"
+                    data={Object.keys(npcs).map(key => ({
+                      name: npcs[key].name,
+                      value: key
+                    }))}
+                    value={npcIds}
+                    textField="name"
+                    valueField="value"
+                    placeholder="What npcs interact or live here?"
+                    caseSensitive={false}
+                    onChange={dataItems => this.setState({ npcIds: dataItems })}
+                    minLength={1}
+                    filter="contains"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#place-quests">Quests</ControlLabel>
+                  <Multiselect
+                    id="place-quests"
+                    data={Object.keys(quests).map(key => ({
+                      name: quests[key].name,
+                      value: key
+                    }))}
+                    value={questIds}
+                    textField="name"
+                    valueField="value"
+                    placeholder="What quests does this can be completed here?"
+                    caseSensitive={false}
+                    onChange={dataItems =>
+                      this.setState({ questIds: dataItems })
+                    }
+                    minLength={1}
+                    filter="contains"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#place-events">Events</ControlLabel>
+                  <Multiselect
+                    id="place-events"
+                    data={Object.keys(events).map(key => ({
+                      name: events[key].name,
+                      value: key
+                    }))}
+                    value={eventIds}
+                    textField="name"
+                    valueField="value"
+                    placeholder="What events have or will happen here?"
+                    caseSensitive={false}
+                    onChange={dataItems =>
+                      this.setState({ eventIds: dataItems })
+                    }
+                    minLength={1}
+                    filter="contains"
+                  />
+                </FormGroup>
+              </Fieldset>
             </Col>
-            <Col xs={6}>
-              <label htmlFor="#place-npcs">
-                NPCs
-                <Multiselect
-                  id="place-npcs"
-                  data={Object.keys(npcs).map(key => ({
-                    name: npcs[key].name,
-                    value: key
-                  }))}
-                  textField="name"
-                  valueField="value"
-                  value={npcIds}
-                  allowCreate={false}
-                  placeholder="Do any NPCs interact here?"
-                  onChange={dataItems => this.setState({ npcIds: dataItems })}
-                  caseSensitive={false}
-                  minLength={3}
-                  filter="contains"
-                />
-              </label>
-            </Col>
-          </Row>
-          {/*</editor-fold>*/}
-          {/*<editor-fold Quests and Tags>*/}
-          <Row className="padding-bottom-1">
-            <Col xs={6}>
-              <label htmlFor="#place-quests">
-                Quests
-                <Multiselect
-                  id="place-quests"
-                  data={Object.keys(quests).map(key => ({
-                    name: quests[key].name,
-                    value: key
-                  }))}
-                  textField="name"
-                  value={questIds}
-                  valueField="value"
-                  allowCreate={false}
-                  placeholder="Are there any quests that take place here?"
-                  onChange={dataItems => this.setState({ questIds: dataItems })}
-                  caseSensitive={false}
-                  minLength={3}
-                  filter="contains"
-                />
-              </label>
-            </Col>
-            <Col xs={6}>
-              <label htmlFor="#tags">
-                Tags
-                <Multiselect
-                  id="tags"
-                  data={Object.keys(tags).map(key => ({
-                    name: tags[key].name,
-                    value: key
-                  }))}
-                  value={tagIds}
-                  allowCreate={'onFilter'}
-                  textField="name"
-                  valueField="value"
-                  onCreate={this.createTag}
-                  placeholder="Add tags to help you search for related things later"
-                  caseSensitive={false}
-                  onChange={dataItems => this.setState({ tagIds: dataItems })}
-                  minLength={3}
-                  filter="contains"
-                />
-              </label>
-            </Col>
-          </Row>
-          {/*</editor-fold>*/}
-          {/*<editor-fold Events>*/}
-          <Row className="padding-bottom-1">
-            <Col xs={6}>
-              <label htmlFor="#events">
-                Events
-                <Multiselect
-                  id="events"
-                  data={Object.keys(events).map(key => ({
-                    name: events[key].name,
-                    value: key
-                  }))}
-                  value={eventIds}
-                  textField="name"
-                  valueField="value"
-                  allowCreate={false}
-                  placeholder="What historical or future events happen here?"
-                  caseSensitive={false}
-                  onChange={dataItems => this.setState({ eventIds: dataItems })}
-                  minLength={3}
-                  filter="contains"
-                />
-              </label>
-            </Col>
-          </Row>
-          {/*</editor-fold>*/}
-          {/*<editor-fold Other Files and Images>*/}
-          <Row>
-            <Col xs={6}>
-              <label htmlFor="#place-other-files">Other Files</label>
-              <input
-                id="place-other-files"
-                type="file"
-                multiple
-                accept="image/png, image/jpeg, image/svg, image/gif, application/xhtml+xml, application/xml, application/pdf"
-                onChange={this.handleExtraFileUpload}
-              />
-              <div className="max-height-200 overflow-y-scroll overflow-x-hidden margin-bottom-1">
-                {this.generateFileList('newAttachedFiles')}
-                {this.generateFileList('attachedFiles')}
-              </div>
-            </Col>
-            <Col xs={6}>
-              <label htmlFor="#place-images">Images</label>
-              <input
-                id="place-images"
-                type="file"
-                multiple
-                accept="image/png, image/jpeg, image/svg, image/gif"
-                onChange={this.handleImageUpload}
-              />
-              <div className="max-height-200 overflow-y-scroll overflow-x-hidden margin-bottom-1">
-                {this.generateFileList('newImages')}
-                {this.generateFileList('images')}
-              </div>
+            <Col xs={12} md={6}>
+              <Fieldset label="Images and Files">
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-image">Image</ControlLabel>
+                  <input
+                    id="npc-image"
+                    type="file"
+                    multiple
+                    accept="image/png, image/jpeg, image/gif"
+                    onChange={e => {
+                      e.preventDefault();
+                      this.setState({ newImages: e.target.files });
+                    }}
+                  />
+                  {this.generateFileList('newImages')}
+                  {this.generateFileList('images')}
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel htmlFor="#npc-attachedFiles">
+                    Other Files
+                  </ControlLabel>
+                  <input
+                    id="npc-attachedFiles"
+                    type="file"
+                    multiple
+                    accept="image/png, image/jpeg, image/svg, image/gif, application/xhtml+xml, application/xml, application/pdf"
+                    onChange={e => {
+                      e.preventDefault();
+                      this.setState({ newAttachedFiles: e.target.files });
+                    }}
+                  />
+                  {this.generateFileList('newAttachedFiles')}
+                  {this.generateFileList('attachedFiles')}
+                </FormGroup>
+              </Fieldset>
             </Col>
           </Row>
-          {/*</editor-fold>*/}
-          {/*<editor-fold Submit>*/}
           <Row className="padding-bottom-1">
             <Col xsOffset={6} xs={6}>
               <Row>
@@ -453,7 +475,6 @@ class PlacesForm extends Component {
               </Row>
             </Col>
           </Row>
-          {/*</editor-fold>*/}
         </form>
       </div>
     );

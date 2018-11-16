@@ -83,10 +83,10 @@ class CampaignPage extends Component {
             padding: 10
           }}
         >
-          <Col xs={8}>
+          <Col xs={12} sm={8}>
             <h1 style={{ color: 'white' }}>Campaigns</h1>
           </Col>
-          <Col xs={3} style={{ marginTop: 20 }}>
+          <Col xs={12} sm={4} style={{ marginTop: 20 }}>
             <Button
               bsStyle="primary"
               block
