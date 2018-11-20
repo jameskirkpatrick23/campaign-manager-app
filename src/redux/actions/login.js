@@ -17,7 +17,7 @@ export const loginUser = user => dispatch => {
     .get()
     .then(snapshot => {
       if (!snapshot.empty) {
-        ref.doc(snapshot.val()).update(scopedUserFields);
+        ref.doc(snapshot.docs[0].id).update(scopedUserFields);
       } else {
         ref.add(scopedUserFields);
       }

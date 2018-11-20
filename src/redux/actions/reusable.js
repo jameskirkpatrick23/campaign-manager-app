@@ -63,7 +63,7 @@ export const createAncillaryObject = (name, type) => (dispatch, getState) => {
       .get()
       .then(snapshot => {
         if (!snapshot.empty) {
-          ref.doc(snapshot.val()).update({
+          ref.doc(snapshot.docs[0].id).update({
             collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
           });
         } else {
