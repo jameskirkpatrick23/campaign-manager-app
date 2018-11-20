@@ -89,14 +89,14 @@ class Quest extends Component {
             if (!foundNPC) return null;
             if (foundNPC)
               return (
-                <Col xs={4} key={`quest-${npcKey}`}>
+                <Col xs={6} md={4} key={`quest-${npcKey}`}>
                   <Panel
                     bsStyle="warning"
                     className="quest-card clickable"
                     onClick={() => history.push(questRoute)}
                   >
                     <Panel.Heading>
-                      <Panel.Title componentClass="h3">
+                      <Panel.Title componentClass="h4">
                         {foundNPC.name}
                       </Panel.Title>
                     </Panel.Heading>
@@ -137,14 +137,14 @@ class Quest extends Component {
             if (!foundQuest) return null;
             if (foundQuest)
               return (
-                <Col xs={4} key={`quest-${questKey}`}>
+                <Col xs={6} md={4} key={`quest-${questKey}`}>
                   <Panel
                     bsStyle="warning"
                     className="quest-card clickable"
                     onClick={() => history.push(questRoute)}
                   >
                     <Panel.Heading>
-                      <Panel.Title componentClass="h3">
+                      <Panel.Title componentClass="h4">
                         {foundQuest.name}
                       </Panel.Title>
                     </Panel.Heading>
@@ -249,14 +249,14 @@ class Quest extends Component {
             if (!foundPlace) return null;
             if (foundPlace)
               return (
-                <Col xs={4} key={`place-${placeKey}`}>
+                <Col xs={6} md={4} key={`place-${placeKey}`}>
                   <Panel
                     bsStyle="warning"
                     className="place-card clickable"
                     onClick={() => history.push(placeRoute)}
                   >
                     <Panel.Heading>
-                      <Panel.Title componentClass="h3">
+                      <Panel.Title componentClass="h4">
                         {foundPlace.name}
                       </Panel.Title>
                     </Panel.Heading>
@@ -355,7 +355,7 @@ class Quest extends Component {
           <Col xs={12}>
             <Panel bsStyle="info">
               <Panel.Heading>
-                <Panel.Title componentClass="h3">
+                <Panel.Title componentClass="h4">
                   {quest.name}
                   <Button
                     className="margin-left-1 vert-text-top"
@@ -378,7 +378,9 @@ class Quest extends Component {
               <Tab.Container id="quest-tabs" defaultActiveKey="images">
                 <Panel.Body>
                   <Row>
-                    <Col xs={1}>{this.renderPills()}</Col>
+                    <Col xs={1} className="margin-right-2">
+                      {this.renderPills()}
+                    </Col>
                     <Col
                       xs={10}
                       style={{ maxHeight: '500px', overflowY: 'scroll' }}

@@ -312,7 +312,6 @@ class NPCForm extends Component {
                     id="npc-height"
                     type="text"
                     value={height}
-                    required
                     placeholder="How tall is this NPC"
                     onChange={e => this.setState({ height: e.target.value })}
                   />
@@ -324,7 +323,6 @@ class NPCForm extends Component {
                     id="npc-weight"
                     type="text"
                     value={weight}
-                    required
                     placeholder="How heavy is this NPC"
                     onChange={e => this.setState({ weight: e.target.value })}
                   />
@@ -341,7 +339,6 @@ class NPCForm extends Component {
                     type="text"
                     componentClass="textarea"
                     value={physDescription}
-                    required
                     placeholder="Describe how this NPC looks"
                     onChange={e =>
                       this.setState({ physDescription: e.target.value })
@@ -418,7 +415,6 @@ class NPCForm extends Component {
                     type="text"
                     componentClass="textarea"
                     value={backstory}
-                    required
                     placeholder="Describe the NPC's backstory"
                     onChange={e => this.setState({ backstory: e.target.value })}
                   />

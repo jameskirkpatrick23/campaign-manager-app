@@ -228,7 +228,6 @@ class QuestForm extends Component {
                     type="text"
                     componentClass="textarea"
                     value={description}
-                    required
                     placeholder="Describe the circumstances of this quest"
                     onChange={e =>
                       this.setState({ description: e.target.value })
@@ -243,7 +242,6 @@ class QuestForm extends Component {
                     type="text"
                     value={rewards}
                     componentClass="textarea"
-                    required
                     placeholder="What rewards does completing this quest grant?"
                     onChange={e => this.setState({ rewards: e.target.value })}
                   />

@@ -223,14 +223,14 @@ class Place extends Component {
             }/home/places/${placeKey}`;
             if (foundPlace)
               return (
-                <Col xs={4} key={`place-${placeKey}`}>
+                <Col xs={6} md={4} key={`place-${placeKey}`}>
                   <Panel
                     bsStyle="warning"
                     className="place-card clickable"
                     onClick={() => history.push(placeRoute)}
                   >
                     <Panel.Heading>
-                      <Panel.Title componentClass="h3">
+                      <Panel.Title componentClass="h4">
                         {foundPlace.name}
                       </Panel.Title>
                     </Panel.Heading>
@@ -280,14 +280,14 @@ class Place extends Component {
             if (!foundNPC) return null;
             if (foundNPC)
               return (
-                <Col xs={4} key={`npc-${npcKey}`}>
+                <Col xs={6} md={4} key={`npc-${npcKey}`}>
                   <Panel
                     bsStyle="warning"
                     className="npc-card clickable"
                     onClick={() => history.push(npcRoute)}
                   >
                     <Panel.Heading>
-                      <Panel.Title componentClass="h3">
+                      <Panel.Title componentClass="h4">
                         {foundNPC.name}
                       </Panel.Title>
                     </Panel.Heading>
@@ -335,14 +335,14 @@ class Place extends Component {
             if (!foundQuest) return null;
             if (foundQuest)
               return (
-                <Col xs={4} key={`npc-${questKey}`}>
+                <Col xs={6} md={4} key={`npc-${questKey}`}>
                   <Panel
                     bsStyle="warning"
                     className="quest-card clickable"
                     onClick={() => history.push(questRoute)}
                   >
                     <Panel.Heading>
-                      <Panel.Title componentClass="h3">
+                      <Panel.Title componentClass="h4">
                         {foundQuest.name}
                       </Panel.Title>
                     </Panel.Heading>
@@ -467,7 +467,9 @@ class Place extends Component {
               <Tab.Container id="place-tabs" defaultActiveKey="images">
                 <Panel.Body>
                   <Row>
-                    <Col xs={1}>{this.renderPills()}</Col>
+                    <Col xs={1} className="margin-right-2">
+                      {this.renderPills()}
+                    </Col>
                     <Col
                       xs={10}
                       style={{ maxHeight: '500px', overflowY: 'scroll' }}

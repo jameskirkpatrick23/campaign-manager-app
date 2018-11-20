@@ -250,7 +250,6 @@ class PlacesForm extends Component {
                     type="text"
                     componentClass="textarea"
                     value={location}
-                    required
                     placeholder="Where is this place located?"
                     onChange={e => this.setState({ location: e.target.value })}
                   />
@@ -271,7 +270,6 @@ class PlacesForm extends Component {
                     type="text"
                     componentClass="textarea"
                     value={insideDescription}
-                    required
                     placeholder="What do the characters see, hear, smell, and even taste when they look inside this place..."
                     onChange={e =>
                       this.setState({ insideDescription: e.target.value })
@@ -292,7 +290,6 @@ class PlacesForm extends Component {
                     type="text"
                     componentClass="textarea"
                     value={outsideDescription}
-                    required
                     placeholder="What do the characters see, hear, smell, and even taste when they look at this place from the outside..."
                     onChange={e =>
                       this.setState({ outsideDescription: e.target.value })
@@ -307,7 +304,6 @@ class PlacesForm extends Component {
                     type="text"
                     componentClass="textarea"
                     value={history}
-                    required
                     placeholder="How did this place come to be, what happened here in the past"
                     onChange={e => this.setState({ history: e.target.value })}
                   />

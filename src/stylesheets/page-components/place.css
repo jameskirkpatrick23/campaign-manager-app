@@ -2,3 +2,12 @@
   height: 150px;
   width: 100%;
 }
+.place-card {
+  height: 200px;
+}
+.npc-card {
+  height: 200px;
+}
+.quest-card {
+  height: 200px;
+}
