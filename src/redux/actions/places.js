@@ -116,7 +116,7 @@ export const createPlace = placeData => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   const currentCampaign = getState().campaigns.currentCampaign;
   const batch = database.batch();
-  const usedRef = database.collection('places').ref();
+  const usedRef = database.collection('places').doc();
   const usedData = { ...placeData, id: usedRef.id };
 
   updateConnected(usedData, 'placeIds', batch);

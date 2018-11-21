@@ -7,13 +7,18 @@ import {
   Row,
   Col,
   Grid,
-  Button
+  Button,
+  FormGroup,
+  InputGroup,
+  FormControl,
+  Glyphicon
 } from 'react-bootstrap';
 
 class Places extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      searchTerm: '',
       formattedPlaces: {
         places: {}
       }
@@ -27,7 +32,8 @@ class Places extends Component {
     Object.keys(placeTypes).forEach(placeTypeKey => {
       const foundPlaceType = placeTypes[placeTypeKey];
       foundPlaceType.places = {};
-      Object.keys(places).forEach(placeKey => {
+      const placeKeys = this.filteredPlaceKeys();
+      placeKeys.forEach(placeKey => {
         if (places[placeKey].campaignIds.includes(currentCampaign.id)) {
           if (places[placeKey].type === foundPlaceType.name) {
             foundPlaceType.places[placeKey] = places[placeKey];
@@ -51,7 +57,7 @@ class Places extends Component {
     }
   }
 
-  renderPlaceTypes() {
+  renderPlaceTypes = () => {
     const { formattedPlaces } = this.state;
     return Object.keys(formattedPlaces).map((placeKey, index) => {
       return (
@@ -80,7 +86,7 @@ class Places extends Component {
         </Row>
       );
     });
-  }
+  };
 
   getPlaceImage = place => {
     if (place.images.length) {
@@ -89,7 +95,7 @@ class Places extends Component {
     return require('../assets/placeholder-location.png');
   };
 
-  renderPlaces(places) {
+  renderPlaces = places => {
     const { currentCampaign } = this.props;
     if (!places)
       return (
@@ -118,15 +124,72 @@ class Places extends Component {
         </Col>
       );
     });
-  }
+  };
+
+  onSearch = e => {
+    this.setState({ searchTerm: e.target.value }, () => {
+      this.setState({ formattedPlaces: this.formatPlacesByType(this.props) });
+    });
+  };
+
+  filteredPlaceKeys = () => {
+    const { searchTerm } = this.state;
+    const { places, placeTypes, tags } = this.props;
+    const doesInclude = (object, stateKey) => {
+      return (
+        object &&
+        object[stateKey].toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    };
+    const includesRelated = object => {
+      return (
+        Object.keys(placeTypes).find(
+          placeType =>
+            placeTypes[placeType].name.toLowerCase() ===
+              searchTerm.toLowerCase() && object.type === placeTypes[placeType]
+        ) ||
+        object.tagIds.find(tagId =>
+          tags[tagId].name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    };
+    return Object.keys(places).filter(
+      placeId =>
+        doesInclude(places[placeId], 'history') ||
+        doesInclude(places[placeId], 'location') ||
+        doesInclude(places[placeId], 'name') ||
+        doesInclude(places[placeId], 'type') ||
+        doesInclude(places[placeId], 'insideDescription') ||
+        doesInclude(places[placeId], 'outsideDescription') ||
+        includesRelated(places[placeId])
+    );
+  };
 
   render() {
     const { currentCampaign } = this.props;
+    const { searchTerm } = this.state;
     const createPlaceRoute = `/campaigns/${currentCampaign.id}/home/places/new`;
     return (
       <Grid>
         <Row className="margin-bottom-1">
-          <Col xs={4} xsOffset={8}>
+          <Col xsOffset={4} xs={6}>
+            <FormGroup>
+              <InputGroup>
+                <InputGroup.Addon
+                  style={{ paddingRight: '25px', paddingTop: '10px' }}
+                >
+                  <Glyphicon glyph="search" />
+                </InputGroup.Addon>
+                <FormControl
+                  type="text"
+                  onChange={this.onSearch}
+                  value={searchTerm}
+                  placeholder="Search for tags, keywords, etc."
+                />
+              </InputGroup>
+            </FormGroup>
+          </Col>
+          <Col xs={2}>
             <Button onClick={() => this.props.history.push(createPlaceRoute)}>
               Create
             </Button>
@@ -149,6 +212,7 @@ Places.propTypes = {};
 
 const mapStateToProps = state => ({
   places: state.places.all,
+  tags: state.tags.all,
   placeTypes: state.places.types,
   currentCampaign: state.campaigns.currentCampaign
 });
