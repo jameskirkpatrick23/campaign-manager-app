@@ -5,7 +5,7 @@ import {
   Grid,
   Row,
   Col,
-  PanelGroup,
+  Checkbox,
   Panel,
   Carousel,
   Image,
@@ -13,7 +13,9 @@ import {
   NavItem,
   Nav,
   Glyphicon,
+  InputGroup,
   Modal,
+  FormControl,
   Button
 } from 'react-bootstrap';
 import QuestForm from '../forms/quest-form';
@@ -172,6 +174,12 @@ class Quest extends Component {
         <p>Status: {quest.status}</p>
         <p>Description: {quest.description}</p>
         <p>Objectives: </p>
+        {quest.objectives.map((obj, idx) => (
+          <InputGroup key={`quest-objective-${idx}`}>
+            <Checkbox checked={obj.complete} disabled />
+            <FormControl type="text" value={obj.name} disabled />
+          </InputGroup>
+        ))}
       </Tab.Pane>
     );
   };

@@ -1,27 +1,34 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import Logo from '../assets/Roll4InitiativeLogo.svg';
 import { Jumbotron, Button } from 'react-bootstrap';
+import Campaigns from './campaigns';
 
 class Splash extends Component {
   render() {
     return (
-      <Jumbotron>
-        <img src={Logo} alt="Roll For Initiative Logo" />
-        <p>
-          Manage your campaign like you never have before. Quickly create, find,
-          modify, and share your creations with the community
-        </p>
-        <div>
-          <Button
-            bsStyle="primary"
-            onClick={() => this.props.history.push('/login')}
-          >
-            Enter
-          </Button>
-        </div>
-      </Jumbotron>
+      <div>
+        {!this.props.isLoggedIn && (
+          <Jumbotron>
+            <img src={Logo} alt="Roll For Initiative Logo" />
+            <p>
+              Manage your campaign like you never have before. Quickly create,
+              find, modify, and share your creations with the community
+            </p>
+            <div>
+              <Button
+                bsStyle="primary"
+                onClick={() => this.props.history.push('/login')}
+              >
+                Enter
+              </Button>
+            </div>
+          </Jumbotron>
+        )}
+        {this.props.isLoggedIn && <Campaigns history={this.props.history} />}
+      </div>
     );
   }
 }
@@ -30,4 +37,13 @@ Splash.propTypes = {
   history: PropTypes.shape({}).isRequired
 };
 
-export default withRouter(Splash);
+const mapStateToProps = state => ({
+  isLoggedIn: state.login.isLoggedIn
+});
+
+const SplashContainer = connect(
+  mapStateToProps,
+  null
+)(Splash);
+
+export default withRouter(SplashContainer);

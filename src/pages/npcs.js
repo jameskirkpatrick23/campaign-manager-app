@@ -1,18 +1,99 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Row, Col, Panel, Image } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  Panel,
+  Image,
+  FormGroup,
+  InputGroup,
+  Glyphicon,
+  FormControl,
+  Grid,
+  Button
+} from 'react-bootstrap';
 
 class NPCPage extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      searchTerm: '',
+      formattedNPCs: {}
+    };
+  }
+
+  filteredNPCKeys = () => {
+    const { searchTerm } = this.state;
+    const { npcs, tags, notes } = this.props;
+    const doesInclude = (object, stateKey) => {
+      return (
+        object &&
+        object[stateKey].toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    };
+    const includesRelated = object => {
+      return (
+        object.tagIds.find(tagId =>
+          tags[tagId].name.toLowerCase().includes(searchTerm.toLowerCase())
+        ) ||
+        object.noteIds.find(
+          noteId =>
+            notes[noteId].title
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            notes[noteId].description
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())
+        )
+      );
+    };
+    return Object.keys(npcs).filter(
+      npcId =>
+        doesInclude(npcs[npcId], 'name') ||
+        doesInclude(npcs[npcId], 'race') ||
+        doesInclude(npcs[npcId], 'occupation') ||
+        doesInclude(npcs[npcId], 'gender') ||
+        doesInclude(npcs[npcId], 'alignment') ||
+        doesInclude(npcs[npcId], 'physDescription') ||
+        doesInclude(npcs[npcId], 'backstory') ||
+        npcs[npcId].values
+          .map(x => x.toLowerCase())
+          .includes(searchTerm.toLowerCase()) ||
+        npcs[npcId].quirks
+          .map(x => x.toLowerCase())
+          .includes(searchTerm.toLowerCase()) ||
+        includesRelated(npcs[npcId])
+    );
+  };
+
+  formatNPCs = props => {
+    const { npcs, currentCampaign } = props;
+    const npcKeys = this.filteredNPCKeys();
+    const foundNPCs = {};
+    npcKeys.forEach(npcKey => {
+      if (npcs[npcKey].campaignIds.includes(currentCampaign.id)) {
+        foundNPCs[npcKey] = npcs[npcKey];
+      }
+    });
+    return foundNPCs;
+  };
+
+  componentDidMount() {
+    this.setState({ formattedNPCs: this.formatNPCs(this.props) });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.npcs !== this.props.npcs) {
+      this.setState({ formattedNPCs: this.formatNPCs(nextProps) });
+    }
   }
 
   renderNpcs() {
-    const { npcs, currentCampaign } = this.props;
-    return Object.keys(npcs).map(key => {
-      const npc = npcs[key];
+    const { currentCampaign } = this.props;
+    const { formattedNPCs } = this.state;
+    return Object.keys(formattedNPCs).map(key => {
+      const npc = formattedNPCs[key];
       let url = npc.images[0]
         ? npc.images[0].downloadUrl
         : require('../assets/placeholder-npc.png');
@@ -36,18 +117,45 @@ class NPCPage extends Component {
     });
   }
 
+  onSearch = e => {
+    this.setState({ searchTerm: e.target.value }, () => {
+      this.setState({ formattedNPCs: this.formatNPCs(this.props) });
+    });
+  };
+
   render() {
     const { currentCampaign } = this.props;
+    const { searchTerm } = this.state;
+    const createNPCRoute = `/campaigns/${currentCampaign.id}/home/npcs/new`;
+
     return (
-      <div>
-        <Link
-          className="button round"
-          to={`/campaigns/${currentCampaign.id}/home/npcs/new`}
-        >
-          Create a new NPC
-        </Link>
+      <Grid>
+        <Row className="margin-bottom-1">
+          <Col xsOffset={4} xs={6}>
+            <FormGroup>
+              <InputGroup>
+                <InputGroup.Addon
+                  style={{ paddingRight: '25px', paddingTop: '10px' }}
+                >
+                  <Glyphicon glyph="search" />
+                </InputGroup.Addon>
+                <FormControl
+                  type="text"
+                  onChange={this.onSearch}
+                  value={searchTerm}
+                  placeholder="Search for tags, keywords, etc."
+                />
+              </InputGroup>
+            </FormGroup>
+          </Col>
+          <Col xs={2}>
+            <Button onClick={() => this.props.history.push(createNPCRoute)}>
+              Create
+            </Button>
+          </Col>
+        </Row>
         <Row>{this.renderNpcs()}</Row>
-      </div>
+      </Grid>
     );
   }
 }

@@ -32,7 +32,7 @@ class Places extends Component {
     Object.keys(placeTypes).forEach(placeTypeKey => {
       const foundPlaceType = placeTypes[placeTypeKey];
       foundPlaceType.places = {};
-      const placeKeys = this.filteredPlaceKeys();
+      const placeKeys = this.getFilteredPlaceKeys();
       placeKeys.forEach(placeKey => {
         if (places[placeKey].campaignIds.includes(currentCampaign.id)) {
           if (places[placeKey].type === foundPlaceType.name) {
@@ -128,13 +128,13 @@ class Places extends Component {
 
   onSearch = e => {
     this.setState({ searchTerm: e.target.value }, () => {
-      this.setState({ formattedPlaces: this.formatPlacesByType(this.props) });
+      this.setState({ formattedQuests: this.formatPlacesByType(this.props) });
     });
   };
 
-  filteredPlaceKeys = () => {
+  getFilteredPlaceKeys = () => {
     const { searchTerm } = this.state;
-    const { places, placeTypes, tags } = this.props;
+    const { places, placeTypes, tags, notes } = this.props;
     const doesInclude = (object, stateKey) => {
       return (
         object &&
@@ -150,6 +150,15 @@ class Places extends Component {
         ) ||
         object.tagIds.find(tagId =>
           tags[tagId].name.toLowerCase().includes(searchTerm.toLowerCase())
+        ) ||
+        object.noteIds.find(
+          noteId =>
+            notes[noteId].title
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            notes[noteId].description
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())
         )
       );
     };
@@ -212,6 +221,7 @@ Places.propTypes = {};
 
 const mapStateToProps = state => ({
   places: state.places.all,
+  notes: state.notes.all,
   tags: state.tags.all,
   placeTypes: state.places.types,
   currentCampaign: state.campaigns.currentCampaign
