@@ -1,0 +1,47 @@
+.mh-menu {
+  width: 100%;
+  margin: 20px auto;
+  position: relative;
+}
+.mh-menu li {
+  width: 200px;
+  list-style: none;
+}
+.mh-menu li .slidein-name {
+  display: block;
+  width: 14em;
+  padding: 10px;
+  position: relative;
+  z-index: 10;
+}
+.mh-menu li:hover .slidein-name {
+  background-color: #337ab7;
+  cursor: pointer;
+  border-radius: 5px;
+  color: white;
+}
+.mh-menu li .slidein-name span:first-child {
+  font-weight: 700;
+  padding-top: 10px;
+}
+.mh-menu li .slidein-name h5 {
+  font-style: italic;
+}
+.mh-menu li img {
+  position: absolute;
+  z-index: 1;
+  left: 14em;
+  top: 0px;
+  max-width: 30rem;
+  max-height: 30rem;
+  opacity: 0;
+  -webkit-transition: left 0.4s ease-in-out, opacity 0.6s ease-in-out;
+  -moz-transition: left 0.4s ease-in-out, opacity 0.6s ease-in-out;
+  -o-transition: left 0.4s ease-in-out, opacity 0.6s ease-in-out;
+  -ms-transition: left 0.4s ease-in-out, opacity 0.6s ease-in-out;
+  transition: left 0.4s ease-in-out, opacity 0.6s ease-in-out;
+}
+.mh-menu li:hover img {
+  left: 15em;
+  opacity: 1;
+}

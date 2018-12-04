@@ -19,6 +19,8 @@ import {
 import NPCForm from '../forms/npc-form';
 import Notes from './notes';
 import * as NPCActions from '../redux/actions/npcs';
+import Fieldset from '../reusable-components/fieldset';
+import ListSlidein from '../reusable-components/list-slidein';
 
 class NPC extends Component {
   constructor(props) {
@@ -27,26 +29,17 @@ class NPC extends Component {
       npc: {},
       npcFormOpen: false
     };
-    this.findRelatedObjects = this.findRelatedObjects.bind(this);
     this.renderDetails = this.renderDetails.bind(this);
     this.handleNPCDelete = this.handleNPCDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
-    this.renderPlaces = this.renderPlaces.bind(this);
+    this.renderObject = this.renderObject.bind(this);
     this.getImage = this.getImage.bind(this);
     this.renderNPCForm = this.renderNPCForm.bind(this);
-    this.renderNPCs = this.renderNPCs.bind(this);
-    this.renderQuests = this.renderQuests.bind(this);
   }
-
-  findRelatedObjects = () => {
-    return false;
-  };
 
   componentWillMount = () => {
     const npcId = this.props.match.params.npc_id;
-    this.setState({ npc: this.props.npcs[npcId] }, () => {
-      this.findRelatedObjects(this.props);
-    });
+    this.setState({ npc: this.props.npcs[npcId] });
   };
 
   componentWillReceiveProps = nextProps => {
@@ -54,11 +47,8 @@ class NPC extends Component {
     const oldNpcId = this.props.match.params.npc_id;
     const foundNpc = nextProps.npcs[npcId];
     if (this.props.npcs !== nextProps.npcs || npcId !== oldNpcId) {
-      this.setState({ npc: foundNpc }, () => {
-        this.findRelatedObjects(nextProps);
-      });
+      this.setState({ npc: foundNpc });
     }
-    this.findRelatedObjects(nextProps);
   };
 
   handleNPCDelete = npc => {
@@ -67,189 +57,98 @@ class NPC extends Component {
     history.goBack();
   };
 
-  renderNPCs = () => {
-    const { npc } = this.state;
-    const { npcs, currentCampaign, history } = this.props;
-    return (
-      <Tab.Pane eventKey="npcs">
-        <Row>
-          <h3>Related NPCs</h3>
-        </Row>
-        <Row>
-          {!npc.npcIds.length && (
-            <div>
-              You have no related NPCs. Please add some to see them here.
-            </div>
-          )}
-          {npc.npcIds.map(npcKey => {
-            const foundNPC = npcs[npcKey];
-            const npcRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/npcs/${npcKey}`;
-            if (!foundNPC) return null;
-            if (foundNPC)
-              return (
-                <Col xs={6} md={4} key={`npc-${npcKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="npc-card clickable"
-                    onClick={() => history.push(npcRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundNPC.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getImage(foundNPC, 'npc')}
-                        className="npc-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
-        </Row>
-      </Tab.Pane>
-    );
-  };
-
-  renderQuests = () => {
-    const { npc } = this.state;
-    const { quests, currentCampaign, history } = this.props;
-    return (
-      <Tab.Pane eventKey="quests">
-        <Row>
-          <h3>Related Quests</h3>
-        </Row>
-        <Row>
-          {!npc.questIds.length && (
-            <div>
-              You have no related quests. Please add some to see them here.
-            </div>
-          )}
-          {npc.questIds.map(questKey => {
-            const foundQuest = quests[questKey];
-            const questRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/quests/${questKey}`;
-            if (!foundQuest) return null;
-            if (foundQuest)
-              return (
-                <Col xs={6} md={4} key={`npc-${questKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="quest-card clickable"
-                    onClick={() => history.push(questRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundQuest.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getImage(foundQuest, 'quest')}
-                        className="npc-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
-        </Row>
-      </Tab.Pane>
-    );
-  };
-
   renderDetails = () => {
     const { npc } = this.state;
 
     return (
       <Tab.Pane eventKey="info">
-        <PanelGroup
-          accordion
-          id={'phys-description'}
-          defaultActiveKey="physDesc"
-        >
-          <Panel
-            id={'npc-panel-phys-description'}
-            bsStyle="warning"
-            eventKey="physDesc"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">
-                  Physical Description
-                </Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
+        <Col xs={12}>
+          <Fieldset label="Physical Description">
+            <Row>
+              <Col xs={4}>
                 <div>
                   <strong>Gender: </strong>
                   <p>{npc.gender}</p>
                 </div>
+              </Col>
+              <Col xs={4}>
                 <div>
                   <strong>Height: </strong>
                   <p>{npc.height}</p>
                 </div>
+              </Col>
+              <Col xs={4}>
                 <div>
                   <strong>Weight: </strong>
                   <p>{npc.weight}</p>
                 </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={4}>
                 <div>
                   <strong>Race: </strong>
                   <p>{npc.race}</p>
                 </div>
+              </Col>
+              <Col xs={4}>
                 <div>
                   <strong>Occupation: </strong>
                   <p>{npc.occupation}</p>
                 </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={12}>
                 <div>
                   <strong>Description: </strong>
                   <p>{npc.physDescription}</p>
                 </div>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-          <Panel
-            id={'npc-panel-personality'}
-            bsStyle="warning"
-            eventKey="personalityPanel"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">Personality</Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
+              </Col>
+            </Row>
+          </Fieldset>
+        </Col>
+        <Col xs={12}>
+          <Fieldset label="Personality">
+            <Row>
+              <Col xs={4}>
                 <div>
                   <strong>Alignment: </strong>
                   <p>{npc.alignment}</p>
                 </div>
+              </Col>
+              <Col xs={8}>
+                <div>
+                  <strong>Values: </strong>
+                  <br />
+                  {npc.values.map(v => (
+                    <span key={v} className="margin-right-1">
+                      {v}
+                    </span>
+                  ))}
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={12}>
                 <div>
                   <strong>Quirks: </strong>
                   {npc.quirks.map(q => (
                     <p key={q}>{q}</p>
                   ))}
                 </div>
-                <div>
-                  <strong>Values: </strong>
-                  {npc.values.map(v => (
-                    <p key={v}>{v}</p>
-                  ))}
-                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={12}>
                 <div>
                   <strong>Backstory: </strong>
                   <p>{npc.backstory}</p>
                 </div>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-        </PanelGroup>
+              </Col>
+            </Row>
+          </Fieldset>
+        </Col>
       </Tab.Pane>
     );
   };
@@ -305,49 +204,34 @@ class NPC extends Component {
     return require(`../assets/placeholder-${type}.png`);
   };
 
-  renderPlaces = () => {
+  renderObject = (type, stateIds, name, secondaryField) => {
     const { npc } = this.state;
-    const { places, currentCampaign, history } = this.props;
+    const { currentCampaign, history } = this.props;
+    const items = npc[stateIds].map(collectionKey => {
+      const foundObject = this.props[type][collectionKey];
+      const foundRoute = `/campaigns/${
+        currentCampaign.id
+      }/home/${type}/${collectionKey}`;
+      return {
+        route: foundRoute,
+        descriptor: foundObject[secondaryField],
+        name: foundObject.name,
+        imageURL: this.getImage(foundObject, name)
+      };
+    });
     return (
-      <Tab.Pane eventKey="places">
+      <Tab.Pane eventKey={type}>
         <Row>
-          <h3>Related Places</h3>
-        </Row>
-        <Row>
-          {!npc.placeIds.length && (
+          {!npc[stateIds].length && (
             <div>
-              You have no related places. Please add some to see them here.
+              You have no related {type}. Please add some to see them here.
             </div>
           )}
-          {npc.placeIds.map(placeKey => {
-            const foundPlace = places[placeKey];
-            const placeRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/places/${placeKey}`;
-            if (!foundPlace) return null;
-            if (foundPlace)
-              return (
-                <Col xs={6} md={4} key={`place-${placeKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="place-card clickable"
-                    onClick={() => history.push(placeRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundPlace.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getImage(foundPlace, 'place')}
-                        className="place-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
+          {!!npc[stateIds].length && (
+            <Col xs={12}>
+              <ListSlidein items={items} history={history} />
+            </Col>
+          )}
         </Row>
       </Tab.Pane>
     );
@@ -397,27 +281,68 @@ class NPC extends Component {
 
   renderPills = () => {
     return (
-      <Nav bsStyle="pills" className="margin-left-0">
+      <Nav bsStyle="pills" className="margin-left-0 width-100">
         <NavItem eventKey="images">
-          <Glyphicon glyph="picture" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="picture"
+            />
+            <span>Images</span>
+          </span>
         </NavItem>
         <NavItem eventKey="info">
-          <Glyphicon glyph="book" />
+          <span>
+            <Glyphicon bsSize="large" className="margin-right-1" glyph="book" />
+            <span>Info</span>
+          </span>
         </NavItem>
         <NavItem eventKey="notes">
-          <Glyphicon glyph="comment" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="comment"
+            />
+            <span>Notes</span>
+          </span>
         </NavItem>
         <NavItem eventKey="places">
-          <Glyphicon glyph="globe" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="globe"
+            />
+            <span>Places</span>
+          </span>
         </NavItem>
         <NavItem eventKey="npcs">
-          <Glyphicon glyph="user" />
+          <span>
+            <Glyphicon bsSize="large" className="margin-right-1" glyph="user" />
+            <span>NPCs</span>
+          </span>
         </NavItem>
         <NavItem eventKey="quests">
-          <Glyphicon glyph="tower" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="tower"
+            />
+            <span>Quests</span>
+          </span>
         </NavItem>
         <NavItem eventKey="attachedFiles">
-          <Glyphicon glyph="duplicate" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="duplicate"
+            />
+            <span>Files</span>
+          </span>
         </NavItem>
       </Nav>
     );
@@ -427,59 +352,47 @@ class NPC extends Component {
     const { npc } = this.state;
     if (!npc) return null;
     return (
-      <Grid>
+      <Grid className="app-container">
         {this.renderNPCForm()}
-        <Row>
-          <Col xs={12}>
-            <Panel bsStyle="info">
-              <Panel.Heading>
-                <Panel.Title componentClass="h3">
-                  {npc.name}
-                  <Button
-                    className="margin-left-1 vert-text-top"
-                    bsSize="small"
-                    bsStyle="warning"
-                    onClick={this.showNPCForm}
-                  >
-                    <Glyphicon glyph="pencil" />
-                  </Button>
-                  <Button
-                    className="margin-left-1 vert-text-top"
-                    bsSize="small"
-                    bsStyle="danger"
-                    onClick={() => this.handleNPCDelete(npc)}
-                  >
-                    <Glyphicon glyph="trash" />
-                  </Button>
-                </Panel.Title>
-              </Panel.Heading>
-              <Tab.Container id="npc-tabs" defaultActiveKey="images">
-                <Panel.Body>
-                  <Row>
-                    <Col xs={3} sm={2}>
-                      {this.renderPills()}
-                    </Col>
-                    <Col
-                      xs={9}
-                      sm={10}
-                      style={{ maxHeight: '500px', overflowY: 'scroll' }}
-                    >
-                      <Tab.Content animation>
-                        {this.renderImages()}
-                        {this.renderDetails()}
-                        {this.renderNotes()}
-                        {this.renderAttachedFiles()}
-                        {this.renderPlaces()}
-                        {this.renderNPCs()}
-                        {this.renderQuests()}
-                      </Tab.Content>
-                    </Col>
-                  </Row>
-                </Panel.Body>
-              </Tab.Container>
-            </Panel>
+        <Row className="margin-bottom-1">
+          <Col xs={10}>
+            <h3>{npc.name}</h3>
+          </Col>
+          <Col xs={2}>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="warning"
+              onClick={this.showNPCForm}
+            >
+              <Glyphicon glyph="pencil" />
+            </Button>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="danger"
+              onClick={() => this.handleNPCDelete(npc)}
+            >
+              <Glyphicon glyph="trash" />
+            </Button>
           </Col>
         </Row>
+        <Tab.Container id="npc-tabs" defaultActiveKey="images">
+          <Row>
+            <Col xs={2}>{this.renderPills()}</Col>
+            <Col xs={10}>
+              <Tab.Content animation>
+                {this.renderImages()}
+                {this.renderDetails()}
+                {this.renderNotes()}
+                {this.renderAttachedFiles()}
+                {this.renderObject('places', 'placeIds', 'place', 'type')}
+                {this.renderObject('npcs', 'npcIds', 'npc', 'race')}
+                {this.renderObject('quests', 'questIds', 'quest', 'status')}
+              </Tab.Content>
+            </Col>
+          </Row>
+        </Tab.Container>
       </Grid>
     );
   }

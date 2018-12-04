@@ -164,6 +164,8 @@ NPCPage.defaultProps = {};
 NPCPage.propTypes = {};
 const mapStateToProps = state => ({
   npcs: state.npcs.all,
+  notes: state.notes.all,
+  tags: state.tags.all,
   currentCampaign: state.campaigns.currentCampaign
 });
 

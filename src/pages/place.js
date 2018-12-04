@@ -31,7 +31,6 @@ class Place extends Component {
       numFloors: 1,
       placeFormOpen: false
     };
-    this.findRelatedObjects = this.findRelatedObjects.bind(this);
     this.renderLocationHistory = this.renderLocationHistory.bind(this);
     this.handlePlaceDelete = this.handlePlaceDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
@@ -40,15 +39,9 @@ class Place extends Component {
     this.getPlaceImage = this.getPlaceImage.bind(this);
   }
 
-  findRelatedObjects = () => {
-    return false;
-  };
-
   componentWillMount = () => {
     const placeId = this.props.match.params.place_id;
-    this.setState({ place: this.props.places[placeId] }, () => {
-      this.findRelatedObjects(this.props);
-    });
+    this.setState({ place: this.props.places[placeId] });
   };
 
   componentWillReceiveProps = nextProps => {
@@ -56,11 +49,8 @@ class Place extends Component {
     const oldPlaceId = this.props.match.params.place_id;
     const foundPlace = nextProps.places[placeId];
     if (this.props.places !== nextProps.places || placeId !== oldPlaceId) {
-      this.setState({ place: foundPlace }, () => {
-        this.findRelatedObjects(nextProps);
-      });
+      this.setState({ place: foundPlace });
     }
-    this.findRelatedObjects(nextProps);
   };
 
   handlePlaceDelete = place => {

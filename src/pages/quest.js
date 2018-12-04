@@ -20,6 +20,8 @@ import {
 } from 'react-bootstrap';
 import QuestForm from '../forms/quest-form';
 import Notes from './notes';
+import ListSlidein from '../reusable-components/list-slidein';
+import Fieldset from '../reusable-components/fieldset';
 import * as QuestActions from '../redux/actions/quests';
 
 class Quest extends Component {
@@ -29,26 +31,17 @@ class Quest extends Component {
       quest: {},
       questFormOpen: false
     };
-    this.findRelatedObjects = this.findRelatedObjects.bind(this);
     this.renderDetails = this.renderDetails.bind(this);
     this.handleQuestDelete = this.handleQuestDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
-    this.renderPlaces = this.renderPlaces.bind(this);
+    this.renderObject = this.renderObject.bind(this);
     this.getImage = this.getImage.bind(this);
     this.renderQuestForm = this.renderQuestForm.bind(this);
-    this.renderQuests = this.renderQuests.bind(this);
-    this.renderNPCs = this.renderNPCs.bind(this);
   }
-
-  findRelatedObjects = () => {
-    return false;
-  };
 
   componentWillMount = () => {
     const questId = this.props.match.params.quest_id;
-    this.setState({ quest: this.props.quests[questId] }, () => {
-      this.findRelatedObjects(this.props);
-    });
+    this.setState({ quest: this.props.quests[questId] });
   };
 
   componentWillReceiveProps = nextProps => {
@@ -56,11 +49,8 @@ class Quest extends Component {
     const oldQuestId = this.props.match.params.quest_id;
     const foundQuest = nextProps.quests[questId];
     if (this.props.quests !== nextProps.quests || questId !== oldQuestId) {
-      this.setState({ quest: foundQuest }, () => {
-        this.findRelatedObjects(nextProps);
-      });
+      this.setState({ quest: foundQuest });
     }
-    this.findRelatedObjects(nextProps);
   };
 
   handleQuestDelete = quest => {
@@ -69,117 +59,46 @@ class Quest extends Component {
     history.goBack();
   };
 
-  renderNPCs = () => {
-    const { quest } = this.state;
-    const { npcs, currentCampaign, history } = this.props;
-    return (
-      <Tab.Pane eventKey="npcs">
-        <Row>
-          <h3>Related NPCs</h3>
-        </Row>
-        <Row>
-          {!quest.npcIds.length && (
-            <div>
-              You have no related NPCs. Please add some to see them here.
-            </div>
-          )}
-          {quest.npcIds.map(npcKey => {
-            const foundNPC = npcs[npcKey];
-            const questRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/npcs/${npcKey}`;
-            if (!foundNPC) return null;
-            if (foundNPC)
-              return (
-                <Col xs={6} md={4} key={`quest-${npcKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="quest-card clickable"
-                    onClick={() => history.push(questRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundNPC.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getImage(foundNPC, 'npc')}
-                        className="quest-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
-        </Row>
-      </Tab.Pane>
-    );
-  };
-
-  renderQuests = () => {
-    const { quest } = this.state;
-    const { quests, currentCampaign, history } = this.props;
-    return (
-      <Tab.Pane eventKey="quests">
-        <Row>
-          <h3>Related Quests</h3>
-        </Row>
-        <Row>
-          {!quest.questIds.length && (
-            <div>
-              You have no related Quests. Please add some to see them here.
-            </div>
-          )}
-          {quest.questIds.map(questKey => {
-            const foundQuest = quests[questKey];
-            const questRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/quests/${questKey}`;
-            if (!foundQuest) return null;
-            if (foundQuest)
-              return (
-                <Col xs={6} md={4} key={`quest-${questKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="quest-card clickable"
-                    onClick={() => history.push(questRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundQuest.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getImage(foundQuest, 'quest')}
-                        className="quest-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
-        </Row>
-      </Tab.Pane>
-    );
-  };
-
   renderDetails = () => {
     const { quest } = this.state;
-
     return (
       <Tab.Pane eventKey="info">
-        <p>Rewards: {quest.rewards}</p>
-        <p>Status: {quest.status}</p>
-        <p>Description: {quest.description}</p>
-        <p>Objectives: </p>
-        {quest.objectives.map((obj, idx) => (
-          <InputGroup key={`quest-objective-${idx}`}>
-            <Checkbox checked={obj.complete} disabled />
-            <FormControl type="text" value={obj.name} disabled />
-          </InputGroup>
-        ))}
+        <Fieldset label="Details">
+          <Row>
+            <Col xs={4}>
+              <div>
+                <strong>Status: </strong>
+                <p>{quest.status}</p>
+              </div>
+            </Col>
+            <Col xs={8}>
+              <div>
+                <strong>Rewards: </strong>
+                <p>{quest.rewards}</p>
+              </div>
+            </Col>
+            <Col xs={12}>
+              <div>
+                <strong>Description: </strong>
+                <p>{quest.description}</p>
+              </div>
+            </Col>
+          </Row>
+        </Fieldset>
+        <Fieldset label="Objectives">
+          {quest.objectives.map((obj, idx) => (
+            <Row key={`quest-objective-${idx}`}>
+              <Col xs={1}>
+                {obj.complete ? (
+                  <Glyphicon glyph="check" />
+                ) : (
+                  <Glyphicon glyph="unchecked" />
+                )}
+              </Col>
+              <Col xs={11}>{obj.name}</Col>
+            </Row>
+          ))}
+        </Fieldset>
       </Tab.Pane>
     );
   };
@@ -235,49 +154,34 @@ class Quest extends Component {
     return require(`../assets/placeholder-${type}.png`);
   };
 
-  renderPlaces = () => {
+  renderObject = (type, stateIds, name, secondaryField) => {
     const { quest } = this.state;
-    const { places, currentCampaign, history } = this.props;
+    const { currentCampaign, history } = this.props;
+    const items = quest[stateIds].map(collectionKey => {
+      const foundObject = this.props[type][collectionKey];
+      const foundRoute = `/campaigns/${
+        currentCampaign.id
+      }/home/${type}/${collectionKey}`;
+      return {
+        route: foundRoute,
+        descriptor: foundObject[secondaryField],
+        name: foundObject.name,
+        imageURL: this.getImage(foundObject, name)
+      };
+    });
     return (
-      <Tab.Pane eventKey="places">
+      <Tab.Pane eventKey={type}>
         <Row>
-          <h3>Related Places</h3>
-        </Row>
-        <Row>
-          {!quest.placeIds.length && (
+          {!quest[stateIds].length && (
             <div>
-              You have no related places. Please add some to see them here.
+              You have no related {type}. Please add some to see them here.
             </div>
           )}
-          {quest.placeIds.map(placeKey => {
-            const foundPlace = places[placeKey];
-            const placeRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/places/${placeKey}`;
-            if (!foundPlace) return null;
-            if (foundPlace)
-              return (
-                <Col xs={6} md={4} key={`place-${placeKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="place-card clickable"
-                    onClick={() => history.push(placeRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundPlace.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getImage(foundPlace, 'place')}
-                        className="place-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
+          {!!quest[stateIds].length && (
+            <Col xs={12}>
+              <ListSlidein items={items} history={history} />
+            </Col>
+          )}
         </Row>
       </Tab.Pane>
     );
@@ -327,27 +231,68 @@ class Quest extends Component {
 
   renderPills = () => {
     return (
-      <Nav bsStyle="pills" className="margin-left-0">
+      <Nav bsStyle="pills" className="margin-left-0 width-100">
         <NavItem eventKey="images">
-          <Glyphicon glyph="picture" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="picture"
+            />
+            <span>Images</span>
+          </span>
         </NavItem>
         <NavItem eventKey="info">
-          <Glyphicon glyph="book" />
+          <span>
+            <Glyphicon bsSize="large" className="margin-right-1" glyph="book" />
+            <span>Info</span>
+          </span>
         </NavItem>
         <NavItem eventKey="notes">
-          <Glyphicon glyph="comment" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="comment"
+            />
+            <span>Notes</span>
+          </span>
         </NavItem>
         <NavItem eventKey="places">
-          <Glyphicon glyph="globe" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="globe"
+            />
+            <span>Places</span>
+          </span>
         </NavItem>
         <NavItem eventKey="npcs">
-          <Glyphicon glyph="user" />
+          <span>
+            <Glyphicon bsSize="large" className="margin-right-1" glyph="user" />
+            <span>NPCs</span>
+          </span>
         </NavItem>
         <NavItem eventKey="quests">
-          <Glyphicon glyph="tower" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="tower"
+            />
+            <span>Quests</span>
+          </span>
         </NavItem>
         <NavItem eventKey="attachedFiles">
-          <Glyphicon glyph="duplicate" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="duplicate"
+            />
+            <span>Files</span>
+          </span>
         </NavItem>
       </Nav>
     );
@@ -357,58 +302,47 @@ class Quest extends Component {
     const { quest } = this.state;
     if (!quest) return null;
     return (
-      <Grid>
+      <Grid className="app-container">
         {this.renderQuestForm()}
-        <Row>
-          <Col xs={12}>
-            <Panel bsStyle="info">
-              <Panel.Heading>
-                <Panel.Title componentClass="h4">
-                  {quest.name}
-                  <Button
-                    className="margin-left-1 vert-text-top"
-                    bsSize="small"
-                    bsStyle="warning"
-                    onClick={this.showQuestForm}
-                  >
-                    <Glyphicon glyph="pencil" />
-                  </Button>
-                  <Button
-                    className="margin-left-1 vert-text-top"
-                    bsSize="small"
-                    bsStyle="danger"
-                    onClick={() => this.handleQuestDelete(quest)}
-                  >
-                    <Glyphicon glyph="trash" />
-                  </Button>
-                </Panel.Title>
-              </Panel.Heading>
-              <Tab.Container id="quest-tabs" defaultActiveKey="images">
-                <Panel.Body>
-                  <Row>
-                    <Col xs={1} className="margin-right-2">
-                      {this.renderPills()}
-                    </Col>
-                    <Col
-                      xs={10}
-                      style={{ maxHeight: '500px', overflowY: 'scroll' }}
-                    >
-                      <Tab.Content animation>
-                        {this.renderImages()}
-                        {this.renderDetails()}
-                        {this.renderNotes()}
-                        {this.renderAttachedFiles()}
-                        {this.renderPlaces()}
-                        {this.renderNPCs()}
-                        {this.renderQuests()}
-                      </Tab.Content>
-                    </Col>
-                  </Row>
-                </Panel.Body>
-              </Tab.Container>
-            </Panel>
+        <Row className="margin-bottom-1">
+          <Col xs={10}>
+            <h3>{quest.name}</h3>
+          </Col>
+          <Col xs={2}>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="warning"
+              onClick={this.showQuestForm}
+            >
+              <Glyphicon glyph="pencil" />
+            </Button>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="danger"
+              onClick={() => this.handleQuestDelete(quest)}
+            >
+              <Glyphicon glyph="trash" />
+            </Button>
           </Col>
         </Row>
+        <Tab.Container id="quest-tabs" defaultActiveKey="images">
+          <Row>
+            <Col xs={2}>{this.renderPills()}</Col>
+            <Col xs={10}>
+              <Tab.Content animation>
+                {this.renderImages()}
+                {this.renderDetails()}
+                {this.renderNotes()}
+                {this.renderAttachedFiles()}
+                {this.renderObject('places', 'placeIds', 'place', 'type')}
+                {this.renderObject('npcs', 'npcIds', 'npc', 'race')}
+                {this.renderObject('quests', 'questIds', 'quest', 'status')}
+              </Tab.Content>
+            </Col>
+          </Row>
+        </Tab.Container>
       </Grid>
     );
   }

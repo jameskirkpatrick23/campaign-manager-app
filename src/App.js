@@ -51,7 +51,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Navbar inverse style={{ borderRadius: 0 }}>
+        <Navbar inverse style={{ borderRadius: 0, width: '100%' }}>
           <Navbar.Header>
             <Navbar.Brand>
               <Link to={'/'} className="app-dashboard-logo">
@@ -69,7 +69,7 @@ class App extends Component {
             </Nav>
           </Navbar.Collapse>
         </Navbar>
-        <div className="container">
+        <div className="app-container">
           <Breadcrumbs routes={routes} />
           {Object.keys(routes).map(route => (
             <Route {...routes[route]} key={route} />

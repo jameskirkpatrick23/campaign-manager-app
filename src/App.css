@@ -45,6 +45,13 @@ label {
   text-overflow: ellipsis;
   display: inline-block; /* for links */
 }
+.navbar .container {
+  width: 100%;
+}
+
+.app-container {
+  margin-left: 10px;
+}
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
