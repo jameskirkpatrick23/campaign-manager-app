@@ -100,18 +100,14 @@ class NPCPage extends Component {
       const npcRoute = `/campaigns/${currentCampaign.id}/home/npcs/${npc.id}`;
       return (
         <Col key={key} xs={4} md={3}>
-          <Panel
-            bsStyle="info"
-            className="npc-card clickable"
+          <Image src={url} circle className="collection-image" />
+          <Button
+            className="collection-item-name"
+            bsStyle="primary"
             onClick={() => this.props.history.push(npcRoute)}
           >
-            <Panel.Heading>
-              <Panel.Title componentClass="h3">{npc.name}</Panel.Title>
-            </Panel.Heading>
-            <Panel.Body className="padding-0">
-              <Image src={url} className="place-image" />
-            </Panel.Body>
-          </Panel>
+            {npc.name}
+          </Button>
         </Col>
       );
     });

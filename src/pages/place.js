@@ -16,6 +16,7 @@ import {
   Modal,
   Button
 } from 'react-bootstrap';
+import ListSlidein from '../reusable-components/list-slidein';
 import Floors from './floors';
 import PlaceForm from '../forms/places-form';
 import Notes from './notes';
@@ -35,7 +36,7 @@ class Place extends Component {
     this.handlePlaceDelete = this.handlePlaceDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderFloors = this.renderFloors.bind(this);
-    this.renderPlaces = this.renderPlaces.bind(this);
+    this.renderObject = this.renderObject.bind(this);
     this.getPlaceImage = this.getPlaceImage.bind(this);
   }
 
@@ -63,7 +64,7 @@ class Place extends Component {
     const { place } = this.state;
 
     return (
-      <Tab.Pane eventKey="location-history">
+      <Tab.Pane eventKey="info">
         <PanelGroup
           accordion
           id={'history-whatever'}
@@ -167,6 +168,39 @@ class Place extends Component {
     );
   };
 
+  renderObject = (type, stateIds, name, secondaryField) => {
+    const { place } = this.state;
+    const { currentCampaign, history } = this.props;
+    const items = place[stateIds].map(collectionKey => {
+      const foundObject = this.props[type][collectionKey];
+      const foundRoute = `/campaigns/${
+        currentCampaign.id
+      }/home/${type}/${collectionKey}`;
+      return {
+        route: foundRoute,
+        descriptor: foundObject[secondaryField],
+        name: foundObject.name,
+        imageURL: this.getImage(foundObject, name)
+      };
+    });
+    return (
+      <Tab.Pane eventKey={type}>
+        <Row>
+          {!place[stateIds].length && (
+            <div>
+              You have no related {type}. Please add some to see them here.
+            </div>
+          )}
+          {!!place[stateIds].length && (
+            <Col xs={12}>
+              <ListSlidein items={items} history={history} />
+            </Col>
+          )}
+        </Row>
+      </Tab.Pane>
+    );
+  };
+
   renderAttachedFiles = () => {
     const { place } = this.state;
     return (
@@ -192,53 +226,6 @@ class Place extends Component {
     return require('../assets/placeholder-location.png');
   };
 
-  renderPlaces = () => {
-    const { place } = this.state;
-    const { places, currentCampaign, history } = this.props;
-    return (
-      <Tab.Pane eventKey="places">
-        <Row>
-          <h3>Related Places</h3>
-        </Row>
-        <Row>
-          {!place.placeIds.length && (
-            <div>
-              You have no related places. Please add some to see them here.
-            </div>
-          )}
-          {place.placeIds.map(placeKey => {
-            const foundPlace = places[placeKey];
-            const placeRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/places/${placeKey}`;
-            if (foundPlace)
-              return (
-                <Col xs={6} md={4} key={`place-${placeKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="place-card clickable"
-                    onClick={() => history.push(placeRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundPlace.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getPlaceImage(foundPlace)}
-                        className="place-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
-        </Row>
-      </Tab.Pane>
-    );
-  };
-
   renderFloors = () => {
     const { place } = this.state;
     return (
@@ -248,107 +235,11 @@ class Place extends Component {
     );
   };
 
-  renderNPCs = () => {
-    const { place } = this.state;
-    const { npcs, currentCampaign, history } = this.props;
-    return (
-      <Tab.Pane eventKey="npcs">
-        <Row>
-          <h3>Related NPCs</h3>
-        </Row>
-        <Row>
-          {!place.npcIds.length && (
-            <div>
-              You have no related NPCs. Please add some to see them here.
-            </div>
-          )}
-          {place.npcIds.map(npcKey => {
-            const foundNPC = npcs[npcKey];
-            const npcRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/npcs/${npcKey}`;
-            if (!foundNPC) return null;
-            if (foundNPC)
-              return (
-                <Col xs={6} md={4} key={`npc-${npcKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="npc-card clickable"
-                    onClick={() => history.push(npcRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundNPC.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getImage(foundNPC, 'npc')}
-                        className="npc-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
-        </Row>
-      </Tab.Pane>
-    );
-  };
-
   getImage = (item, type) => {
     if (item.images.length) {
       return item.images[0].downloadUrl;
     }
     return require(`../assets/placeholder-${type}.png`);
-  };
-
-  renderQuests = () => {
-    const { place } = this.state;
-    const { quests, currentCampaign, history } = this.props;
-    return (
-      <Tab.Pane eventKey="quests">
-        <Row>
-          <h3>Related Quests</h3>
-        </Row>
-        <Row>
-          {!place.questIds.length && (
-            <div>
-              You have no related quests. Please add some to see them here.
-            </div>
-          )}
-          {place.questIds.map(questKey => {
-            const foundQuest = quests[questKey];
-            const questRoute = `/campaigns/${
-              currentCampaign.id
-            }/home/quests/${questKey}`;
-            if (!foundQuest) return null;
-            if (foundQuest)
-              return (
-                <Col xs={6} md={4} key={`npc-${questKey}`}>
-                  <Panel
-                    bsStyle="warning"
-                    className="quest-card clickable"
-                    onClick={() => history.push(questRoute)}
-                  >
-                    <Panel.Heading>
-                      <Panel.Title componentClass="h4">
-                        {foundQuest.name}
-                      </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body className="padding-0">
-                      <Image
-                        src={this.getImage(foundQuest, 'quest')}
-                        className="npc-image"
-                      />
-                    </Panel.Body>
-                  </Panel>
-                </Col>
-              );
-          })}
-        </Row>
-      </Tab.Pane>
-    );
   };
 
   renderNotes = () => {
@@ -395,30 +286,78 @@ class Place extends Component {
 
   renderPills = () => {
     return (
-      <Nav bsStyle="pills" className="margin-left-0">
+      <Nav bsStyle="pills" className="margin-left-0 width-100">
         <NavItem eventKey="images">
-          <Glyphicon glyph="picture" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="picture"
+            />
+            <span>Images</span>
+          </span>
         </NavItem>
-        <NavItem eventKey="location-history">
-          <Glyphicon glyph="book" />
+        <NavItem eventKey="info">
+          <span>
+            <Glyphicon bsSize="large" className="margin-right-1" glyph="book" />
+            <span>Info</span>
+          </span>
         </NavItem>
         <NavItem eventKey="floors">
-          <Glyphicon glyph="th-large" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="th-large"
+            />
+            <span>Floors</span>
+          </span>
         </NavItem>
         <NavItem eventKey="notes">
-          <Glyphicon glyph="comment" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="comment"
+            />
+            <span>Notes</span>
+          </span>
         </NavItem>
         <NavItem eventKey="places">
-          <Glyphicon glyph="globe" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="globe"
+            />
+            <span>Places</span>
+          </span>
         </NavItem>
         <NavItem eventKey="npcs">
-          <Glyphicon glyph="user" />
+          <span>
+            <Glyphicon bsSize="large" className="margin-right-1" glyph="user" />
+            <span>NPCs</span>
+          </span>
         </NavItem>
         <NavItem eventKey="quests">
-          <Glyphicon glyph="tower" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="tower"
+            />
+            <span>Quests</span>
+          </span>
         </NavItem>
         <NavItem eventKey="attachedFiles">
-          <Glyphicon glyph="duplicate" />
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="duplicate"
+            />
+            <span>Files</span>
+          </span>
         </NavItem>
       </Nav>
     );
@@ -430,57 +369,46 @@ class Place extends Component {
     return (
       <Grid>
         {this.renderPlaceForm()}
-        <Row>
-          <Col xs={12}>
-            <Panel bsStyle="info">
-              <Panel.Heading>
-                <Panel.Title componentClass="h3">
-                  {place.name}
-                  <Button
-                    className="margin-left-1 vert-text-top"
-                    bsSize="small"
-                    bsStyle="warning"
-                    onClick={this.showPlaceForm}
-                  >
-                    <Glyphicon glyph="pencil" />
-                  </Button>
-                  <Button
-                    className="margin-left-1 vert-text-top"
-                    bsSize="small"
-                    bsStyle="danger"
-                    onClick={() => this.handlePlaceDelete(place)}
-                  >
-                    <Glyphicon glyph="trash" />
-                  </Button>
-                </Panel.Title>
-              </Panel.Heading>
-              <Tab.Container id="place-tabs" defaultActiveKey="images">
-                <Panel.Body>
-                  <Row>
-                    <Col xs={1} className="margin-right-2">
-                      {this.renderPills()}
-                    </Col>
-                    <Col
-                      xs={10}
-                      style={{ maxHeight: '500px', overflowY: 'scroll' }}
-                    >
-                      <Tab.Content animation>
-                        {this.renderImages()}
-                        {this.renderLocationHistory()}
-                        {this.renderFloors()}
-                        {this.renderNotes()}
-                        {this.renderAttachedFiles()}
-                        {this.renderPlaces()}
-                        {this.renderNPCs()}
-                        {this.renderQuests()}
-                      </Tab.Content>
-                    </Col>
-                  </Row>
-                </Panel.Body>
-              </Tab.Container>
-            </Panel>
+        <Row className="margin-bottom-1">
+          <Col xs={10}>
+            <h3>{place.name}</h3>
+          </Col>
+          <Col xs={2}>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="warning"
+              onClick={this.showPlaceForm}
+            >
+              <Glyphicon glyph="pencil" />
+            </Button>
+            <Button
+              className="margin-left-1 vert-text-top"
+              bsSize="small"
+              bsStyle="danger"
+              onClick={() => this.handlePlaceDelete(place)}
+            >
+              <Glyphicon glyph="trash" />
+            </Button>
           </Col>
         </Row>
+        <Tab.Container id="npc-tabs" defaultActiveKey="images">
+          <Row>
+            <Col xs={2}>{this.renderPills()}</Col>
+            <Col xs={10}>
+              <Tab.Content animation>
+                {this.renderImages()}
+                {this.renderLocationHistory()}
+                {this.renderFloors()}
+                {this.renderNotes()}
+                {this.renderAttachedFiles()}
+                {this.renderObject('places', 'placeIds', 'place', 'type')}
+                {this.renderObject('npcs', 'npcIds', 'npc', 'race')}
+                {this.renderObject('quests', 'questIds', 'quest', 'status')}
+              </Tab.Content>
+            </Col>
+          </Row>
+        </Tab.Container>
       </Grid>
     );
   }

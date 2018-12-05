@@ -67,11 +67,11 @@ class Places extends Component {
               defaultExpanded
               id={`Place-Panel-${formattedPlaces[placeKey].name}`}
               eventKey={`place-panel-${index}`}
-              bsStyle="primary"
+              bsStyle="default"
             >
               <Panel.Heading>
                 <Panel.Toggle
-                  style={{ textDecoration: 'none', color: 'white' }}
+                  style={{ textDecoration: 'none', color: 'black' }}
                 >
                   <Panel.Title>{formattedPlaces[placeKey].name}</Panel.Title>
                 </Panel.Toggle>
@@ -109,18 +109,18 @@ class Places extends Component {
       const placeRoute = `/campaigns/${currentCampaign.id}/home/places/${key}`;
       return (
         <Col xs={4} md={3} key={`place-${key}`}>
-          <Panel
-            bsStyle="info"
-            className="place-card clickable"
+          <Image
+            src={this.getPlaceImage(place)}
+            circle
+            className="collection-image"
+          />
+          <Button
+            className="collection-item-name"
+            bsStyle="primary"
             onClick={() => this.props.history.push(placeRoute)}
           >
-            <Panel.Heading>
-              <Panel.Title componentClass="h3">{place.name}</Panel.Title>
-            </Panel.Heading>
-            <Panel.Body className="padding-0">
-              <Image src={this.getPlaceImage(place)} className="place-image" />
-            </Panel.Body>
-          </Panel>
+            {place.name}
+          </Button>
         </Col>
       );
     });

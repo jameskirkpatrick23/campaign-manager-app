@@ -11,3 +11,16 @@
 .quest-card {
   height: 200px;
 }
+.collection-image {
+  height: 10em;
+  width: 10em;
+  display: block;
+  margin-right: auto;
+  margin-bottom: 5px;
+  margin-left: auto;
+}
+.collection-item-name {
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}

@@ -96,18 +96,14 @@ class QuestPage extends Component {
       }`;
       return (
         <Col key={key} xs={4} md={3}>
-          <Panel
-            bsStyle="info"
-            className="quest-card clickable"
+          <Image src={url} circle className="collection-image" />
+          <Button
+            className="collection-item-name"
+            bsStyle="primary"
             onClick={() => this.props.history.push(questRoute)}
           >
-            <Panel.Heading>
-              <Panel.Title componentClass="h3">{quest.name}</Panel.Title>
-            </Panel.Heading>
-            <Panel.Body className="padding-0">
-              <Image src={url} className="place-image" />
-            </Panel.Body>
-          </Panel>
+            {quest.name}
+          </Button>
         </Col>
       );
     });
