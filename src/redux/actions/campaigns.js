@@ -42,6 +42,15 @@ export const setListeners = () => (dispatch, getState) => {
     .where('creatorId', '==', userUid);
   dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER });
   setListenerFor(placeTypesRef, PlacesActions.updatePlaceTypesList, dispatch);
+  let placeDefaultTypesRef = database
+    .collection('placeTypes')
+    .where('default', '==', true);
+  dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER });
+  setListenerFor(
+    placeDefaultTypesRef,
+    PlacesActions.updatePlaceTypesList,
+    dispatch
+  );
   let tagsRef = database.collection('tags').where('creatorId', '==', userUid);
   dispatch({ type: constants.Tag.SET_TAGS_LISTENER });
   setListenerFor(tagsRef, TagActions.updateTagList, dispatch);

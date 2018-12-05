@@ -29,8 +29,17 @@ class Places extends Component {
 
   formatPlacesByType(props) {
     const { places, placeTypes, currentCampaign } = props;
-    Object.keys(placeTypes).forEach(placeTypeKey => {
-      const foundPlaceType = placeTypes[placeTypeKey];
+    const usedPlaceTypes = {};
+    const usedPlaceTypeKeys = Object.keys(places).map(place =>
+      Object.keys(placeTypes).find(
+        pt => placeTypes[pt].name === places[place].type
+      )
+    );
+    usedPlaceTypeKeys.forEach(
+      placeKey => (usedPlaceTypes[placeKey] = placeTypes[placeKey])
+    );
+    usedPlaceTypeKeys.forEach(placeTypeKey => {
+      const foundPlaceType = usedPlaceTypes[placeTypeKey];
       foundPlaceType.places = {};
       const placeKeys = this.getFilteredPlaceKeys();
       placeKeys.forEach(placeKey => {
@@ -41,7 +50,7 @@ class Places extends Component {
         }
       });
     });
-    return placeTypes;
+    return usedPlaceTypes;
   }
 
   componentDidMount() {
