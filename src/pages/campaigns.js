@@ -14,7 +14,7 @@ class CampaignPage extends Component {
   getCampaignImage = currentCampaign => {
     return (
       (currentCampaign.image && currentCampaign.image.downloadUrl) ||
-      require('../assets/placeholder-location.png')
+      require('../assets/placeholder.png')
     );
   };
 
@@ -76,23 +76,10 @@ class CampaignPage extends Component {
   render() {
     return (
       <Grid>
-        <Row
-          style={{
-            backgroundImage: 'url(' + CampaignImage + ')',
-            backgroundPosition: 'center',
-            padding: 10
-          }}
-        >
-          <Col xs={12} sm={8}>
-            <h1 style={{ color: 'white' }}>Campaigns</h1>
-          </Col>
-          <Col xs={12} sm={4} style={{ marginTop: 20 }}>
-            <Button
-              bsStyle="primary"
-              block
-              onClick={() => this.props.history.push('/campaigns/new')}
-            >
-              Create a new campaign
+        <Row>
+          <Col xsOffset={10} xs={2}>
+            <Button onClick={() => this.props.history.push('/campaigns/new')}>
+              Create
             </Button>
           </Col>
         </Row>

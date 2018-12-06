@@ -157,10 +157,7 @@ class Place extends Component {
                 );
               })}
             {!place.images.length && (
-              <Image
-                src={require('../assets/placeholder-location.png')}
-                responsive
-              />
+              <Image src={require('../assets/placeholder.png')} responsive />
             )}
           </Carousel>
         )}
@@ -223,7 +220,7 @@ class Place extends Component {
     if (place.images.length) {
       return place.images[0].downloadUrl;
     }
-    return require('../assets/placeholder-location.png');
+    return require('../assets/placeholder.png');
   };
 
   renderFloors = () => {
@@ -239,7 +236,7 @@ class Place extends Component {
     if (item.images.length) {
       return item.images[0].downloadUrl;
     }
-    return require(`../assets/placeholder-${type}.png`);
+    return require(`../assets/placeholder.png`);
   };
 
   renderNotes = () => {

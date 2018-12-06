@@ -173,7 +173,7 @@ class NPC extends Component {
           </Carousel>
         )}
         {!npc.images.length && (
-          <Image src={require('../assets/placeholder-npc.png')} responsive />
+          <Image src={require('../assets/placeholder.png')} responsive />
         )}
       </Tab.Pane>
     );
@@ -201,7 +201,7 @@ class NPC extends Component {
     if (item.images.length) {
       return item.images[0].downloadUrl;
     }
-    return require(`../assets/placeholder-${type}.png`);
+    return require(`../assets/placeholder.png`);
   };
 
   renderObject = (type, stateIds, name, secondaryField) => {

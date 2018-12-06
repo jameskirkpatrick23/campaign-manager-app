@@ -96,7 +96,7 @@ class NPCPage extends Component {
       const npc = formattedNPCs[key];
       let url = npc.images[0]
         ? npc.images[0].downloadUrl
-        : require('../assets/placeholder-npc.png');
+        : require('../assets/placeholder.png');
       const npcRoute = `/campaigns/${currentCampaign.id}/home/npcs/${npc.id}`;
       return (
         <Col key={key} xs={4} md={3}>

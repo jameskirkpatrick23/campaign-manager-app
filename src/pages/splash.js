@@ -11,11 +11,11 @@ class Splash extends Component {
     return (
       <div>
         {!this.props.isLoggedIn && (
-          <Jumbotron>
+          <Jumbotron className="padding-left-2">
             <img src={Logo} alt="Roll For Initiative Logo" />
             <p>
               Manage your campaign like you never have before. Quickly create,
-              find, modify, and share your creations with the community
+              find, and modify the people, places, and objects in your world!
             </p>
             <div>
               <Button

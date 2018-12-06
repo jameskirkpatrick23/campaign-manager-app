@@ -90,7 +90,7 @@ class QuestPage extends Component {
       const quest = formattedQuests[key];
       let url = quest.images[0]
         ? quest.images[0].downloadUrl
-        : require('../assets/placeholder-quest.png');
+        : require('../assets/placeholder.png');
       const questRoute = `/campaigns/${currentCampaign.id}/home/quests/${
         quest.id
       }`;

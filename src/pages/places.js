@@ -101,7 +101,7 @@ class Places extends Component {
     if (place.images.length) {
       return place.images[0].downloadUrl;
     }
-    return require('../assets/placeholder-location.png');
+    return require('../assets/placeholder.png');
   };
 
   renderPlaces = places => {
