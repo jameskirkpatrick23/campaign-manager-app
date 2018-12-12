@@ -207,17 +207,20 @@ class NPC extends Component {
   renderObject = (type, stateIds, name, secondaryField) => {
     const { npc } = this.state;
     const { currentCampaign, history } = this.props;
-    const items = npc[stateIds].map(collectionKey => {
+    const items = [];
+    npc[stateIds].forEach(collectionKey => {
       const foundObject = this.props[type][collectionKey];
       const foundRoute = `/campaigns/${
         currentCampaign.id
       }/home/${type}/${collectionKey}`;
-      return {
-        route: foundRoute,
-        descriptor: foundObject[secondaryField],
-        name: foundObject.name,
-        imageURL: this.getImage(foundObject, name)
-      };
+      if (foundRoute && foundObject) {
+        items.push({
+          route: foundRoute,
+          descriptor: foundObject[secondaryField],
+          name: foundObject.name,
+          imageURL: this.getImage(foundObject, name)
+        });
+      }
     });
     return (
       <Tab.Pane eventKey={type}>

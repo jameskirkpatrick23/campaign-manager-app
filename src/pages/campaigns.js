@@ -77,8 +77,11 @@ class CampaignPage extends Component {
     return (
       <Grid>
         <Row>
-          <Col xsOffset={10} xs={2}>
-            <Button onClick={() => this.props.history.push('/campaigns/new')}>
+          <Col xsOffset={8} xs={4} sm={2} smOffset={10}>
+            <Button
+              onClick={() => this.props.history.push('/campaigns/new')}
+              className="float-right"
+            >
               Create
             </Button>
           </Col>

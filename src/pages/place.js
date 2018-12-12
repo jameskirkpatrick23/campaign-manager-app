@@ -168,17 +168,20 @@ class Place extends Component {
   renderObject = (type, stateIds, name, secondaryField) => {
     const { place } = this.state;
     const { currentCampaign, history } = this.props;
-    const items = place[stateIds].map(collectionKey => {
+    const items = [];
+    place[stateIds].forEach(collectionKey => {
       const foundObject = this.props[type][collectionKey];
       const foundRoute = `/campaigns/${
         currentCampaign.id
       }/home/${type}/${collectionKey}`;
-      return {
-        route: foundRoute,
-        descriptor: foundObject[secondaryField],
-        name: foundObject.name,
-        imageURL: this.getImage(foundObject, name)
-      };
+      if (foundObject && foundRoute) {
+        items.push({
+          route: foundRoute,
+          descriptor: foundObject[secondaryField],
+          name: foundObject.name,
+          imageURL: this.getImage(foundObject, name)
+        });
+      }
     });
     return (
       <Tab.Pane eventKey={type}>

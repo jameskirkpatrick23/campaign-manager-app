@@ -24,7 +24,6 @@ class CampaignForm extends Component {
       })
       .then(res => {
         this.props.history.push('/campaigns');
-        console.log('Document successfully written!');
       })
       .catch(function(error) {
         console.error('Error writing document: ', error);
