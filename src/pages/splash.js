@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
-import Logo from '../assets/Roll4InitiativeLogo.svg';
+import Logo from '../assets/Logo-Inverse.svg';
 import { Jumbotron, Button } from 'react-bootstrap';
 import Campaigns from './campaigns';
 
