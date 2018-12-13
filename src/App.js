@@ -3,13 +3,13 @@ import './App.css';
 import { Route, Link, withRouter } from 'react-router-dom';
 import routes from './routes';
 import { app } from './firebaseDB';
-import Logo from './assets/Logo-Inverse.svg';
+import Logo from './assets/Navbar-Logo.svg';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as LoginActions from './redux/actions/login';
 import * as CampaignActions from './redux/actions/campaigns';
 import Breadcrumbs from './reusable-components/navigation-breadcrumbs';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, Image } from 'react-bootstrap';
 import ReactGA from 'react-ga';
 
 class App extends Component {
@@ -54,8 +54,12 @@ class App extends Component {
         <Navbar inverse style={{ borderRadius: 0, width: '100%' }}>
           <Navbar.Header>
             <Navbar.Brand>
-              <Link to={'/'} className="app-dashboard-logo">
-                <img width={150} height={150} src={Logo} alt="" />
+              <Link
+                to={'/'}
+                className="app-dashboard-logo"
+                style={{ paddingTop: '10px' }}
+              >
+                <Image src={Logo} alt="" />
               </Link>
             </Navbar.Brand>
             <Navbar.Toggle />

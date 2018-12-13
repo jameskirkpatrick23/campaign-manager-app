@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import Logo from '../assets/Logo-Inverse.svg';
-import { Jumbotron, Button } from 'react-bootstrap';
+import { Jumbotron, Button, Image } from 'react-bootstrap';
 import Campaigns from './campaigns';
 
 class Splash extends Component {
@@ -12,7 +12,7 @@ class Splash extends Component {
       <div>
         {!this.props.isLoggedIn && (
           <Jumbotron className="padding-left-2">
-            <img src={Logo} alt="Roll For Initiative Logo" />
+            <Image responsive src={Logo} alt="Roll For Initiative Logo" />
             <p>
               Manage your campaign like you never have before. Quickly create,
               find, and modify the people, places, and objects in your world!
