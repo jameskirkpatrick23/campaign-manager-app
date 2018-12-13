@@ -93,7 +93,7 @@ class Place extends Component {
               </Col>
               <Col xs={12}>
                 <div>
-                  <strong>Outside Description: </strong>
+                  <strong>Inside Description: </strong>
                   <p>{place.insideDescription}</p>
                 </div>
               </Col>
