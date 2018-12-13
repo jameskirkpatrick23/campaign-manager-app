@@ -1,0 +1,20 @@
+.circle-div {
+  border-radius: 100px;
+  height: 150px;
+  width: 150px;
+  text-align: center;
+  margin: auto;
+}
+.circle-div .glyphicon {
+  top: 25%;
+  font-size: 65px;
+}
+.bg-lightblue {
+  background-color: lightblue;
+}
+.bg-blue {
+  background-color: lightskyblue;
+}
+.bg-darkblue {
+  background-color: steelblue;
+}

@@ -65,6 +65,28 @@ class App extends Component {
             <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
+            <Nav>
+              <NavItem onClick={() => this.props.history.push('/about')}>
+                About
+              </NavItem>
+            </Nav>
+            <Nav>
+              <NavItem
+                onClick={() =>
+                  window.open(
+                    'https://www.patreon.com/tabletopchronicler',
+                    '_blank'
+                  )
+                }
+              >
+                Become a Patreon
+              </NavItem>
+            </Nav>
+            <Nav>
+              <NavItem onClick={() => this.props.history.push('/contact')}>
+                Contact
+              </NavItem>
+            </Nav>
             <Nav pullRight>
               {this.props.isLoggedIn &&
                 !this.props.location.pathname.match('/login') && (

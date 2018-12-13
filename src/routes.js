@@ -1,5 +1,7 @@
 import LoginSignup from './pages/login-signup';
 import Splash from './pages/splash';
+import About from './pages/about';
+import Contact from './pages/contact';
 import Home from './pages/home';
 import CampaignPage from './pages/campaigns';
 import CampaignForm from './forms/campaign-form';
@@ -22,6 +24,20 @@ export default {
     customName: 'Home',
     hasCustomName: true,
     component: Splash
+  },
+  '/about': {
+    key: 'About',
+    name: 'About',
+    path: '/about',
+    exact: true,
+    component: About
+  },
+  '/contact': {
+    key: 'Contact',
+    name: 'Contact',
+    path: '/contact',
+    exact: true,
+    component: Contact
   },
   '/login': {
     key: 'Login',
