@@ -21,6 +21,7 @@ import Floors from './floors';
 import PlaceForm from '../forms/places-form';
 import Notes from './notes';
 import * as PlaceActions from '../redux/actions/places';
+import Fieldset from '../reusable-components/fieldset';
 
 class Place extends Component {
   constructor(props) {
@@ -65,76 +66,40 @@ class Place extends Component {
 
     return (
       <Tab.Pane eventKey="info">
-        <PanelGroup
-          accordion
-          id={'history-whatever'}
-          defaultActiveKey="locationPanel"
-        >
-          <Panel
-            id={'place-panel-location'}
-            bsStyle="warning"
-            eventKey="locationPanel"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">Location</Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
-                <p>{place.location}</p>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-          <Panel
-            id={'place-panel-history'}
-            bsStyle="warning"
-            eventKey="historyPanel"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">History</Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
-                <p>{place.history}</p>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-          <Panel
-            id={'place-panel-outside'}
-            bsStyle="warning"
-            eventKey="outsidePanel"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">Outside</Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
-                <p>{place.outsideDescription}</p>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-          <Panel
-            id={'place-panel-inside'}
-            bsStyle="warning"
-            eventKey="insidePanel"
-          >
-            <Panel.Heading>
-              <Panel.Toggle style={{ textDecoration: 'none' }}>
-                <Panel.Title componentClass="h3">Inside</Panel.Title>
-              </Panel.Toggle>
-            </Panel.Heading>
-            <Panel.Collapse>
-              <Panel.Body>
-                <p>{place.insideDescription}</p>
-              </Panel.Body>
-            </Panel.Collapse>
-          </Panel>
-        </PanelGroup>
+        <Col xs={12}>
+          <Fieldset label="Location and History">
+            <Row>
+              <Col xs={12}>
+                <div>
+                  <strong>Location: </strong>
+                  <p>{place.location}</p>
+                </div>
+              </Col>
+              <Col xs={12}>
+                <div>
+                  <strong>History: </strong>
+                  <p>{place.history}</p>
+                </div>
+              </Col>
+            </Row>
+          </Fieldset>
+          <Fieldset label="Physical Description">
+            <Row>
+              <Col xs={12}>
+                <div>
+                  <strong>Outside Description: </strong>
+                  <p>{place.outsideDescription}</p>
+                </div>
+              </Col>
+              <Col xs={12}>
+                <div>
+                  <strong>Outside Description: </strong>
+                  <p>{place.insideDescription}</p>
+                </div>
+              </Col>
+            </Row>
+          </Fieldset>
+        </Col>
       </Tab.Pane>
     );
   };
