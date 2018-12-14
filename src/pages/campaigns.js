@@ -76,17 +76,20 @@ class CampaignPage extends Component {
   render() {
     return (
       <Grid>
-        <Row>
-          <Col xsOffset={8} xs={4} sm={2} smOffset={10}>
-            <Button
-              onClick={() => this.props.history.push('/campaigns/new')}
-              className="float-right"
-            >
-              Create
-            </Button>
-          </Col>
-        </Row>
-        {!this.props.campaigns && (
+        {!!Object.keys(this.props.campaigns).length && (
+          <Row>
+            <Col xsOffset={8} xs={4} sm={2} smOffset={10}>
+              <Button
+                onClick={() => this.props.history.push('/campaigns/new')}
+                className="float-right"
+                bsStyle="primary"
+              >
+                Create
+              </Button>
+            </Col>
+          </Row>
+        )}
+        {!Object.keys(this.props.campaigns).length && (
           <Jumbotron>
             <h1>Campaigns</h1>
             <p>
@@ -94,6 +97,13 @@ class CampaignPage extends Component {
               quests you want to make. The campaign is important because it
               helps you to identify which pieces go where.
             </p>
+            <Button
+              onClick={() => this.props.history.push('/campaigns/new')}
+              className="float-right"
+              bsStyle="primary"
+            >
+              Create
+            </Button>
           </Jumbotron>
         )}
         <hr />
