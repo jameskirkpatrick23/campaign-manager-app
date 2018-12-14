@@ -71,8 +71,7 @@ const setGenericListeners = uid => dispatch => {
   });
 };
 
-export const setListeners = () => (dispatch, getState) => {
-  const userUid = getState().login.user.uid;
+export const setListeners = userUid => dispatch => {
   let npcRef = database.collection(`npcs`).where('creatorId', '==', userUid);
   dispatch({ type: constants.Npc.SET_NPCS_LISTENER });
   setListenerFor(npcRef, NPCActions.updateNPCsList, dispatch);

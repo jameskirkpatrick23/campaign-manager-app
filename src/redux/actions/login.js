@@ -8,7 +8,7 @@ export const loginUser = user => dispatch => {
     displayName: user.displayName,
     photoURL: user.photoURL,
     email: user.email,
-    phoneNUmber: user.phoneNumber,
+    phoneNumber: user.phoneNumber,
     signinType: user.signinType
   };
   const ref = database.collection(`users`);
@@ -21,20 +21,9 @@ export const loginUser = user => dispatch => {
       } else {
         ref.add(scopedUserFields);
       }
+      dispatch(CampaignActions.setCampaignListener(scopedUserFields));
+      dispatch(CampaignActions.setListeners(user.uid));
     });
-  dispatch(CampaignActions.setCampaignListener(scopedUserFields));
-  dispatch(CampaignActions.setListeners());
-  // [
-  //   'values',
-  //   'alignments',
-  //   'quirks',
-  //   'occupations',
-  //   'races',
-  //   'genders',
-  //   'placeTypes'
-  // ].forEach(item => {
-  //   dispatch(AdminActions.loadCollection(item, user.uid));
-  // });
   return dispatch({ type: constants.Login.LOGIN_USER, user: scopedUserFields });
 };
 export const logoutUser = _user => {

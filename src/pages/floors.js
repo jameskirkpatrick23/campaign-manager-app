@@ -45,12 +45,7 @@ class Floors extends Component {
   };
 
   componentWillReceiveProps = nextProps => {
-    if (
-      this.props.place.floorIds !== nextProps.place.floorIds ||
-      this.props.floors !== nextProps.floors
-    ) {
-      this.setSelectedFloors(nextProps);
-    }
+    this.setSelectedFloors(nextProps);
   };
 
   showFloorForm = (e, floor) => {

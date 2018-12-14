@@ -74,16 +74,23 @@ export const updateFloor = floorData => (dispatch, getState) => {
   }
 
   return new Promise((resolve, reject) => {
+    const data = {
+      ...floorData,
+      questIds: [],
+      updatedAt: firebase.firestore.Timestamp.now(),
+      tiles: newTiles //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
+    };
     database
       .collection(`floors`)
       .doc(floorData.floorId)
-      .update({
-        ...floorData,
-        questIds: [],
-        updatedAt: firebase.firestore.Timestamp.now(),
-        tiles: newTiles //{11: {}, 12: {}, 21: {} } USE FLOOR THEN COL FOR ID OF OBJECT SO YOU CAN DO 'floor.tiles[`${row}${col}`]'
-      })
+      .update(data)
       .then(res => {
+        const allFloors = { ...getState().floors.all };
+        allFloors[floorData.floorId] = data;
+        dispatch({
+          type: constants.Floor.UPDATE_FLOOR_LIST,
+          floors: allFloors
+        });
         resolve(res);
       })
       .catch(error => {
@@ -108,7 +115,7 @@ export const createFloor = floorData => (dispatch, getState) => {
   const batch = database.batch();
   const usedRef = database.collection('floors').doc();
   const usedId = usedRef.id;
-  batch.set({
+  batch.set(usedRef, {
     ...floorData,
     questIds: [],
     createdAt: firebase.firestore.Timestamp.now(),
@@ -116,7 +123,7 @@ export const createFloor = floorData => (dispatch, getState) => {
     creatorId: userUid,
     collaboratorIds: []
   });
-  const placeRef = database.collection('places').doc(usedId);
+  const placeRef = database.collection('places').doc(floorData.placeId);
   batch.update(placeRef, { floorIds: arrayUnion(usedId) });
   return new Promise((resolve, reject) => {
     batch

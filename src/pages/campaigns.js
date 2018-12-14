@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import CampaignImage from '../assets/campaign-hero.jpeg';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Row, Col, Grid, Button } from 'react-bootstrap';
+import { Row, Col, Grid, Button, Jumbotron } from 'react-bootstrap';
 import * as CampaignActions from '../redux/actions/campaigns';
 
 class CampaignPage extends Component {
@@ -86,6 +86,16 @@ class CampaignPage extends Component {
             </Button>
           </Col>
         </Row>
+        {!this.props.campaigns && (
+          <Jumbotron>
+            <h1>Campaigns</h1>
+            <p>
+              Here you can create a campaign to house the NPCs, places, and
+              quests you want to make. The campaign is important because it
+              helps you to identify which pieces go where.
+            </p>
+          </Jumbotron>
+        )}
         <hr />
         {this.renderCampaigns()}
       </Grid>

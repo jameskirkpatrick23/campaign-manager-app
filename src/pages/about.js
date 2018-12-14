@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Row, Col, Glyphicon } from 'react-bootstrap';
+import { Grid, Row, Col, Glyphicon, Carousel, Image } from 'react-bootstrap';
 import CircleDiv from '../reusable-components/circle-div';
 
 class About extends React.Component {
@@ -21,28 +21,6 @@ class About extends React.Component {
                 often, those creations get lost in the gigantic mess of an
                 organization method.
               </p>
-            </Row>
-            <Row className="margin-vertical-1 text-center">
-              <Col xs={4}>
-                <h4>Save</h4>
-                <CircleDiv bgColor="lightblue">
-                  <Glyphicon bsSize="large" glyph="cloud-download" />
-                </CircleDiv>
-              </Col>
-              <Col xs={4}>
-                <h4>Connect</h4>
-                <CircleDiv bgColor="blue">
-                  <Glyphicon bsSize="large" glyph="globe" />
-                </CircleDiv>
-              </Col>
-              <Col xs={4}>
-                <h4>Find</h4>
-                <CircleDiv bgColor="darkblue">
-                  <Glyphicon bsSize="large" glyph="eye-open" />
-                </CircleDiv>
-              </Col>
-            </Row>
-            <Row>
               <p>
                 Using this site, game masters can quickly save, connect, and
                 find their creations. Do you have a word document already set up
@@ -52,6 +30,60 @@ class About extends React.Component {
                 Attach the quest and objectives to the shopkeeper, and never
                 lose track of it again!
               </p>
+              <p>
+                This tool has been a passion project of mine for the better part
+                of a year. Thank you for taking the time to check it out. If you
+                like it, and want to see more updates in the future, support the
+                Chronicler on Patreon!
+              </p>
+            </Row>
+            <Row>
+              <Col xs={12}>
+                <Carousel>
+                  <Carousel.Item key={1}>
+                    <Image
+                      src={require('../assets/showcase/1.png')}
+                      responsive
+                    />
+                  </Carousel.Item>
+                  <Carousel.Item key={0}>
+                    <Image
+                      src={require('../assets/showcase/7.png')}
+                      responsive
+                    />
+                  </Carousel.Item>
+                  <Carousel.Item key={2}>
+                    <Image
+                      src={require('../assets/showcase/2.png')}
+                      responsive
+                    />
+                  </Carousel.Item>
+                  <Carousel.Item key={3}>
+                    <Image
+                      src={require('../assets/showcase/3.png')}
+                      responsive
+                    />
+                  </Carousel.Item>
+                  <Carousel.Item key={4}>
+                    <Image
+                      src={require('../assets/showcase/4.png')}
+                      responsive
+                    />
+                  </Carousel.Item>
+                  <Carousel.Item key={5}>
+                    <Image
+                      src={require('../assets/showcase/5.png')}
+                      responsive
+                    />
+                  </Carousel.Item>
+                  <Carousel.Item key={6}>
+                    <Image
+                      src={require('../assets/showcase/6.png')}
+                      responsive
+                    />
+                  </Carousel.Item>
+                </Carousel>
+              </Col>
             </Row>
           </Col>
         </Row>
