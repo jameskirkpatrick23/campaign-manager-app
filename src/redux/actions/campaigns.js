@@ -22,6 +22,55 @@ const setListenerFor = (ref, callback, dispatch) => {
   });
 };
 
+const setGenericListeners = uid => dispatch => {
+  const types = [
+    {
+      type: 'placeTypes',
+      constant: constants.Place.SET_PLACE_TYPES_LISTENER,
+      action: PlacesActions.updatePlaceTypesList
+    },
+    {
+      type: 'tags',
+      constant: constants.Tag.SET_TAGS_LISTENER,
+      action: TagActions.updateTagList
+    },
+    {
+      type: 'quirks',
+      constant: constants.Quirk.SET_QUIRKS_LISTENER,
+      action: QuirkActions.updateQuirksList
+    },
+    {
+      type: 'values',
+      constant: constants.Value.SET_VALUES_LISTENER,
+      action: ValueActions.updateValuesList
+    },
+    {
+      type: 'races',
+      constant: constants.Race.SET_RACES_LISTENER,
+      action: RaceActions.updateRacesList
+    },
+    {
+      type: 'occupations',
+      constant: constants.Occupation.SET_OCCUPATIONS_LISTENER,
+      action: OccupationActions.updateOccupationsList
+    }
+  ];
+  types.forEach(genericType => {
+    const ref = database.collection(genericType.type);
+    const whereDefault = ref.where('default', '==', true);
+    const whereCreator = ref.where('creatorId', '==', uid);
+    const whereCollaborator = ref.where(
+      'collaboratorIds',
+      'array-contains',
+      uid
+    );
+    dispatch({ type: genericType.constant });
+    setListenerFor(whereDefault, genericType.action, dispatch);
+    setListenerFor(whereCreator, genericType.action, dispatch);
+    setListenerFor(whereCollaborator, genericType.action, dispatch);
+  });
+};
+
 export const setListeners = () => (dispatch, getState) => {
   const userUid = getState().login.user.uid;
   let npcRef = database.collection(`npcs`).where('creatorId', '==', userUid);
@@ -37,23 +86,6 @@ export const setListeners = () => (dispatch, getState) => {
     .where('creatorId', '==', userUid);
   dispatch({ type: constants.Floor.SET_FLOORS_LISTENER });
   setListenerFor(floorsRef, FloorActions.updateFloorsList, dispatch);
-  let placeTypesRef = database
-    .collection('placeTypes')
-    .where('creatorId', '==', userUid);
-  dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER });
-  setListenerFor(placeTypesRef, PlacesActions.updatePlaceTypesList, dispatch);
-  let placeDefaultTypesRef = database
-    .collection('placeTypes')
-    .where('default', '==', true);
-  dispatch({ type: constants.Place.SET_PLACE_TYPES_LISTENER });
-  setListenerFor(
-    placeDefaultTypesRef,
-    PlacesActions.updatePlaceTypesList,
-    dispatch
-  );
-  let tagsRef = database.collection('tags').where('creatorId', '==', userUid);
-  dispatch({ type: constants.Tag.SET_TAGS_LISTENER });
-  setListenerFor(tagsRef, TagActions.updateTagList, dispatch);
   let questsRef = database
     .collection(`quests`)
     .where('creatorId', '==', userUid);
@@ -65,52 +97,7 @@ export const setListeners = () => (dispatch, getState) => {
   let tilesRef = database.collection(`tiles`).where('creatorId', '==', userUid);
   dispatch({ type: constants.Tile.SET_TILES_LISTENER });
   setListenerFor(tilesRef, TileActions.updateTileList, dispatch);
-  let quirksRef = database
-    .collection(`quirks`)
-    .where('creatorId', '==', userUid);
-  dispatch({ type: constants.Quirk.SET_QUIRKS_LISTENER });
-  setListenerFor(quirksRef, QuirkActions.updateQuirksList, dispatch);
-  let quirks2Ref = database
-    .collection(`quirks`)
-    .where('collaboratorIds', 'array-contains', userUid);
-  dispatch({ type: constants.Quirk.SET_QUIRKS_LISTENER });
-  setListenerFor(quirks2Ref, QuirkActions.updateQuirksList, dispatch);
-  let valuesRef = database
-    .collection(`values`)
-    .where('creatorId', '==', userUid);
-  dispatch({ type: constants.Value.SET_VALUES_LISTENER });
-  setListenerFor(valuesRef, ValueActions.updateValuesList, dispatch);
-  let values2Ref = database
-    .collection(`values`)
-    .where('collaboratorIds', 'array-contains', userUid);
-  dispatch({ type: constants.Value.SET_VALUES_LISTENER });
-  setListenerFor(values2Ref, ValueActions.updateValuesList, dispatch);
-  let racesRef = database.collection(`races`).where('creatorId', '==', userUid);
-  dispatch({ type: constants.Race.SET_RACES_LISTENER });
-  setListenerFor(racesRef, RaceActions.updateRacesList, dispatch);
-  let races2Ref = database
-    .collection(`races`)
-    .where('collaboratorIds', 'array-contains', userUid);
-  dispatch({ type: constants.Race.SET_RACES_LISTENER });
-  setListenerFor(races2Ref, RaceActions.updateRacesList, dispatch);
-  let occupationsRef = database
-    .collection(`occupations`)
-    .where('creatorId', '==', userUid);
-  dispatch({ type: constants.Occupation.SET_OCCUPATIONS_LISTENER });
-  setListenerFor(
-    occupationsRef,
-    OccupationActions.updateOccupationsList,
-    dispatch
-  );
-  let occupations2Ref = database
-    .collection(`occupations`)
-    .where('collaboratorIds', 'array-contains', userUid);
-  dispatch({ type: constants.Occupation.SET_OCCUPATIONS_LISTENER });
-  setListenerFor(
-    occupations2Ref,
-    OccupationActions.updateOccupationsList,
-    dispatch
-  );
+  dispatch(setGenericListeners(userUid));
 };
 
 export const setCurrentCampaign = campaign => dispatch => {

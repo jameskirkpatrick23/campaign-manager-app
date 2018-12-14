@@ -26,44 +26,37 @@ class NPCPage extends Component {
   filteredNPCKeys = () => {
     const { searchTerm } = this.state;
     const { npcs, tags, notes } = this.props;
-    const doesInclude = (object, stateKey) => {
-      return (
-        object &&
-        object[stateKey].toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    const searchTerms = searchTerm.split(' ').map(st => st.toLowerCase());
+    const doesInclude = (object, stateKey, term) => {
+      return object && object[stateKey].toLowerCase().includes(term);
     };
-    const includesRelated = object => {
+    const includesRelated = (object, term) => {
       return (
+        object.values.map(x => x.toLowerCase()).includes(term) ||
+        object.quirks.map(x => x.toLowerCase()).includes(term) ||
         object.tagIds.find(tagId =>
-          tags[tagId].name.toLowerCase().includes(searchTerm.toLowerCase())
+          tags[tagId].name.toLowerCase().includes(term)
         ) ||
         object.noteIds.find(
           noteId =>
-            notes[noteId].title
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            notes[noteId].description
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
+            notes[noteId].title.toLowerCase().includes(term) ||
+            notes[noteId].description.toLowerCase().includes(term)
         )
       );
     };
-    return Object.keys(npcs).filter(
-      npcId =>
-        doesInclude(npcs[npcId], 'name') ||
-        doesInclude(npcs[npcId], 'race') ||
-        doesInclude(npcs[npcId], 'occupation') ||
-        doesInclude(npcs[npcId], 'gender') ||
-        doesInclude(npcs[npcId], 'alignment') ||
-        doesInclude(npcs[npcId], 'physDescription') ||
-        doesInclude(npcs[npcId], 'backstory') ||
-        npcs[npcId].values
-          .map(x => x.toLowerCase())
-          .includes(searchTerm.toLowerCase()) ||
-        npcs[npcId].quirks
-          .map(x => x.toLowerCase())
-          .includes(searchTerm.toLowerCase()) ||
-        includesRelated(npcs[npcId])
+    return Object.keys(npcs).filter(npcId =>
+      searchTerms.every(
+        st =>
+          doesInclude(npcs[npcId], 'name', st) ||
+          doesInclude(npcs[npcId], 'race', st) ||
+          doesInclude(npcs[npcId], 'occupation', st) ||
+          doesInclude(npcs[npcId], 'relationshipToGroup', st) ||
+          doesInclude(npcs[npcId], 'gender', st) ||
+          doesInclude(npcs[npcId], 'alignment', st) ||
+          doesInclude(npcs[npcId], 'physDescription', st) ||
+          doesInclude(npcs[npcId], 'backstory', st) ||
+          includesRelated(npcs[npcId], st)
+      )
     );
   };
 
@@ -99,7 +92,7 @@ class NPCPage extends Component {
         : require('../assets/placeholder.png');
       const npcRoute = `/campaigns/${currentCampaign.id}/home/npcs/${npc.id}`;
       return (
-        <Col key={key} xs={4} md={3}>
+        <Col key={key} xs={4} md={3} className="margin-bottom-2">
           <Image src={url} circle className="collection-image" />
           <Button
             className="collection-item-name"
@@ -125,7 +118,7 @@ class NPCPage extends Component {
     const createNPCRoute = `/campaigns/${currentCampaign.id}/home/npcs/new`;
 
     return (
-      <Grid>
+      <Grid className="app-container">
         <Row className="margin-bottom-1">
           <Col xsOffset={4} xs={6}>
             <FormGroup>

@@ -8,7 +8,7 @@ export default function ValuesReducer(state = initialState, action) {
       return Object.assign({}, state, {
         all: action.values
       });
-    case constants.Value.UPDATE_VALUES_LIST:
+    case constants.Value.UPDATE_VALUE_LIST:
       return Object.assign({}, state, {
         all: action.values
       });

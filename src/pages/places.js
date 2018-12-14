@@ -86,7 +86,7 @@ class Places extends Component {
                 </Panel.Toggle>
               </Panel.Heading>
               <Panel.Collapse>
-                <Panel.Body>
+                <Panel.Body className="padding-bottom-0">
                   {this.renderPlaces(formattedPlaces[placeKey].places)}
                 </Panel.Body>
               </Panel.Collapse>
@@ -117,7 +117,7 @@ class Places extends Component {
       const place = places[key];
       const placeRoute = `/campaigns/${currentCampaign.id}/home/places/${key}`;
       return (
-        <Col xs={4} md={3} key={`place-${key}`}>
+        <Col xs={4} md={3} key={`place-${key}`} className="margin-bottom-2">
           <Image
             src={this.getPlaceImage(place)}
             circle
@@ -144,42 +144,38 @@ class Places extends Component {
   getFilteredPlaceKeys = () => {
     const { searchTerm } = this.state;
     const { places, placeTypes, tags, notes } = this.props;
-    const doesInclude = (object, stateKey) => {
-      return (
-        object &&
-        object[stateKey].toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    const searchTerms = searchTerm.split(' ').map(st => st.toLowerCase());
+    const doesInclude = (object, stateKey, term) => {
+      return object && object[stateKey].toLowerCase().includes(term);
     };
-    const includesRelated = object => {
+    const includesRelated = (object, term) => {
       return (
         Object.keys(placeTypes).find(
           placeType =>
-            placeTypes[placeType].name.toLowerCase() ===
-              searchTerm.toLowerCase() && object.type === placeTypes[placeType]
+            placeTypes[placeType].name.toLowerCase() === term &&
+            object.type === placeTypes[placeType]
         ) ||
         object.tagIds.find(tagId =>
-          tags[tagId].name.toLowerCase().includes(searchTerm.toLowerCase())
+          tags[tagId].name.toLowerCase().includes(term)
         ) ||
         object.noteIds.find(
           noteId =>
-            notes[noteId].title
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            notes[noteId].description
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
+            notes[noteId].title.toLowerCase().includes(term) ||
+            notes[noteId].description.toLowerCase().includes(term)
         )
       );
     };
-    return Object.keys(places).filter(
-      placeId =>
-        doesInclude(places[placeId], 'history') ||
-        doesInclude(places[placeId], 'location') ||
-        doesInclude(places[placeId], 'name') ||
-        doesInclude(places[placeId], 'type') ||
-        doesInclude(places[placeId], 'insideDescription') ||
-        doesInclude(places[placeId], 'outsideDescription') ||
-        includesRelated(places[placeId])
+    return Object.keys(places).filter(placeId =>
+      searchTerms.every(
+        st =>
+          doesInclude(places[placeId], 'history', st) ||
+          doesInclude(places[placeId], 'location', st) ||
+          doesInclude(places[placeId], 'name', st) ||
+          doesInclude(places[placeId], 'type', st) ||
+          doesInclude(places[placeId], 'insideDescription', st) ||
+          doesInclude(places[placeId], 'outsideDescription', st) ||
+          includesRelated(places[placeId], st)
+      )
     );
   };
 
@@ -188,7 +184,7 @@ class Places extends Component {
     const { searchTerm } = this.state;
     const createPlaceRoute = `/campaigns/${currentCampaign.id}/home/places/new`;
     return (
-      <Grid>
+      <Grid className="app-container">
         <Row className="margin-bottom-1">
           <Col xsOffset={4} xs={6}>
             <FormGroup>
@@ -213,7 +209,7 @@ class Places extends Component {
             </Button>
           </Col>
         </Row>
-        <Row>
+        <Row className="object-content">
           <Col xs={12}>
             <PanelGroup id="place-panel-group">
               {this.renderPlaceTypes()}

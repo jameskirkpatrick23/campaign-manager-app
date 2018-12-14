@@ -333,7 +333,7 @@ class Quest extends Component {
         <Tab.Container id="quest-tabs" defaultActiveKey="images">
           <Row>
             <Col xs={2}>{this.renderPills()}</Col>
-            <Col xs={10}>
+            <Col xs={10} className="object-content">
               <Tab.Content animation>
                 {this.renderImages()}
                 {this.renderDetails()}

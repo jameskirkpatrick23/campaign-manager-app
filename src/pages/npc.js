@@ -117,7 +117,15 @@ class NPC extends Component {
                   <p>{npc.alignment}</p>
                 </div>
               </Col>
-              <Col xs={8}>
+              <Col xs={4}>
+                <div>
+                  <strong>Relationship to Group: </strong>
+                  <p>
+                    {npc.relationshipToGroup ? npc.relationshipToGroup : 'N/A'}
+                  </p>
+                </div>
+              </Col>
+              <Col xs={12}>
                 <div>
                   <strong>Values: </strong>
                   <br />
@@ -383,7 +391,7 @@ class NPC extends Component {
         <Tab.Container id="npc-tabs" defaultActiveKey="images">
           <Row>
             <Col xs={2}>{this.renderPills()}</Col>
-            <Col xs={10}>
+            <Col xs={10} className="object-content">
               <Tab.Content animation>
                 {this.renderImages()}
                 {this.renderDetails()}

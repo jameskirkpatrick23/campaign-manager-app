@@ -26,38 +26,32 @@ class QuestPage extends Component {
   filteredQuestKeys = () => {
     const { searchTerm } = this.state;
     const { quests, tags, notes } = this.props;
-    const doesInclude = (object, stateKey) => {
-      return (
-        object &&
-        object[stateKey].toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    const searchTerms = searchTerm.split(' ').map(st => st.toLowerCase());
+    const doesInclude = (object, stateKey, term) => {
+      return object && object[stateKey].toLowerCase().includes(term);
     };
-    const includesRelated = object => {
+    const includesRelated = (object, term) => {
       return (
+        object.objectives.map(x => x.name.toLowerCase()).includes(term) ||
         object.tagIds.find(tagId =>
-          tags[tagId].name.toLowerCase().includes(searchTerm.toLowerCase())
+          tags[tagId].name.toLowerCase().includes(term)
         ) ||
         object.noteIds.find(
           noteId =>
-            notes[noteId].title
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            notes[noteId].description
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
+            notes[noteId].title.toLowerCase().includes(term) ||
+            notes[noteId].description.toLowerCase().includes(term)
         )
       );
     };
-    return Object.keys(quests).filter(
-      questId =>
-        doesInclude(quests[questId], 'name') ||
-        doesInclude(quests[questId], 'description') ||
-        doesInclude(quests[questId], 'rewards') ||
-        doesInclude(quests[questId], 'status') ||
-        quests[questId].objectives
-          .map(x => x.name.toLowerCase())
-          .includes(searchTerm.toLowerCase()) ||
-        includesRelated(quests[questId])
+    return Object.keys(quests).filter(questId =>
+      searchTerms.every(
+        st =>
+          doesInclude(quests[questId], 'name', st) ||
+          doesInclude(quests[questId], 'description', st) ||
+          doesInclude(quests[questId], 'rewards', st) ||
+          doesInclude(quests[questId], 'status', st) ||
+          includesRelated(quests[questId], st)
+      )
     );
   };
 
@@ -95,7 +89,7 @@ class QuestPage extends Component {
         quest.id
       }`;
       return (
-        <Col key={key} xs={4} md={3}>
+        <Col key={key} xs={4} md={3} className="margin-bottom-1">
           <Image src={url} circle className="collection-image" />
           <Button
             className="collection-item-name"

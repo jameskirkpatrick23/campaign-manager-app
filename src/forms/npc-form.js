@@ -35,6 +35,7 @@ class NPCForm extends Component {
       race: '',
       gender: '',
       occupation: '',
+      relationshipToGroup: '',
       quirks: [],
       values: [],
       tagIds: [],
@@ -80,6 +81,7 @@ class NPCForm extends Component {
       questIds: [...npc.questIds] || [],
       tagIds: [...npc.tagIds] || [],
       name: npc.name || '',
+      relationshipToGroup: npc.relationshipToGroup || '',
       physDescription: npc.physDescription || '',
       backstory: npc.backstory || '',
       height: npc.height || '',
@@ -204,6 +206,7 @@ class NPCForm extends Component {
       alignment,
       values,
       race,
+      relationshipToGroup,
       quirks,
       tagIds,
       placeIds,
@@ -363,6 +366,24 @@ class NPCForm extends Component {
                     placeholder="Lawful, Chaotic, Good, Evil, Neutral"
                     onChange={dataItem =>
                       this.setState({ alignment: dataItem })
+                    }
+                  />
+                </FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState(
+                    'relationshipToGroup'
+                  )}
+                >
+                  <ControlLabel htmlFor="npc-alignment">
+                    Relationship to Group
+                  </ControlLabel>
+                  <DropdownList
+                    id="npc-relationshipToGroup"
+                    data={['Ally', 'Enemy', 'Neutral']}
+                    value={relationshipToGroup}
+                    placeholder="Ally, Enemy, Neutral"
+                    onChange={dataItem =>
+                      this.setState({ relationshipToGroup: dataItem })
                     }
                   />
                 </FormGroup>

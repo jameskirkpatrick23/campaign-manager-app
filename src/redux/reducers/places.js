@@ -11,6 +11,10 @@ export default function PlaceReducer(state = initialState, action) {
       return Object.assign({}, state, {
         all: action.places
       });
+    case constants.Place.SET_PLACE_TYPES_LIST:
+      return Object.assign({}, state, {
+        types: action.placeTypes
+      });
     case constants.Place.UPDATE_PLACE_TYPES:
       return Object.assign({}, state, {
         types: action.types

@@ -50,8 +50,9 @@ label {
 }
 
 .app-container {
+  width: 95%;
   margin-left: 10px;
-  margin-right: 10px;
+  margin-right: 20px;
 }
 
 .App-logo {

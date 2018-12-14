@@ -5,6 +5,9 @@ import _ from 'lodash';
 const setValuesList = values => dispatch => {
   dispatch({ type: constants.Value.SET_VALUES_LIST, values });
 };
+const setPlacetypesList = placeTypes => dispatch => {
+  dispatch({ type: constants.Place.SET_PLACE_TYPES_LIST, placeTypes });
+};
 const setAlignmentsList = alignments => dispatch => {
   dispatch({ type: constants.Alignment.SET_ALIGNMENTS_LIST, alignments });
 };
@@ -32,17 +35,33 @@ export const updateCollectionList = (item, type, constant) => (
 
 export const loadCollection = (type, uid) => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
-    database
-      .collection(type)
+    const ref = database.collection(type);
+    ref
       .where('default', '==', true)
       .get()
       .then(snap => {
-        let items = {};
-        snap.forEach(doc => {
-          items[doc.id] = { ...doc.data(), id: doc.id };
-        });
-        dispatch(eval(`set${_.capitalize(type)}List`)(items));
-        resolve(items);
+        ref
+          .where('creatorId', '==', uid)
+          .get()
+          .then(mySnaps => {
+            ref
+              .where('collaboratorIds', 'array-contains', uid)
+              .get()
+              .then(partOfSnaps => {
+                let items = {};
+                snap.forEach(doc => {
+                  items[doc.id] = { ...doc.data(), id: doc.id };
+                });
+                mySnaps.forEach(doc => {
+                  items[doc.id] = { ...doc.data(), id: doc.id, default: false };
+                });
+                partOfSnaps.forEach(doc => {
+                  items[doc.id] = { ...doc.data(), id: doc.id, default: false };
+                });
+                dispatch(eval(`set${_.capitalize(type)}List`)(items));
+                resolve(items);
+              });
+          });
       })
       .catch(err => reject(err));
   });

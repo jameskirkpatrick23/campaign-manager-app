@@ -360,7 +360,7 @@ class Place extends Component {
         <Tab.Container id="npc-tabs" defaultActiveKey="images">
           <Row>
             <Col xs={2}>{this.renderPills()}</Col>
-            <Col xs={10}>
+            <Col xs={10} className="object-content">
               <Tab.Content animation>
                 {this.renderImages()}
                 {this.renderLocationHistory()}
