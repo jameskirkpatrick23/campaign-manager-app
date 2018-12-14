@@ -1,9 +1,36 @@
 import React from 'react';
 import { app } from '../firebaseDB';
 import { withRouter } from 'react-router-dom';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as LoginActions from '../redux/actions/login';
+import {
+  Grid,
+  Row,
+  Col,
+  FormGroup,
+  FormControl,
+  ControlLabel,
+  Button,
+  HelpBlock
+} from 'react-bootstrap';
+import Fieldset from '../reusable-components/fieldset';
 
 class Signup extends React.Component {
   state = { email: '', password: '' };
+
+  getValidationState = formKey => {
+    const emailRegex = new RegExp(
+      '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$'
+    );
+    const pwRegex = new RegExp('^(?=[^\\d_].*?\\d)\\w(\\w|[!@#$%]){7,20}');
+    const length = this.state[formKey].length;
+    const regex = formKey === 'email' ? emailRegex : pwRegex;
+    if (length > 0 && regex.test(this.state[formKey].toLowerCase()))
+      return 'success';
+    return null;
+  };
+
   submitForm = e => {
     e.preventDefault();
     if (this.state.email && this.state.password) {
@@ -11,7 +38,9 @@ class Signup extends React.Component {
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(res => {
-          this.props.history.push('/campaigns/1/home');
+          let user = res.user;
+          this.props.loginUser({ ...user, signinType: 'EmailPassword' });
+          this.props.history.push('/home');
         })
         .catch(err => {
           alert(err);
@@ -20,38 +49,81 @@ class Signup extends React.Component {
   };
 
   render() {
+    const { email, password } = this.state;
     return (
-      <div className="row collapse expanded">
-        <div className="small-12 medium-6 column small-order-1 medium-order-1 callout">
-          <div className="login-box-form-section">
-            <h1 className="login-box-title">Create a new account</h1>
-            <form onSubmit={this.submitForm}>
-              <input
-                className="login-box-input"
-                type="email"
-                name="email"
-                placeholder="E-mail"
-                onChange={e => this.setState({ email: e.target.value })}
-              />
-              <input
-                className="login-box-input"
-                type="password"
-                name="password"
-                placeholder="Password"
-                onChange={e => this.setState({ password: e.target.value })}
-              />
-              <input
-                className="login-box-submit-button"
-                type="submit"
-                name="signup_submit"
-                value="Sign me up"
-              />
-            </form>
-          </div>
-        </div>
-      </div>
+      <Grid>
+        <Row>
+          <Col xs={12} sm={6}>
+            <Fieldset label="Create an Account">
+              <div>
+                <h4>Join the community!</h4>
+              </div>
+              <FormGroup validationState={this.getValidationState('email')}>
+                <ControlLabel htmlFor="#email">Email</ControlLabel>
+                <FormControl
+                  id="email"
+                  type="email"
+                  value={email}
+                  placeholder="Enter your email"
+                  onChange={e => this.setState({ email: e.target.value })}
+                />
+                <FormControl.Feedback />
+              </FormGroup>
+              <FormGroup validationState={this.getValidationState('password')}>
+                <ControlLabel htmlFor="#password">Password</ControlLabel>
+                <FormControl
+                  id="password"
+                  type="password"
+                  value={password}
+                  placeholder="Enter your password"
+                  onChange={e => this.setState({ password: e.target.value })}
+                />
+                <FormControl.Feedback />
+                <HelpBlock>
+                  8 to 20 alphanumeric characters and select special characters
+                  (!, @, #, $, %). The password can not start with a digit,
+                  underscore or special character and must contain at least one
+                  digit.
+                </HelpBlock>
+              </FormGroup>
+              <div className="margin-bottom-1 text-right">
+                <Button
+                  onClick={() => this.props.history.push('/login')}
+                  bsStyle="danger"
+                  className="margin-right-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={this.submitForm}
+                  disabled={
+                    !this.getValidationState('email') ||
+                    !this.getValidationState('password')
+                  }
+                  bsStyle="primary"
+                >
+                  Register
+                </Button>
+              </div>
+            </Fieldset>
+          </Col>
+        </Row>
+      </Grid>
     );
   }
 }
 
-export default withRouter(Signup);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      loginUser: LoginActions.loginUser
+    },
+    dispatch
+  );
+
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(Signup)
+);

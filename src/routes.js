@@ -2,6 +2,7 @@ import LoginSignup from './pages/login-signup';
 import Splash from './pages/splash';
 import About from './pages/about';
 import Contact from './pages/contact';
+import Register from './pages/register';
 import Home from './pages/home';
 import CampaignPage from './pages/campaigns';
 import CampaignForm from './forms/campaign-form';
@@ -45,6 +46,13 @@ export default {
     path: '/login',
     exact: false,
     component: LoginSignup
+  },
+  '/register': {
+    key: 'Register',
+    name: 'Register',
+    path: '/register',
+    exact: false,
+    component: Register
   },
   '/campaigns': {
     key: 'Campaigns',
