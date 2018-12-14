@@ -65,13 +65,13 @@ class Quest extends Component {
       <Tab.Pane eventKey="info">
         <Fieldset label="Details">
           <Row>
-            <Col xs={4}>
+            <Col xs={12} sm={4}>
               <div>
                 <strong>Status: </strong>
                 <p>{quest.status}</p>
               </div>
             </Col>
-            <Col xs={8}>
+            <Col xs={12} sm={8}>
               <div>
                 <strong>Rewards: </strong>
                 <p>{quest.rewards}</p>
@@ -308,7 +308,7 @@ class Quest extends Component {
       <Grid className="app-container">
         {this.renderQuestForm()}
         <Row className="margin-bottom-1">
-          <Col xs={10}>
+          <Col xs={9}>
             <h3>{quest.name}</h3>
           </Col>
           <Col xs={2}>
@@ -333,7 +333,7 @@ class Quest extends Component {
         <Tab.Container id="quest-tabs" defaultActiveKey="images">
           <Row>
             <Col xs={2}>{this.renderPills()}</Col>
-            <Col xs={10} className="object-content">
+            <Col xs={9} className="object-content">
               <Tab.Content animation>
                 {this.renderImages()}
                 {this.renderDetails()}

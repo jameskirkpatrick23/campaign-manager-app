@@ -101,7 +101,6 @@ export const setListeners = () => (dispatch, getState) => {
 };
 
 export const setCurrentCampaign = campaign => dispatch => {
-  dispatch(setListeners(campaign.id));
   return dispatch({ type: constants.Campaign.SET_CURRENT_CAMPAIGN, campaign });
 };
 

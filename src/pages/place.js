@@ -335,7 +335,7 @@ class Place extends Component {
       <Grid>
         {this.renderPlaceForm()}
         <Row className="margin-bottom-1">
-          <Col xs={10}>
+          <Col xs={9}>
             <h3>{place.name}</h3>
           </Col>
           <Col xs={2}>
@@ -360,7 +360,7 @@ class Place extends Component {
         <Tab.Container id="npc-tabs" defaultActiveKey="images">
           <Row>
             <Col xs={2}>{this.renderPills()}</Col>
-            <Col xs={10} className="object-content">
+            <Col xs={9} className="object-content">
               <Tab.Content animation>
                 {this.renderImages()}
                 {this.renderLocationHistory()}

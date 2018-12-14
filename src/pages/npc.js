@@ -65,19 +65,19 @@ class NPC extends Component {
         <Col xs={12}>
           <Fieldset label="Physical Description">
             <Row>
-              <Col xs={4}>
+              <Col xs={12} sm={4}>
                 <div>
                   <strong>Gender: </strong>
                   <p>{npc.gender}</p>
                 </div>
               </Col>
-              <Col xs={4}>
+              <Col xs={12} sm={4}>
                 <div>
                   <strong>Height: </strong>
                   <p>{npc.height}</p>
                 </div>
               </Col>
-              <Col xs={4}>
+              <Col xs={12} sm={4}>
                 <div>
                   <strong>Weight: </strong>
                   <p>{npc.weight}</p>
@@ -85,13 +85,13 @@ class NPC extends Component {
               </Col>
             </Row>
             <Row>
-              <Col xs={4}>
+              <Col xs={12} sm={4}>
                 <div>
                   <strong>Race: </strong>
                   <p>{npc.race}</p>
                 </div>
               </Col>
-              <Col xs={4}>
+              <Col xs={12} sm={4}>
                 <div>
                   <strong>Occupation: </strong>
                   <p>{npc.occupation}</p>
@@ -111,13 +111,13 @@ class NPC extends Component {
         <Col xs={12}>
           <Fieldset label="Personality">
             <Row>
-              <Col xs={4}>
+              <Col xs={12} sm={4}>
                 <div>
                   <strong>Alignment: </strong>
                   <p>{npc.alignment}</p>
                 </div>
               </Col>
-              <Col xs={4}>
+              <Col xs={12} sm={4}>
                 <div>
                   <strong>Relationship to Group: </strong>
                   <p>
@@ -366,10 +366,10 @@ class NPC extends Component {
       <Grid className="app-container">
         {this.renderNPCForm()}
         <Row className="margin-bottom-1">
-          <Col xs={10}>
+          <Col xs={9}>
             <h3>{npc.name}</h3>
           </Col>
-          <Col xs={2}>
+          <Col xs={3}>
             <Button
               className="margin-left-1 vert-text-top"
               bsSize="small"
@@ -391,7 +391,7 @@ class NPC extends Component {
         <Tab.Container id="npc-tabs" defaultActiveKey="images">
           <Row>
             <Col xs={2}>{this.renderPills()}</Col>
-            <Col xs={10} className="object-content">
+            <Col xs={9} className="object-content">
               <Tab.Content animation>
                 {this.renderImages()}
                 {this.renderDetails()}

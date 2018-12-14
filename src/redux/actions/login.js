@@ -23,17 +23,18 @@ export const loginUser = user => dispatch => {
       }
     });
   dispatch(CampaignActions.setCampaignListener(scopedUserFields));
-  [
-    'values',
-    'alignments',
-    'quirks',
-    'occupations',
-    'races',
-    'genders',
-    'placeTypes'
-  ].forEach(item => {
-    dispatch(AdminActions.loadCollection(item, user.uid));
-  });
+  dispatch(CampaignActions.setListeners());
+  // [
+  //   'values',
+  //   'alignments',
+  //   'quirks',
+  //   'occupations',
+  //   'races',
+  //   'genders',
+  //   'placeTypes'
+  // ].forEach(item => {
+  //   dispatch(AdminActions.loadCollection(item, user.uid));
+  // });
   return dispatch({ type: constants.Login.LOGIN_USER, user: scopedUserFields });
 };
 export const logoutUser = _user => {
