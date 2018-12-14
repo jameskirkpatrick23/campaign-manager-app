@@ -89,7 +89,7 @@ class QuestPage extends Component {
         quest.id
       }`;
       return (
-        <Col key={key} xs={4} md={3} className="margin-bottom-1">
+        <Col key={key} xs={6} sm={4} md={3} className="margin-bottom-1">
           <Image src={url} circle className="collection-image" />
           <Button
             className="collection-item-name"

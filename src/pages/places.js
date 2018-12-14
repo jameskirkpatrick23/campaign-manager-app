@@ -117,7 +117,13 @@ class Places extends Component {
       const place = places[key];
       const placeRoute = `/campaigns/${currentCampaign.id}/home/places/${key}`;
       return (
-        <Col xs={4} md={3} key={`place-${key}`} className="margin-bottom-2">
+        <Col
+          xs={6}
+          sm={4}
+          md={3}
+          key={`place-${key}`}
+          className="margin-bottom-2"
+        >
           <Image
             src={this.getPlaceImage(place)}
             circle

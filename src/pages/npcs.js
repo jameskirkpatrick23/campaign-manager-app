@@ -92,7 +92,7 @@ class NPCPage extends Component {
         : require('../assets/placeholder.png');
       const npcRoute = `/campaigns/${currentCampaign.id}/home/npcs/${npc.id}`;
       return (
-        <Col key={key} xs={4} md={3} className="margin-bottom-2">
+        <Col key={key} xs={6} sm={4} md={3} className="margin-bottom-2">
           <Image src={url} circle className="collection-image" />
           <Button
             className="collection-item-name"
