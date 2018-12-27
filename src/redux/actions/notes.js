@@ -3,6 +3,14 @@ import database from '../../firebaseDB';
 import firebase from 'firebase';
 import ReactGA from 'react-ga';
 
+export const loadAllNotes = notes => (dispatch, getState) => {
+  const updatedState = { ...getState().notes.all };
+  Object.keys(notes).forEach(noteKey => {
+    updatedState[noteKey] = notes[noteKey];
+  });
+  dispatch({ type: constants.Note.UPDATE_NOTE_LIST, notes: updatedState });
+};
+
 export const updateNotesList = note => (dispatch, getState) => {
   const updatedState = { ...getState().notes.all };
   updatedState[note.id] = { ...note, createdAt: note.createdAt.toDate() };
@@ -27,12 +35,14 @@ export const createNote = noteData => (dispatch, getState) => {
   const batch = database.batch();
   const ref = database.collection('notes').doc();
   const myId = ref.id;
-  batch.set(ref, {
+  const finalData = {
+    id: myId,
     ...noteData,
     creatorId: getState().login.user.uid,
     createdAt: firebase.firestore.Timestamp.now(),
     updatedAt: firebase.firestore.Timestamp.now()
-  });
+  };
+  batch.set(ref, finalData);
   const parentRef = database.collection(noteData.type).doc(noteData.typeId);
   batch.update(parentRef, {
     noteIds: firebase.firestore.FieldValue.arrayUnion(myId)
@@ -41,6 +51,7 @@ export const createNote = noteData => (dispatch, getState) => {
     batch
       .commit()
       .then(res => {
+        dispatch(updateNotesList(finalData));
         resolve(res);
       })
       .catch(error => {
@@ -56,14 +67,16 @@ export const updateNote = noteData => dispatch => {
   });
   dispatch({ type: constants.Note.UPDATING_NOTE, note: noteData });
   return new Promise((resolve, reject) => {
+    const finalData = {
+      ...noteData,
+      updatedAt: firebase.firestore.Timestamp.now()
+    };
     database
       .collection('notes')
-      .doc(noteData.noteId)
-      .update({
-        ...noteData,
-        updatedAt: firebase.firestore.Timestamp.now()
-      })
+      .doc(noteData.id)
+      .update(finalData)
       .then(res => {
+        dispatch(updateNotesList(finalData));
         resolve(res);
       })
       .catch(error => {

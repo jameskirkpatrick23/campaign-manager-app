@@ -7,6 +7,14 @@ export const updateValuesList = value => (dispatch, getState) => {
   dispatch({ type: Value.UPDATE_VALUE_LIST, values: updatedState });
 };
 
+export const loadAllValues = values => (dispatch, getState) => {
+  const updatedState = { ...getState().values.all };
+  Object.keys(values).forEach(valueKey => {
+    updatedState[valueKey] = values[valueKey];
+  });
+  dispatch({ type: Value.UPDATE_VALUE_LIST, values: updatedState });
+};
+
 export const createValue = valueName => dispatch => {
-  dispatch(createAncillaryObject(valueName, 'value'));
+  dispatch(createAncillaryObject(valueName, 'value', updateValuesList));
 };

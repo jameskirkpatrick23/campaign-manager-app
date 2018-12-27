@@ -20,10 +20,12 @@
     "react-router-breadcrumbs-hoc": "^2.1.4",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
+    "react-toastify": "^4.5.1",
     "react-widgets": "^4.4.4",
     "recompose": "^0.28.2",
     "redux": "^4.0.0",
     "redux-firestore": "^0.5.7",
+    "redux-logger": "^3.0.6",
     "redux-persist": "^5.10.0",
     "redux-thunk": "^2.3.0",
     "route-parser": "0.0.5"

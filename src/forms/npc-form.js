@@ -4,6 +4,7 @@ import 'react-widgets/dist/css/react-widgets.css';
 import { Multiselect, DropdownList } from 'react-widgets';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { toast } from 'react-toastify';
 import {
   ControlLabel,
   FormControl,
@@ -91,8 +92,26 @@ class NPCForm extends Component {
       alignment: npc.alignment || '',
       race: npc.race || '',
       gender: npc.gender || '',
-      occupation: npc.occupation || ''
+      occupation: npc.occupation || '',
+      occupations: this.props.occupations,
+      races: this.props.races,
+      propQuirks: this.props.propQuirks,
+      propValues: this.props.propValues,
+      tags: this.props.tags
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.propQuirks !== this.props.propQuirks ||
+      nextProps.propValues !== this.props.propValues ||
+      nextProps.tags !== this.props.tags ||
+      nextProps.races !== this.props.races ||
+      nextProps.occupations !== this.props.occupations
+    ) {
+      const { propValues, propQuirks, tags, races, occupations } = nextProps;
+      this.setState({ propValues, propQuirks, tags, races, occupations });
+    }
   }
 
   onSubmit = e => {
@@ -147,23 +166,66 @@ class NPCForm extends Component {
   };
 
   createTag = tagName => {
-    this.props.createTag(tagName);
+    if (tagName.length) {
+      this.props.createTag(tagName).then(res => {
+        toast.success(`Created the tag: ${tagName} successfully!`);
+        const currentTags = [...this.state.tagIds];
+        currentTags.push(res.id);
+        this.setState({ tagIds: currentTags });
+      });
+    } else {
+      toast.error('Your tag needs to be at least one character long');
+    }
   };
 
-  createRace = tagName => {
-    this.props.createRace(tagName);
+  createRace = raceName => {
+    if (raceName.length) {
+      this.props.createRace(raceName).then(res => {
+        toast.success(`Created the race: ${raceName} successfully!`);
+        this.setState({ race: raceName });
+      });
+    } else {
+      toast.error('Your race needs to be at least one character long');
+    }
   };
 
-  createOccupation = tagName => {
-    this.props.createOccupation(tagName);
+  createOccupation = occupationName => {
+    if (occupationName.length) {
+      this.props.createOccupation(occupationName).then(res => {
+        toast.success(
+          `Created the occupation: ${occupationName} successfully!`
+        );
+        this.setState({ race: occupationName });
+      });
+    } else {
+      toast.error('Your occupation needs to be at least one character long');
+    }
   };
 
-  createValue = tagName => {
-    this.props.createValue(tagName);
+  createValue = valueName => {
+    if (valueName.length) {
+      this.props.createValue(valueName).then(res => {
+        toast.success(`Created the value: ${valueName} successfully!`);
+        const currentValues = [...this.state.values];
+        currentValues.push(valueName);
+        this.setState({ values: currentValues });
+      });
+    } else {
+      toast.error('Your value needs to be at least one character long');
+    }
   };
 
-  createQuirk = tagName => {
-    this.props.createQuirk(tagName);
+  createQuirk = quirkName => {
+    if (quirkName.length) {
+      this.props.createQuirk(quirkName).then(res => {
+        toast.success(`Created the quirk: ${quirkName} successfully!`);
+        const currentQuirks = [...this.state.quirks];
+        currentQuirks.push(quirkName);
+        this.setState({ quirks: currentQuirks });
+      });
+    } else {
+      toast.error('Your quirk needs to be at least one character long');
+    }
   };
 
   handleExistingDelete = (fileKey, type) => {
@@ -214,21 +276,14 @@ class NPCForm extends Component {
       eventIds,
       npcIds,
       physDescription,
-      isSubmitting
-    } = this.state;
-    const {
+      isSubmitting,
       occupations,
       races,
       propQuirks,
       propValues,
-      alignments,
-      genders,
-      tags,
-      places,
-      quests,
-      npcs,
-      events
-    } = this.props;
+      tags
+    } = this.state;
+    const { alignments, genders, places, quests, npcs, events } = this.props;
     return (
       <div>
         <Spinner show={isSubmitting} />

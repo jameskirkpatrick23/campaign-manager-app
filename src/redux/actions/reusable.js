@@ -50,7 +50,10 @@ export const generateFileDeletePromiseArray = (deleteKeys, currentArray) => {
   return promiseArray;
 };
 
-export const createAncillaryObject = (name, type) => (dispatch, getState) => {
+export const createAncillaryObject = (name, type, onCreateCallback) => (
+  dispatch,
+  getState
+) => {
   ReactGA.event({
     category: `${_.capitalize(type)}s`,
     action: `Create ${_.capitalize(type)}`
@@ -67,16 +70,18 @@ export const createAncillaryObject = (name, type) => (dispatch, getState) => {
             collaboratorIds: firebase.firestore.FieldValue.arrayUnion(myId)
           });
         } else {
+          const data = {
+            name: name,
+            creatorId: myId,
+            default: false,
+            collaboratorIds: []
+          };
           ref
-            .add({
-              name: name,
-              creatorId: myId,
-              default: false,
-              collaboratorIds: []
-            })
+            .add(data)
             .then(res => {
               dispatch({ type: `CREATED_${_.toUpper(type)}`, name });
-              resolve(res);
+              dispatch(onCreateCallback({ ...data, id: res.id }));
+              resolve({ ...data, id: res.id });
             })
             .catch(error => {
               reject('Error writing document: ', error);

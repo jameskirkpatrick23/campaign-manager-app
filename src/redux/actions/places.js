@@ -21,12 +21,31 @@ export const updatePlaceTypesList = type => (dispatch, getState) => {
   dispatch({ type: constants.Place.UPDATE_PLACE_TYPES, types: updatedState });
 };
 
+export const loadAllPlaceTypes = placeTypes => (dispatch, getState) => {
+  const updatedState = { ...getState().places.types };
+  Object.keys(placeTypes).forEach(placeTypeKey => {
+    updatedState[placeTypeKey] = placeTypes[placeTypeKey];
+  });
+  dispatch({
+    type: constants.Place.UPDATE_PLACE_TYPES,
+    placeTypes: updatedState
+  });
+};
+
 export const createPlaceType = typeName => dispatch => {
-  dispatch(createAncillaryObject(typeName, 'placeType'));
+  dispatch(createAncillaryObject(typeName, 'placeType', updatePlaceTypesList));
 };
 //</editor-fold>
 
 //<editor-fold Places>
+export const loadAllPlaces = places => (dispatch, getState) => {
+  const updatedState = { ...getState().places.all };
+  Object.keys(places).forEach(placeKey => {
+    updatedState[placeKey] = places[placeKey];
+  });
+  dispatch({ type: constants.Place.UPDATE_PLACE_LIST, places: updatedState });
+};
+
 export const updatePlacesList = place => (dispatch, getState) => {
   const updatedState = { ...getState().places.all };
   updatedState[place.id] = place;
@@ -66,17 +85,19 @@ export const editPlace = placeData => (dispatch, getState) => {
               ...fileChanges.deleteAttachedArray
             ])
               .then(() => {
-                batch.update(usedRef, {
+                const finalData = {
                   ...usedData,
                   updatedAt: firebase.firestore.Timestamp.now(),
                   images: fileChanges.currentImages.concat(resolvedImages),
                   attachedFiles: fileChanges.currentAttachedFiles.concat(
                     resolvedFiles
                   )
-                });
+                };
+                batch.update(usedRef, finalData);
                 batch
                   .commit()
                   .then(res => {
+                    dispatch(updatePlacesList(finalData));
                     resolve(res);
                   })
                   .catch(error => {
@@ -129,7 +150,7 @@ export const createPlace = placeData => (dispatch, getState) => {
       .then(resolvedImages => {
         Promise.all(newFiles.attachedFilePromiseArray)
           .then(resolvedFiles => {
-            batch.set(usedRef, {
+            const finalData = {
               ...usedData,
               floorIds: [],
               noteIds: [],
@@ -140,10 +161,12 @@ export const createPlace = placeData => (dispatch, getState) => {
               attachedFiles: resolvedFiles,
               creatorId: userUid,
               collaboratorIds: []
-            });
+            };
+            batch.set(usedRef, finalData);
             batch
               .commit()
               .then(res => {
+                dispatch(updatePlacesList(finalData));
                 resolve(res);
               })
               .catch(error => {

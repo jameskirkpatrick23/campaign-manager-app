@@ -12,6 +12,14 @@ import {
   conditionallyUpdateConnected
 } from './reusable';
 
+export const loadAllNPCs = npcs => (dispatch, getState) => {
+  const updatedState = { ...getState().npcs.all };
+  Object.keys(npcs).forEach(npcKey => {
+    updatedState[npcKey] = npcs[npcKey];
+  });
+  dispatch({ type: Npc.UPDATE_NPC_LIST, npcs: updatedState });
+};
+
 export const updateNPCsList = npc => (dispatch, getState) => {
   const updatedState = { ...getState().npcs.all };
   updatedState[npc.id] = npc;
@@ -51,17 +59,19 @@ export const editNPC = npcData => (dispatch, getState) => {
               ...fileChanges.deleteAttachedArray
             ])
               .then(() => {
-                batch.update(usedRef, {
+                const finalData = {
                   ...usedData,
                   updatedAt: firebase.firestore.Timestamp.now(),
                   images: fileChanges.currentImages.concat(resolvedImages),
                   attachedFiles: fileChanges.currentAttachedFiles.concat(
                     resolvedFiles
                   )
-                });
+                };
+                batch.update(usedRef, finalData);
                 batch
                   .commit()
                   .then(res => {
+                    dispatch(updateNPCsList(finalData));
                     resolve(res);
                   })
                   .catch(error => {
@@ -115,7 +125,7 @@ export const createNPC = npcData => (dispatch, getState) => {
       .then(resolvedImages => {
         Promise.all(newFiles.attachedFilePromiseArray)
           .then(resolvedFiles => {
-            batch.set(usedRef, {
+            const finalData = {
               ...usedData,
               createdAt: firebase.firestore.Timestamp.now(),
               updatedAt: firebase.firestore.Timestamp.now(),
@@ -125,10 +135,12 @@ export const createNPC = npcData => (dispatch, getState) => {
               attachedFiles: resolvedFiles,
               creatorId: userUid,
               collaboratorIds: []
-            });
+            };
+            batch.set(usedRef, finalData);
             batch
               .commit()
               .then(res => {
+                dispatch(updateNPCsList(finalData));
                 resolve(res);
               })
               .catch(error => {

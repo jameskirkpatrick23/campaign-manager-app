@@ -5,12 +5,15 @@ import routes from './routes';
 import { app } from './firebaseDB';
 import Logo from './assets/Navbar-Logo.svg';
 import { bindActionCreators } from 'redux';
+import { ToastContainer, toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import * as LoginActions from './redux/actions/login';
 import * as CampaignActions from './redux/actions/campaigns';
+import * as ResourceActions from './redux/actions/resource_load';
 import Breadcrumbs from './reusable-components/navigation-breadcrumbs';
 import { Navbar, Nav, NavItem, Image } from 'react-bootstrap';
 import ReactGA from 'react-ga';
+import 'react-toastify/dist/ReactToastify.css';
 
 class App extends Component {
   componentWillMount() {
@@ -19,17 +22,16 @@ class App extends Component {
     this.props.history.listen(location => ReactGA.pageview(location.pathname));
     if (this.props.isLoggedIn) {
       this.props.fetchCampaigns(this.props.currentUser).then(() => {
+        this.props.getAppData(this.props.currentUser.uid);
         this.props.setCampaignListener(this.props.currentUser);
       });
-    }
-    if (this.props.currentCampaign && this.props.currentCampaign.id) {
-      this.props.setCampaignListeners(this.props.currentCampaign.id);
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.isLoggedIn && this.props.isLoggedIn) {
       this.signOut();
+      toast.success('Logout successful');
     }
   }
 
@@ -96,6 +98,7 @@ class App extends Component {
           </Navbar.Collapse>
         </Navbar>
         <div className="app-container">
+          <ToastContainer autoClose={8000} />
           <Breadcrumbs routes={routes} />
           {Object.keys(routes).map(route => (
             <Route {...routes[route]} key={route} />
@@ -110,7 +113,7 @@ const mapDispatchToProps = dispatch =>
     {
       logOut: LoginActions.logoutUser,
       setCampaignListener: CampaignActions.setCampaignListener,
-      setCampaignListeners: CampaignActions.setListeners,
+      getAppData: ResourceActions.getAppData,
       fetchCampaigns: CampaignActions.fetchCampaigns
     },
     dispatch

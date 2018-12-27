@@ -8,7 +8,7 @@ const setValuesList = values => dispatch => {
 const setPlacetypesList = placeTypes => dispatch => {
   dispatch({ type: constants.Place.SET_PLACE_TYPES_LIST, placeTypes });
 };
-const setAlignmentsList = alignments => dispatch => {
+export const setAlignmentsList = alignments => dispatch => {
   dispatch({ type: constants.Alignment.SET_ALIGNMENTS_LIST, alignments });
 };
 const setQuirksList = quirks => dispatch => {
@@ -20,7 +20,7 @@ const setOccupationsList = occupations => dispatch => {
 const setRacesList = races => dispatch => {
   dispatch({ type: constants.Race.SET_RACES_LIST, races });
 };
-const setGendersList = genders => dispatch => {
+export const setGendersList = genders => dispatch => {
   dispatch({ type: constants.Gender.SET_GENDERS_LIST, genders });
 };
 
@@ -75,7 +75,7 @@ export const createCollection = (collection, type) => (dispatch, getState) => {
       .then(res =>
         dispatch(
           updateCollectionList(
-            { id: res.id, name: item },
+            { id: res.id, name: item, default: true },
             type,
             constants[_.capitalize(type.slice(0, -1))][
               `SET_${_.toUpper(type)}_LIST`

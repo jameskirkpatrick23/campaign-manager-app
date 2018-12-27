@@ -1,7 +1,8 @@
 import database from '../../firebaseDB';
 import * as constants from '../constants';
 import * as CampaignActions from '../actions/campaigns';
-import * as AdminActions from '../actions/administrative';
+import * as AppDataActions from './resource_load';
+
 export const loginUser = user => dispatch => {
   let scopedUserFields = {
     uid: user.uid,
@@ -22,10 +23,10 @@ export const loginUser = user => dispatch => {
         ref.add(scopedUserFields);
       }
       dispatch(CampaignActions.setCampaignListener(scopedUserFields));
-      dispatch(CampaignActions.setListeners(user.uid));
+      dispatch(AppDataActions.getAppData(user.uid));
     });
   return dispatch({ type: constants.Login.LOGIN_USER, user: scopedUserFields });
 };
-export const logoutUser = _user => {
-  return { type: constants.Login.LOGOUT_USER };
+export const logoutUser = _user => (dispatch, getState) => {
+  return dispatch({ type: constants.Login.LOGOUT_USER });
 };

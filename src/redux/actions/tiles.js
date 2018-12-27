@@ -4,6 +4,14 @@ import * as FloorActions from './floors';
 import firebase from 'firebase';
 import ReactGA from 'react-ga';
 
+export const loadAllTiles = tiles => (dispatch, getState) => {
+  const updatedState = { ...getState().tiles.all };
+  Object.keys(tiles).forEach(tileKey => {
+    updatedState[tileKey] = tiles[tileKey];
+  });
+  dispatch({ type: constants.Tile.UPDATE_TILE_LIST, tiles: updatedState });
+};
+
 export const updateTileList = tile => (dispatch, getState) => {
   const updatedState = { ...getState().tiles.all };
   updatedState[tile.id] = { ...tile, createdAt: tile.createdAt.toDate() };
@@ -56,16 +64,18 @@ export const createTile = tileData => (dispatch, getState) => {
       const tileDataCopy = { ...tileData };
       delete tileDataCopy.selectedFile;
       delete tileDataCopy.selectedFileUrl;
+      const finalData = {
+        ...tileDataCopy,
+        image: imageInformation,
+        creatorId: getState().login.user.uid,
+        createdAt: firebase.firestore.Timestamp.now(),
+        updatedAt: firebase.firestore.Timestamp.now()
+      };
       database
         .collection(`tiles`)
-        .add({
-          ...tileDataCopy,
-          image: imageInformation,
-          creatorId: getState().login.user.uid,
-          createdAt: firebase.firestore.Timestamp.now(),
-          updatedAt: firebase.firestore.Timestamp.now()
-        })
+        .add(finalData)
         .then(res => {
+          dispatch(updateTileList({ ...tileData, id: res.id }));
           dispatch(updateTileParent({ ...tileData, id: res.id }, res, resolve));
         })
         .catch(error => {
@@ -96,15 +106,17 @@ export const updateTile = tileData => (dispatch, getState) => {
       if (!Object.keys(imageInformation).length) {
         usedImageInfo = { ...getState().tiles.all[tileData.id].image };
       }
+      const finalData = {
+        image: usedImageInfo,
+        updatedAt: firebase.firestore.Timestamp.now(),
+        ...tileData
+      };
       database
         .collection('tiles')
         .doc(currentTile.id)
-        .update({
-          image: usedImageInfo,
-          updatedAt: firebase.firestore.Timestamp.now(),
-          ...tileData
-        })
+        .update(finalData)
         .then(res => {
+          dispatch(updateTileList(finalData));
           resolve(res);
         })
         .catch(error => {

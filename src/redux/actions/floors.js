@@ -5,6 +5,14 @@ import * as PlaceActions from './places';
 import firebase from 'firebase';
 import * as TileActions from './tiles';
 
+export const loadAllFloors = floors => (dispatch, getState) => {
+  const updatedState = { ...getState().floors.all };
+  Object.keys(floors).forEach(floorKey => {
+    updatedState[floorKey] = floors[floorKey];
+  });
+  dispatch({ type: constants.Floor.UPDATE_FLOOR_LIST, floors: updatedState });
+};
+
 export const updateFloorsList = floor => (dispatch, getState) => {
   const updatedState = { ...getState().floors.all };
   updatedState[floor.id] = floor;

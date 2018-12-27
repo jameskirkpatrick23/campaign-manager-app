@@ -10,6 +10,19 @@ export const updateOccupationsList = occupation => (dispatch, getState) => {
   });
 };
 
+export const loadAllOccupations = occupations => (dispatch, getState) => {
+  const updatedState = { ...getState().occupations.all };
+  Object.keys(occupations).forEach(occupationKey => {
+    updatedState[occupationKey] = occupations[occupationKey];
+  });
+  dispatch({
+    type: Occupation.UPDATE_OCCUPATION_LIST,
+    occupations: updatedState
+  });
+};
+
 export const createOccupation = occupationName => dispatch => {
-  dispatch(createAncillaryObject(occupationName, 'occupation'));
+  dispatch(
+    createAncillaryObject(occupationName, 'occupation', updateOccupationsList)
+  );
 };

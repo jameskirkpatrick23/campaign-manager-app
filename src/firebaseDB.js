@@ -10,6 +10,7 @@ const config = {
 };
 export const app = firebase.initializeApp(config);
 const database = app.firestore();
-const settings = { /* your settings... */ timestampsInSnapshots: true };
+const settings = { timestampsInSnapshots: true };
 database.settings(settings);
+database.enablePersistence({ experimentalTabSynchronization: true });
 export default database;

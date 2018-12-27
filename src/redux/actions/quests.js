@@ -13,6 +13,14 @@ import {
   conditionallyUpdateConnected
 } from './reusable';
 
+export const loadAllQuests = quests => (dispatch, getState) => {
+  const updatedState = { ...getState().quests.all };
+  Object.keys(quests).forEach(questKey => {
+    updatedState[questKey] = quests[questKey];
+  });
+  dispatch({ type: constants.Quest.UPDATE_QUEST_LIST, quests: updatedState });
+};
+
 export const updateQuestsList = quest => (dispatch, getState) => {
   const updatedState = { ...getState().quests.all };
   updatedState[quest.id] = quest;
@@ -52,17 +60,19 @@ export const editQuest = questData => (dispatch, getState) => {
               ...fileChanges.deleteAttachedArray
             ])
               .then(() => {
-                batch.update(usedRef, {
+                const finalData = {
                   ...usedData,
                   updatedAt: firebase.firestore.Timestamp.now(),
                   images: fileChanges.currentImages.concat(resolvedImages),
                   attachedFiles: fileChanges.currentAttachedFiles.concat(
                     resolvedFiles
                   )
-                });
+                };
+                batch.update(usedRef, finalData);
                 batch
                   .commit()
                   .then(res => {
+                    dispatch(updateQuestsList(finalData));
                     resolve(res);
                   })
                   .catch(error => {
@@ -116,7 +126,7 @@ export const createQuest = questData => (dispatch, getState) => {
       .then(resolvedImages => {
         Promise.all(newFiles.attachedFilePromiseArray)
           .then(resolvedFiles => {
-            batch.set(usedRef, {
+            const finalData = {
               ...usedData,
               createdAt: firebase.firestore.Timestamp.now(),
               updatedAt: firebase.firestore.Timestamp.now(),
@@ -126,10 +136,12 @@ export const createQuest = questData => (dispatch, getState) => {
               attachedFiles: resolvedFiles,
               creatorId: userUid,
               collaboratorIds: []
-            });
+            };
+            batch.set(usedRef, finalData);
             batch
               .commit()
               .then(res => {
+                dispatch(updateQuestsList(finalData));
                 resolve(res);
               })
               .catch(error => {

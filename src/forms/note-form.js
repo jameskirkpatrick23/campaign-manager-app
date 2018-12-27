@@ -58,7 +58,7 @@ class NoteForm extends Component {
     } else {
       updateNote({
         ...this.state,
-        noteId: note.id,
+        id: note.id,
         type: type,
         typeId: typeId
       })

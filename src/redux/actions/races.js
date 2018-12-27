@@ -7,6 +7,14 @@ export const updateRacesList = race => (dispatch, getState) => {
   dispatch({ type: Race.UPDATE_RACE_LIST, races: updatedState });
 };
 
+export const loadAllRaces = races => (dispatch, getState) => {
+  const updatedState = { ...getState().races.all };
+  Object.keys(races).forEach(raceKey => {
+    updatedState[raceKey] = races[raceKey];
+  });
+  dispatch({ type: Race.UPDATE_RACE_LIST, races: updatedState });
+};
+
 export const createRace = raceName => dispatch => {
-  dispatch(createAncillaryObject(raceName, 'race'));
+  dispatch(createAncillaryObject(raceName, 'race', updateRacesList));
 };

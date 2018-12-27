@@ -7,6 +7,14 @@ export const updateQuirksList = quirk => (dispatch, getState) => {
   dispatch({ type: Quirk.UPDATE_QUIRK_LIST, quirks: updatedState });
 };
 
+export const loadAllQuirks = quirks => (dispatch, getState) => {
+  const updatedState = { ...getState().quirks.all };
+  Object.keys(quirks).forEach(quirkKey => {
+    updatedState[quirkKey] = quirks[quirkKey];
+  });
+  dispatch({ type: Quirk.UPDATE_QUIRK_LIST, quirks: updatedState });
+};
+
 export const createQuirk = quirkName => dispatch => {
-  dispatch(createAncillaryObject(quirkName, 'quirk'));
+  dispatch(createAncillaryObject(quirkName, 'quirk', updateQuirksList));
 };
