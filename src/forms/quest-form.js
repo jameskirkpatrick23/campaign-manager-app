@@ -4,6 +4,7 @@ import 'react-widgets/dist/css/react-widgets.css';
 import { Multiselect, DropdownList } from 'react-widgets';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { toast } from 'react-toastify';
 import {
   ControlLabel,
   FormControl,
