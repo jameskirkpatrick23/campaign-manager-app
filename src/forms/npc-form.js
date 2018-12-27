@@ -55,6 +55,11 @@ class NPCForm extends Component {
       isSubmitting: false
     };
     this.onSubmit = this.onSubmit.bind(this);
+    this.createTag = this.createTag.bind(this);
+    this.createRace = this.createRace.bind(this);
+    this.createOccupation = this.createOccupation.bind(this);
+    this.createValue = this.createValue.bind(this);
+    this.createQuirk = this.createQuirk.bind(this);
   }
 
   componentWillMount() {
@@ -129,16 +134,22 @@ class NPCForm extends Component {
       if (formAction !== 'edit') {
         createNPC(formattedData)
           .then(res => {
+            toast.success(
+              `Created the NPC: ${formattedData.name} successfully!`
+            );
             history.goBack();
           })
-          .catch(err => alert(`Something went wrong: ${err}`));
+          .catch(err => toast.error(`Something went wrong: ${err}`));
       } else {
         editNPC(formattedData)
           .then(res => {
+            toast.success(
+              `Edited the NPC: ${formattedData.name} successfully!`
+            );
             onSubmit(res);
             this.setState({ isSubmitting: false });
           })
-          .catch(err => alert(`Something went wrong: ${err}`));
+          .catch(err => toast.error(`Something went wrong: ${err}`));
       }
     });
   };
@@ -195,7 +206,7 @@ class NPCForm extends Component {
         toast.success(
           `Created the occupation: ${occupationName} successfully!`
         );
-        this.setState({ race: occupationName });
+        this.setState({ occupation: occupationName });
       });
     } else {
       toast.error('Your occupation needs to be at least one character long');

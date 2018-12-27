@@ -22,7 +22,7 @@ export const loadAllOccupations = occupations => (dispatch, getState) => {
 };
 
 export const createOccupation = occupationName => dispatch => {
-  dispatch(
+  return dispatch(
     createAncillaryObject(occupationName, 'occupation', updateOccupationsList)
   );
 };

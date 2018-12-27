@@ -73,12 +73,12 @@ const getStaticObjects = () => dispatch => {
   const types = [
     {
       type: 'alignments',
-      constant: constants.Alignment.SET_ALIGNMENTS_LIST,
+      constant: constants.Alignment.SET_ALIGNMENTS,
       action: AdministrativeActions.setAlignmentsList
     },
     {
       type: 'genders',
-      constant: constants.Gender.SET_GENDERS_LIST,
+      constant: constants.Gender.SET_GENDERS,
       action: AdministrativeActions.setGendersList
     }
   ];

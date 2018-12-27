@@ -16,5 +16,5 @@ export const loadAllRaces = races => (dispatch, getState) => {
 };
 
 export const createRace = raceName => dispatch => {
-  dispatch(createAncillaryObject(raceName, 'race', updateRacesList));
+  return dispatch(createAncillaryObject(raceName, 'race', updateRacesList));
 };

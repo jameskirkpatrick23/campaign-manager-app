@@ -29,6 +29,7 @@ class QuestForm extends Component {
       rewards: '',
       status: '',
       tagIds: [],
+      tags: {},
       placeIds: [],
       npcIds: [],
       questIds: [],
@@ -50,7 +51,7 @@ class QuestForm extends Component {
   }
 
   componentWillMount() {
-    const { quest } = this.props;
+    const { quest, tags } = this.props;
     const images = {};
     const attachedFiles = {};
     if (quest.images.length) {
@@ -75,6 +76,7 @@ class QuestForm extends Component {
       questIds: [...quest.questIds] || [],
       tagIds: [...quest.tagIds] || [],
       name: quest.name || '',
+      tags,
       description: quest.description || '',
       rewards: quest.rewards || '',
       status: quest.status || ''
@@ -102,16 +104,22 @@ class QuestForm extends Component {
       if (formAction !== 'edit') {
         createQuest(formattedData)
           .then(res => {
+            toast.success(
+              `Created the quest: ${formattedData.name} successfully!`
+            );
             history.goBack();
           })
-          .catch(err => alert(`Something went wrong: ${err}`));
+          .catch(err => toast.error(`Something went wrong: ${err}`));
       } else {
         editQuest(formattedData)
           .then(res => {
+            toast.success(
+              `Edited the quest: ${formattedData.name} successfully!`
+            );
             onSubmit(res);
             this.setState({ isSubmitting: false });
           })
-          .catch(err => alert(`Something went wrong: ${err}`));
+          .catch(err => toast.error(`Something went wrong: ${err}`));
       }
     });
   };
@@ -139,7 +147,16 @@ class QuestForm extends Component {
   };
 
   createTag = tagName => {
-    this.props.createTag(tagName);
+    if (tagName.length) {
+      this.props.createTag(tagName).then(res => {
+        toast.success(`Created the tag: ${tagName} successfully!`);
+        const currentTags = [...this.state.tagIds];
+        currentTags.push(res.id);
+        this.setState({ tagIds: currentTags });
+      });
+    } else {
+      toast.error('Your tag needs to be at least one character long');
+    }
   };
 
   handleExistingDelete = (fileKey, type) => {
@@ -195,9 +212,10 @@ class QuestForm extends Component {
       eventIds,
       questIds,
       objectives,
+      tags,
       isSubmitting
     } = this.state;
-    const { tags, places, quests, npcs, events } = this.props;
+    const { places, quests, npcs, events } = this.props;
     return (
       <div>
         <Spinner show={isSubmitting} />

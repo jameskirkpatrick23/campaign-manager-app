@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 import {
   Button,
   Glyphicon,
@@ -43,17 +44,17 @@ class PlacesForm extends Component {
       outsideDescription: '',
       isSubmitting: false
     };
-    this.createPlaceType = this.createPlaceType.bind(this);
     this.handleCloseRequest = this.handleCloseRequest.bind(this);
     this.handleExistingDelete = this.handleExistingDelete.bind(this);
     this.getValidationState = this.getValidationState.bind(this);
     this.generateFileList = this.generateFileList.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.createTag = this.createTag.bind(this);
+    this.createPlaceType = this.createPlaceType.bind(this);
   }
 
   componentWillMount() {
-    const { place } = this.props;
+    const { place, placeTypes } = this.props;
     const images = {};
     const attachedFiles = {};
     if (place.images.length) {
@@ -81,9 +82,20 @@ class PlacesForm extends Component {
       location: place.location || '',
       name: place.name || '',
       type: place.type || '',
+      placeTypes,
       insideDescription: place.insideDescription || '',
       outsideDescription: place.outsideDescription || ''
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.tags !== this.props.tags ||
+      nextProps.placeTypes !== this.props.placeTypes
+    ) {
+      const { tags, placeTypes } = nextProps;
+      this.setState({ tags, placeTypes });
+    }
   }
 
   onSubmit = e => {
@@ -107,16 +119,22 @@ class PlacesForm extends Component {
       if (formAction !== 'edit') {
         createPlace(formattedData)
           .then(res => {
+            toast.success(
+              `Created the Place: ${formattedData.name} successfully!`
+            );
             history.goBack();
           })
-          .catch(err => alert(`Something went wrong: ${err}`));
+          .catch(err => toast.error(`Something went wrong: ${err}`));
       } else {
         editPlace(formattedData)
           .then(res => {
+            toast.success(
+              `Created the Place: ${formattedData.name} successfully!`
+            );
             onSubmit(res);
             this.setState({ isSubmitting: false });
           })
-          .catch(err => alert(`Something went wrong: ${err}`));
+          .catch(err => toast.error(`Something went wrong: ${err}`));
       }
     });
   };
@@ -132,11 +150,27 @@ class PlacesForm extends Component {
   };
 
   createPlaceType = typeName => {
-    this.props.createPlaceType(typeName);
+    if (typeName.length) {
+      this.props.createPlaceType(typeName).then(res => {
+        toast.success(`Created the type: ${typeName} successfully!`);
+        this.setState({ type: typeName });
+      });
+    } else {
+      toast.error('Your type needs to be at least one character long');
+    }
   };
 
   createTag = tagName => {
-    this.props.createTag(tagName);
+    if (tagName.length) {
+      this.props.createTag(tagName).then(res => {
+        toast.success(`Created the tag: ${tagName} successfully!`);
+        const currentTags = [...this.state.tagIds];
+        currentTags.push(res.id);
+        this.setState({ tagIds: currentTags });
+      });
+    } else {
+      toast.error('Your tag needs to be at least one character long');
+    }
   };
 
   getValidationState = formKey => {
@@ -198,9 +232,11 @@ class PlacesForm extends Component {
       npcIds,
       questIds,
       tagIds,
-      eventIds
+      eventIds,
+      placeTypes,
+      tags
     } = this.state;
-    const { placeTypes, places, npcs, quests, tags, events } = this.props;
+    const { places, npcs, quests, events } = this.props;
     return (
       <div>
         <Spinner show={isSubmitting} />

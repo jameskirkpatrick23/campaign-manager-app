@@ -16,5 +16,5 @@ export const loadAllValues = values => (dispatch, getState) => {
 };
 
 export const createValue = valueName => dispatch => {
-  dispatch(createAncillaryObject(valueName, 'value', updateValuesList));
+  return dispatch(createAncillaryObject(valueName, 'value', updateValuesList));
 };

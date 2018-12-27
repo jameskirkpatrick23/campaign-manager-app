@@ -16,5 +16,5 @@ export const loadAllQuirks = quirks => (dispatch, getState) => {
 };
 
 export const createQuirk = quirkName => dispatch => {
-  dispatch(createAncillaryObject(quirkName, 'quirk', updateQuirksList));
+  return dispatch(createAncillaryObject(quirkName, 'quirk', updateQuirksList));
 };
