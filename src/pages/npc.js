@@ -73,6 +73,12 @@ class NPC extends Component {
               </Col>
               <Col xs={12} sm={4}>
                 <div>
+                  <strong>Age: </strong>
+                  <p>{npc.age}</p>
+                </div>
+              </Col>
+              <Col xs={12} sm={4}>
+                <div>
                   <strong>Height: </strong>
                   <p>{npc.height}</p>
                 </div>

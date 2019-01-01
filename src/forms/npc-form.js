@@ -31,6 +31,7 @@ class NPCForm extends Component {
       physDescription: '',
       backstory: '',
       height: '',
+      age: '',
       weight: '',
       alignment: '',
       race: '',
@@ -274,6 +275,7 @@ class NPCForm extends Component {
       backstory,
       height,
       weight,
+      age,
       gender,
       occupation,
       alignment,
@@ -375,6 +377,17 @@ class NPCForm extends Component {
             </Col>
             <Col xs={12} md={6}>
               <Fieldset label="Physical Characteristics">
+                <FormGroup validationState={this.getValidationState('age')}>
+                  <ControlLabel htmlFor="#npc-age">Age</ControlLabel>
+                  <FormControl
+                    id="npc-age"
+                    type="text"
+                    value={age}
+                    placeholder="How old is this NPC"
+                    onChange={e => this.setState({ age: e.target.value })}
+                  />
+                  <FormControl.Feedback />
+                </FormGroup>
                 <FormGroup validationState={this.getValidationState('height')}>
                   <ControlLabel htmlFor="#npc-height">Height</ControlLabel>
                   <FormControl
