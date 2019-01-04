@@ -152,7 +152,7 @@ class QuestForm extends Component {
       this.props.createTag(tagName).then(res => {
         toast.success(`Created the tag: ${tagName} successfully!`);
         const currentTags = [...this.state.tagIds];
-        currentTags.push(res.id);
+        currentTags.push({ value: res.id, name: tagName });
         this.setState({ tagIds: currentTags });
       });
     } else {
