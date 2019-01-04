@@ -22,17 +22,17 @@ const persistConfig = {
   stateReconciler: autoMergeLevel2
 };
 
-const mylogger = createLogger({
-  collapsed: true,
-  timestamp: true,
-  duration: true
-});
+// const mylogger = createLogger({
+//   collapsed: true,
+//   timestamp: true,
+//   duration: true
+// });
 
 const persistedReducer = persistReducer(persistConfig, RootReducer);
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
   persistedReducer,
-  composeEnhancers(applyMiddleware(thunk, mylogger))
+  composeEnhancers(applyMiddleware(thunk))
 );
 
 ReactDOM.render(
