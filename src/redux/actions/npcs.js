@@ -60,6 +60,7 @@ export const editNPC = npcData => (dispatch, getState) => {
               .then(() => {
                 const finalData = {
                   ...usedData,
+                  campaignIds: currentNPC.campaignIds,
                   updatedAt: firebase.firestore.Timestamp.now(),
                   images: fileChanges.currentImages.concat(resolvedImages),
                   attachedFiles: fileChanges.currentAttachedFiles.concat(

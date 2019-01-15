@@ -62,6 +62,7 @@ export const editQuest = questData => (dispatch, getState) => {
               .then(() => {
                 const finalData = {
                   ...usedData,
+                  campaignIds: currentQuest.campaignIds,
                   updatedAt: firebase.firestore.Timestamp.now(),
                   images: fileChanges.currentImages.concat(resolvedImages),
                   attachedFiles: fileChanges.currentAttachedFiles.concat(

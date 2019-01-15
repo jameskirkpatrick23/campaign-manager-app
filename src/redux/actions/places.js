@@ -87,6 +87,7 @@ export const editPlace = placeData => (dispatch, getState) => {
               .then(() => {
                 const finalData = {
                   ...usedData,
+                  campaignIds: currentPlace.campaignIds,
                   updatedAt: firebase.firestore.Timestamp.now(),
                   images: fileChanges.currentImages.concat(resolvedImages),
                   attachedFiles: fileChanges.currentAttachedFiles.concat(
