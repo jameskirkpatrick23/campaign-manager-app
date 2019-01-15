@@ -1,7 +1,11 @@
 import * as constants from '../constants';
 import database from '../../firebaseDB';
 import firebase from 'firebase';
+import _ from 'lodash';
 import ReactGA from 'react-ga';
+import { updateNpcsList } from './npcs';
+import { updateQuestsList } from './quests';
+import { updatePlacesList } from './places';
 
 export const loadAllNotes = notes => (dispatch, getState) => {
   const updatedState = { ...getState().notes.all };
@@ -27,6 +31,7 @@ const removeNoteFromList = noteId => (dispatch, getState) => {
 };
 
 export const createNote = noteData => (dispatch, getState) => {
+  const { npcs, places, quests } = getState();
   ReactGA.event({
     category: 'Notes',
     action: 'Create Note'
@@ -35,6 +40,7 @@ export const createNote = noteData => (dispatch, getState) => {
   const batch = database.batch();
   const ref = database.collection('notes').doc();
   const myId = ref.id;
+  const parentRef = database.collection(noteData.type).doc(noteData.typeId);
   const finalData = {
     id: myId,
     ...noteData,
@@ -43,7 +49,6 @@ export const createNote = noteData => (dispatch, getState) => {
     updatedAt: firebase.firestore.Timestamp.now()
   };
   batch.set(ref, finalData);
-  const parentRef = database.collection(noteData.type).doc(noteData.typeId);
   batch.update(parentRef, {
     noteIds: firebase.firestore.FieldValue.arrayUnion(myId)
   });
@@ -52,6 +57,22 @@ export const createNote = noteData => (dispatch, getState) => {
       .commit()
       .then(res => {
         dispatch(updateNotesList(finalData));
+        const used = { ...getState()[noteData.type].all[noteData.typeId] };
+        if (!used.noteIds.find(noteId => noteId === myId))
+          used.noteIds.push(myId);
+        // _.capitalize()
+        dispatch({ type: `UPDATE_${noteData.type.toUpperCase()}` });
+        switch (noteData.type) {
+          case 'npcs':
+            dispatch(updateNpcsList(used));
+            break;
+          case 'places':
+            dispatch(updatePlacesList(used));
+            break;
+          case 'quests':
+            dispatch(updateQuestsList(used));
+            break;
+        }
         resolve(res);
       })
       .catch(error => {

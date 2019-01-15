@@ -71,7 +71,6 @@ class Login extends React.Component {
       })
       .catch(function(error) {
         // Handle Errors here.
-        console.warn(error);
         // var errorCode = error.code;
         // var errorMessage = error.message;
         // The email of the user's account used.
@@ -98,7 +97,6 @@ class Login extends React.Component {
       })
       .catch(function(error) {
         // Handle Errors here.
-        console.warn(error);
         // var errorCode = error.code;
         // var errorMessage = error.message;
         // The email of the user's account used.

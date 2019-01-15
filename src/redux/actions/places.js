@@ -65,10 +65,10 @@ export const editPlace = placeData => (dispatch, getState) => {
   });
   dispatch({ type: constants.Place.UPDATE_PLACE, data: placeData });
   const userUid = getState().login.user.uid;
-  const currentPlace = getState().places.all[placeData.placeId];
+  const currentPlace = getState().places.all[placeData.id];
 
   const batch = database.batch();
-  const usedRef = database.collection(`places`).doc(placeData.placeId);
+  const usedRef = database.collection(`places`).doc(placeData.id);
   conditionallyUpdateConnected(currentPlace, placeData, batch);
   const usedData = { ...placeData };
   stripExcessData(usedData);

@@ -40,7 +40,7 @@ export const editQuest = questData => (dispatch, getState) => {
   });
   dispatch({ type: Quest.UPDATE_QUEST, data: questData });
   const userUid = getState().login.user.uid;
-  const currentQuest = getState().quests.all[questData.questId];
+  const currentQuest = getState().quests.all[questData.id];
 
   const batch = database.batch();
   const usedRef = database.collection('quests').doc(currentQuest.id);

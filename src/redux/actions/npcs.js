@@ -20,7 +20,7 @@ export const loadAllNPCs = npcs => (dispatch, getState) => {
   dispatch({ type: Npc.UPDATE_NPC_LIST, npcs: updatedState });
 };
 
-export const updateNPCsList = npc => (dispatch, getState) => {
+export const updateNpcsList = npc => (dispatch, getState) => {
   const updatedState = { ...getState().npcs.all };
   updatedState[npc.id] = npc;
   dispatch({ type: Npc.UPDATE_NPC_LIST, npcs: updatedState });
@@ -37,12 +37,11 @@ export const editNPC = npcData => (dispatch, getState) => {
     category: 'NPCs',
     action: 'Edit NPC'
   });
-  dispatch({ type: Npc.UPDATE_NPC, data: npcData });
+  dispatch({ type: Npc.UPDATE_NPCS });
   const userUid = getState().login.user.uid;
-  const currentNPC = getState().npcs.all[npcData.npcId];
-
+  const currentNPC = getState().npcs.all[npcData.id];
   const batch = database.batch();
-  const usedRef = database.collection('npcs').doc(npcData.npcId);
+  const usedRef = database.collection('npcs').doc(npcData.id);
   conditionallyUpdateConnected(currentNPC, npcData, batch);
   const usedData = { ...npcData };
   stripExcessData(usedData);
@@ -71,7 +70,7 @@ export const editNPC = npcData => (dispatch, getState) => {
                 batch
                   .commit()
                   .then(res => {
-                    dispatch(updateNPCsList(finalData));
+                    dispatch(updateNpcsList(finalData));
                     resolve(res);
                   })
                   .catch(error => {
@@ -140,7 +139,7 @@ export const createNPC = npcData => (dispatch, getState) => {
             batch
               .commit()
               .then(res => {
-                dispatch(updateNPCsList(finalData));
+                dispatch(updateNpcsList(finalData));
                 resolve(res);
               })
               .catch(error => {

@@ -33,7 +33,7 @@ class PlacesForm extends Component {
       npcIds: [],
       placeIds: [],
       eventIds: [],
-      placeId: '',
+      id: '',
       questIds: [],
       tagIds: [],
       history: '',
@@ -69,7 +69,7 @@ class PlacesForm extends Component {
     }
     this.setState({
       images: images,
-      placeId: place.id || '',
+      id: place.id || '',
       attachedFiles: attachedFiles,
       npcIds: [...place.npcIds] || [],
       placeIds: [...place.placeIds] || [],
@@ -115,6 +115,8 @@ class PlacesForm extends Component {
         );
       }
     );
+    delete formattedData.placeTypes;
+    delete formattedData.tags;
     this.setState({ isSubmitting: true }, () => {
       if (formAction !== 'edit') {
         createPlace(formattedData)

@@ -79,7 +79,7 @@ class NPCForm extends Component {
     }
     this.setState({
       images: images,
-      npcId: npc.id || '',
+      id: npc.id || '',
       attachedFiles: attachedFiles,
       npcIds: [...npc.npcIds] || [],
       placeIds: [...npc.placeIds] || [],
@@ -91,6 +91,7 @@ class NPCForm extends Component {
       relationshipToGroup: npc.relationshipToGroup || '',
       physDescription: npc.physDescription || '',
       backstory: npc.backstory || '',
+      age: npc.age || '',
       height: npc.height || '',
       weight: npc.weight || '',
       quirks: [...npc.quirks] || [],
@@ -129,6 +130,11 @@ class NPCForm extends Component {
         formattedData[stateKey] = formattedData[stateKey].map(
           item => item.value || item
         );
+      }
+    );
+    ['occupations', 'tags', 'races', 'propQuirks', 'propValues'].forEach(
+      option => {
+        delete formattedData[option];
       }
     );
     this.setState({ isSubmitting: true }, () => {

@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import _ from 'lodash';
 import {
   Grid,
   Row,
   Col,
-  PanelGroup,
-  Panel,
   Carousel,
   Image,
   Tab,
@@ -27,7 +26,8 @@ class NPC extends Component {
     super(props);
     this.state = {
       npc: {},
-      npcFormOpen: false
+      npcFormOpen: false,
+      loading: false
     };
     this.renderDetails = this.renderDetails.bind(this);
     this.handleNPCDelete = this.handleNPCDelete.bind(this);
@@ -45,9 +45,8 @@ class NPC extends Component {
   componentWillReceiveProps = nextProps => {
     const npcId = nextProps.match.params.npc_id;
     const oldNpcId = this.props.match.params.npc_id;
-    const foundNpc = nextProps.npcs[npcId];
-    if (this.props.npcs !== nextProps.npcs || npcId !== oldNpcId) {
-      this.setState({ npc: foundNpc });
+    if (!_.isEqual(this.props.npcs, nextProps.npcs) || npcId !== oldNpcId) {
+      this.setState({ npc: nextProps.npcs[npcId] });
     }
   };
 
@@ -419,6 +418,8 @@ NPC.defaultProps = {};
 NPC.propTypes = {};
 const mapStateToProps = state => ({
   npcs: state.npcs.all,
+  updating: state.npcs.updating,
+  notes: state.notes.all,
   quests: state.quests.all,
   places: state.places.all,
   currentCampaign: state.campaigns.currentCampaign

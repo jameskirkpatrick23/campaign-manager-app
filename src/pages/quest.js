@@ -1,21 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import _ from 'lodash';
 import {
   Grid,
   Row,
   Col,
-  Checkbox,
-  Panel,
   Carousel,
   Image,
   Tab,
   NavItem,
   Nav,
   Glyphicon,
-  InputGroup,
   Modal,
-  FormControl,
   Button
 } from 'react-bootstrap';
 import QuestForm from '../forms/quest-form';
@@ -47,9 +44,11 @@ class Quest extends Component {
   componentWillReceiveProps = nextProps => {
     const questId = nextProps.match.params.quest_id;
     const oldQuestId = this.props.match.params.quest_id;
-    const foundQuest = nextProps.quests[questId];
-    if (this.props.quests !== nextProps.quests || questId !== oldQuestId) {
-      this.setState({ quest: foundQuest });
+    if (
+      !_.isEqual(this.props.quests, nextProps.quests) ||
+      questId !== oldQuestId
+    ) {
+      this.setState({ quest: nextProps.quests[questId] });
     }
   };
 

@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import {
   Row,
   Col,
-  Panel,
   Image,
   FormGroup,
   InputGroup,
@@ -34,13 +33,15 @@ class NPCPage extends Component {
       return (
         object.values.map(x => x.toLowerCase()).includes(term) ||
         object.quirks.map(x => x.toLowerCase()).includes(term) ||
-        object.tagIds.find(tagId =>
-          tags[tagId].name.toLowerCase().includes(term)
+        object.tagIds.find(
+          tagId => tags[tagId] && tags[tagId].name.toLowerCase().includes(term)
         ) ||
         object.noteIds.find(
           noteId =>
-            notes[noteId].title.toLowerCase().includes(term) ||
-            notes[noteId].description.toLowerCase().includes(term)
+            (notes[noteId] &&
+              notes[noteId].title.toLowerCase().includes(term)) ||
+            (notes[noteId] &&
+              notes[noteId].description.toLowerCase().includes(term))
         )
       );
     };
@@ -65,7 +66,11 @@ class NPCPage extends Component {
     const npcKeys = this.filteredNPCKeys();
     const foundNPCs = {};
     npcKeys.forEach(npcKey => {
-      if (npcs[npcKey].campaignIds.includes(currentCampaign.id)) {
+      if (
+        npcs[npcKey] &&
+        npcs[npcKey].campaignIds &&
+        npcs[npcKey].campaignIds.includes(currentCampaign.id)
+      ) {
         foundNPCs[npcKey] = npcs[npcKey];
       }
     });

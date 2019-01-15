@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import _ from 'lodash';
 import {
   Grid,
   Row,
   Col,
-  PanelGroup,
-  Panel,
   Carousel,
   Image,
   Tab,
@@ -49,9 +48,11 @@ class Place extends Component {
   componentWillReceiveProps = nextProps => {
     const placeId = nextProps.match.params.place_id;
     const oldPlaceId = this.props.match.params.place_id;
-    const foundPlace = nextProps.places[placeId];
-    if (this.props.places !== nextProps.places || placeId !== oldPlaceId) {
-      this.setState({ place: foundPlace });
+    if (
+      !_.isEqual(this.props.places, nextProps.places) ||
+      placeId !== oldPlaceId
+    ) {
+      this.setState({ place: nextProps.places[placeId] });
     }
   };
 

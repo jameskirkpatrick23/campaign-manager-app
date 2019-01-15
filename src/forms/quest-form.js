@@ -67,7 +67,7 @@ class QuestForm extends Component {
     }
     this.setState({
       images: images,
-      questId: quest.id || '',
+      id: quest.id || '',
       attachedFiles: attachedFiles,
       objectives: quest.objectives ? [...quest.objectives] : [],
       npcIds: [...quest.npcIds] || [],
@@ -101,6 +101,7 @@ class QuestForm extends Component {
         );
       }
     );
+    delete formattedData.tags;
     this.setState({ isSubmitting: true }, () => {
       if (formAction !== 'edit') {
         createQuest(formattedData)
