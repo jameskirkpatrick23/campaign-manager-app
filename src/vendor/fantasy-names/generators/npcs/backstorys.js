@@ -1,6 +1,6 @@
-function generator$descriptions$backstorys(type) {
-  var nm1 = ['He', 'he', 'his', 'him', 'man'];
-  var nm2 = [
+export default function generator___descriptions___backstorys(gender) {
+  let nm1 = ['He', 'he', 'his', 'him', 'man'];
+  let nm2 = [
     'adventurous',
     'affectionate',
     'analytical',
@@ -57,7 +57,7 @@ function generator$descriptions$backstorys(type) {
     'wise',
     'witty'
   ];
-  var nm3 = [
+  let nm3 = [
     'anxious',
     'arrogant',
     'bewildered',
@@ -89,7 +89,7 @@ function generator$descriptions$backstorys(type) {
     'timid',
     'uncontrolled'
   ];
-  var nm4 = [
+  let nm4 = [
     'This is to be expected from somebody',
     "But what'd you expect from somebody",
     "This isn't surprising considering for someone",
@@ -98,7 +98,7 @@ function generator$descriptions$backstorys(type) {
     "But there's more than this to somebody",
     "But there's more than meets the eye, not surprising for somebody"
   ];
-  var nm5 = [
+  let nm5 = [
     'n average',
     ' wealthy',
     ' royal',
@@ -112,7 +112,7 @@ function generator$descriptions$backstorys(type) {
     ' decent',
     ' successful'
   ];
-  var nm6 = [
+  let nm6 = [
     'n average',
     ' normal',
     ' large',
@@ -123,8 +123,8 @@ function generator$descriptions$backstorys(type) {
     ' developing',
     ' developed'
   ];
-  var nm7 = ['town', 'city', 'village', 'port', 'community', 'capital'];
-  var nm8 = [
+  let nm7 = ['town', 'city', 'village', 'port', 'community', 'capital'];
+  let nm8 = [
     'without worry',
     'out of trouble',
     'free of worries',
@@ -133,14 +133,14 @@ function generator$descriptions$backstorys(type) {
     'comfortably',
     'happily'
   ];
-  var nm9 = Math.floor(Math.random() * 10) + 10;
-  var nm10 = [
+  let nm9 = Math.floor(Math.random() * 10) + 10;
+  let nm10 = [
     'things changed',
     'things began to change',
     'life changed',
     'life began to change'
   ];
-  var nm11 = [
+  let nm11 = [
     'gained responsibilities',
     'gained new responsibilities',
     'became more important',
@@ -164,7 +164,7 @@ function generator$descriptions$backstorys(type) {
     'got a new pet',
     'got a new companion'
   ];
-  var nm12 = [
+  let nm12 = [
     'among the most popular people',
     'becoming quite desirable',
     'very successful',
@@ -183,7 +183,7 @@ function generator$descriptions$backstorys(type) {
     'strengthening the relationship with both parents',
     'competing in large tournaments'
   ];
-  var nm12b = [
+  let nm12b = [
     'managed to bloom',
     'succeeded',
     'managed to thrive',
@@ -210,7 +210,7 @@ function generator$descriptions$backstorys(type) {
     'is venturing out',
     'is trying to help others'
   ];
-  var nm13 = [
+  let nm13 = [
     'With the support of great friends',
     'With the support of great parents',
     'With plenty of money and connections',
@@ -227,7 +227,7 @@ function generator$descriptions$backstorys(type) {
     'With the help of great friends',
     'Having overcome plenty of obstacles'
   ];
-  var nm14 = [
+  let nm14 = [
     'strange',
     'weird',
     'crazy',
@@ -249,7 +249,7 @@ function generator$descriptions$backstorys(type) {
     'extraordinary',
     'mystifying'
   ];
-  var nm15 = [
+  let nm15 = [
     'bravery',
     'brilliance',
     'capability',
@@ -271,7 +271,7 @@ function generator$descriptions$backstorys(type) {
     'intrepidness',
     'honesty'
   ];
-  var nm16 = [
+  let nm16 = [
     'reaching great success',
     'finding a way to the top',
     'fulfilling all dreams',
@@ -283,7 +283,7 @@ function generator$descriptions$backstorys(type) {
     'reaching full potential',
     'doing anything'
   ];
-  var nm17 = [
+  let nm17 = [
     'a force to be reckoned with',
     'a true inspiration for many',
     'a true friend for life',
@@ -295,7 +295,7 @@ function generator$descriptions$backstorys(type) {
     "a friend you'd want by your side",
     'a person of (great) importance'
   ];
-  var nm18 = [
+  let nm18 = [
     'Despite all this success,',
     'However,',
     'But there may be more to it than this;',
@@ -305,7 +305,7 @@ function generator$descriptions$backstorys(type) {
     'But anything could happen;',
     'But things could change quickly;'
   ];
-  var nm19 = [
+  let nm19 = [
     'searching for a higher purpose',
     'still studying',
     'enjoying the simpler life',
@@ -322,7 +322,7 @@ function generator$descriptions$backstorys(type) {
     'looking for a place to truly call home',
     'still learning, exploring and discovering'
   ];
-  var nm20 = [
+  let nm20 = [
     'to explore',
     'than meets the eye',
     'than we know',
@@ -339,7 +339,7 @@ function generator$descriptions$backstorys(type) {
     'to enjoy',
     'people to meet'
   ];
-  var nm21 = [
+  let nm21 = [
     'great friends',
     'great companions',
     'great parents',
@@ -351,14 +351,12 @@ function generator$descriptions$backstorys(type) {
     'wise teachers and great friends',
     'a close group of friends'
   ];
-  var names = [];
+  let names = [];
 
-  var tp = type;
-  var gnd = Math.random();
-  if (gnd < 0.5) {
+  if (gender > 0.5) {
     nm1 = ['She', 'she', 'her', 'her', 'woman'];
   }
-  if (tp === 2) {
+  if (gender > 0.5) {
     nm2 = [
       'adventurous',
       'ambitious',
@@ -470,7 +468,7 @@ function generator$descriptions$backstorys(type) {
       'life took a turn for the worst',
       'things took a turn for the worst'
     ];
-    if (gnd < 0.5) {
+    if (gender > 0.5) {
       nm11 = [
         'lost her parents in',
         'lost her mother in',
@@ -710,43 +708,43 @@ function generator$descriptions$backstorys(type) {
       'purpose to life'
     ];
   }
-  var rnd2a = Math.floor(Math.random() * nm2.length);
-  var rnd2b = Math.floor(Math.random() * nm2.length);
+  let rnd2a = Math.floor(Math.random() * nm2.length);
+  let rnd2b = Math.floor(Math.random() * nm2.length);
   while (rnd2a === rnd2b) {
     rnd2b = Math.floor(Math.random() * nm2.length);
   }
-  var rnd2c = Math.floor(Math.random() * nm2.length);
+  let rnd2c = Math.floor(Math.random() * nm2.length);
   while (rnd2c === rnd2b || rnd2c === rnd2a) {
     rnd2c = Math.floor(Math.random() * nm2.length);
   }
-  var rnd3 = Math.floor(Math.random() * nm3.length);
-  var rnd4 = Math.floor(Math.random() * nm4.length);
-  var rnd5 = Math.floor(Math.random() * nm5.length);
-  var rnd6 = Math.floor(Math.random() * nm6.length);
-  var rnd7 = Math.floor(Math.random() * nm7.length);
-  var rnd8 = Math.floor(Math.random() * nm8.length);
-  var rnd10 = Math.floor(Math.random() * nm10.length);
-  var rnd11 = Math.floor(Math.random() * nm11.length);
-  var rnd12 = Math.floor(Math.random() * nm12.length);
-  var rnd12b = Math.floor(Math.random() * nm12b.length);
-  var rnd13 = Math.floor(Math.random() * nm13.length);
-  var rnd14 = Math.floor(Math.random() * nm14.length);
-  var rnd15a = Math.floor(Math.random() * nm15.length);
-  var rnd15b = Math.floor(Math.random() * nm15.length);
+  let rnd3 = Math.floor(Math.random() * nm3.length);
+  let rnd4 = Math.floor(Math.random() * nm4.length);
+  let rnd5 = Math.floor(Math.random() * nm5.length);
+  let rnd6 = Math.floor(Math.random() * nm6.length);
+  let rnd7 = Math.floor(Math.random() * nm7.length);
+  let rnd8 = Math.floor(Math.random() * nm8.length);
+  let rnd10 = Math.floor(Math.random() * nm10.length);
+  let rnd11 = Math.floor(Math.random() * nm11.length);
+  let rnd12 = Math.floor(Math.random() * nm12.length);
+  let rnd12b = Math.floor(Math.random() * nm12b.length);
+  let rnd13 = Math.floor(Math.random() * nm13.length);
+  let rnd14 = Math.floor(Math.random() * nm14.length);
+  let rnd15a = Math.floor(Math.random() * nm15.length);
+  let rnd15b = Math.floor(Math.random() * nm15.length);
   while (rnd15a === rnd15b) {
     rnd15b = Math.floor(Math.random() * nm15.length);
   }
-  var rnd16 = Math.floor(Math.random() * nm16.length);
-  var rnd17 = Math.floor(Math.random() * nm17.length);
+  let rnd16 = Math.floor(Math.random() * nm16.length);
+  let rnd17 = Math.floor(Math.random() * nm17.length);
   while (rnd16 === rnd17) {
     rnd17 = Math.floor(Math.random() * nm17.length);
   }
-  var rnd18 = Math.floor(Math.random() * nm18.length);
-  var rnd19 = Math.floor(Math.random() * nm19.length);
-  var rnd20 = Math.floor(Math.random() * nm20.length);
-  var rnd21 = Math.floor(Math.random() * nm21.length);
+  let rnd18 = Math.floor(Math.random() * nm18.length);
+  let rnd19 = Math.floor(Math.random() * nm19.length);
+  let rnd20 = Math.floor(Math.random() * nm20.length);
+  let rnd21 = Math.floor(Math.random() * nm21.length);
 
-  if (tp === 2) {
+  if (gender > 0.5) {
     names[0] =
       nm1[0] +
       "'s " +
@@ -911,14 +909,5 @@ function generator$descriptions$backstorys(type) {
       nm1[3] +
       '.';
   }
-
-  var result = '';
-
-  for (i = 0; i < 4; i++) {
-    result += names;
-    result += '\n';
-    result += '\n';
-  }
-
-  return result;
+  return names;
 }

@@ -1,10 +1,4 @@
-function generator$descriptions$characters(type) {
-  return type === 1
-    ? generator$descriptions$charactersFemale()
-    : generator$descriptions$charactersMale();
-}
-
-function generator$descriptions$charactersMale() {
+function generator___descriptions___charactersMale() {
   var names1 = [
     'Black',
     'Gray',
@@ -417,77 +411,6 @@ function generator$descriptions$charactersMale() {
     'unfortunate adventures'
   ];
 
-  var names18 = [
-    'Adam',
-    'Adan',
-    'Addison',
-    'Brock',
-    'Brodie',
-    'Brody',
-    'Brooks',
-    'Bruce',
-    'Bruno',
-    'Bryan',
-    'Bryant',
-    'Bryce',
-    'Brycen',
-    'Bryson',
-    'Byron',
-    'Cade',
-    'Caden',
-    'Cael',
-    'Caiden',
-    'Cale',
-    'Gunnar',
-    'Irving',
-    'Isaac',
-    'Jamal',
-    'Jamar',
-    'Kade',
-    'Maverick',
-    'Max',
-    'Orion',
-    'Orlando'
-  ];
-  var names19 = [
-    'Adwell',
-    'Afton',
-    'Barnett',
-    'Barney',
-    'Barnfield',
-    'Chilson',
-    'Chilton',
-    'Cawthorn',
-    'Davenport',
-    'Davey',
-    'Dallin',
-    'Eustice',
-    'Eustis',
-    'Evatt',
-    'Falcon',
-    'Faley',
-    'Falkner',
-    'Geary',
-    'Gedman',
-    'Gedney',
-    'Hanshaw',
-    'Hansley',
-    'Hanson',
-    'Lamkin',
-    'Lamkins',
-    'Lamm',
-    'Lockridge',
-    'Locks',
-    'Lockwood',
-    'Masser',
-    'Massey',
-    'Massingale',
-    'Rosemond',
-    'Shepherd',
-    'Shepley',
-    'Wakeley',
-    'Wakelin'
-  ];
   var names20 = [
     'hero',
     'friend',
@@ -875,39 +798,7 @@ function generator$descriptions$charactersMale() {
       'children',
       'spirits'
     ];
-    names18 = [
-      'Wyninn',
-      'Ninleyn',
-      'Tinlef',
-      'Elluin',
-      'Elduin',
-      'Elmon',
-      'Almar',
-      'Alas',
-      'Alwin',
-      'Almer',
-      'Alre',
-      'Alred',
-      'Alen',
-      'Alluin',
-      'Alduin',
-      'Almon',
-      'Hagwin',
-      'Hagmere'
-    ];
-    names19 = [
-      'Moonwalker',
-      'Dawnwing',
-      'Dawnfury',
-      'Moonfall',
-      'Nightgaze',
-      'Dawnthorn',
-      'Stagrunner',
-      'Wildoak',
-      'Lunadancer',
-      'Dawnwhisper'
-    ];
-  } else if (random21 == 10) {
+  } else if (random21 === 10) {
     names1 = [
       'Purple',
       'Blue',
@@ -953,30 +844,6 @@ function generator$descriptions$charactersMale() {
       'lean',
       'skinny',
       'fat'
-    ];
-    names18 = [
-      'Glinoflonk',
-      'Bonlebick',
-      'Bimbik',
-      'Gnobflink',
-      'Binflonk',
-      'Nittlewizz',
-      'Gimkink',
-      'Merbibus',
-      'Totonk',
-      'Dinnus'
-    ];
-    names19 = [
-      'Steambonk',
-      'Berryspark',
-      'Spannerwhistle',
-      'Steamspanner',
-      'Tosslefuse',
-      'Draxlespanner',
-      'Finewizzle',
-      'Puddleblast',
-      'Stormgauge',
-      'Shinesprocket'
     ];
   } else if (random21 >= 11 || random21 < 14) {
     names2 = [
@@ -1039,102 +906,6 @@ function generator$descriptions$charactersMale() {
       'mines',
       'spirits'
     ];
-    if (random21 == 11) {
-      names18 = [
-        'Ekon',
-        'Erasto',
-        'Haijen',
-        'Hamedi',
-        'Hokima',
-        'Jaafan',
-        'Jabir',
-        'Jalai',
-        'Javyn',
-        'Jijel',
-        'Juma',
-        'Jumoke',
-        'Kaijin',
-        'Kazko',
-        'Maalik',
-        'Makas',
-        'Malak',
-        'Nyabingi',
-        'Rahjin',
-        'Rakash',
-        'Rashi',
-        'Razi'
-      ];
-      names19 = [
-        'Xueshi',
-        'Vintish',
-        'Zalaahoku',
-        'Valkeiki',
-        'Hakjel',
-        'Hanalaji',
-        'Zebnanji',
-        "Tesh'Rimon",
-        'Junbir',
-        'Zenunjo'
-      ];
-    } else if (random21 == 12) {
-      names18 = [
-        'Gnarg',
-        'Gnarlug',
-        'Gnorl',
-        'Gnorth',
-        'Gnoth',
-        'Gnurl',
-        'Golag',
-        'Golub',
-        'Gomatug',
-        'Gomoku',
-        'Gorgu',
-        'Gorlag',
-        'Grikug',
-        'Grug',
-        'Grukag',
-        'Grukk',
-        'Grung',
-        'Gruul'
-      ];
-      names19 = [
-        'Wolfbasher',
-        'Burningfury',
-        'Firesong',
-        'Goreseeker',
-        'Hellsplitter',
-        'Deatheye',
-        'Burninghorn',
-        'Gorebasher',
-        'Wolfhammer',
-        'Boneslayer'
-      ];
-    } else if (random21 == 13) {
-      names18 = [
-        'Karax',
-        'Baxeek',
-        'Soxart',
-        'Rezikmez',
-        'Fizink',
-        'Wimax',
-        'Jexmelyx',
-        'Grexmex',
-        'Tinkbelex',
-        'Greekeels'
-      ];
-      names19 = [
-        'Greaseblast',
-        'Haggletooth',
-        'Deadnozzle',
-        'Fizfingers',
-        'Gearnozzle',
-        'Shadowgleam',
-        'Copperbuttons',
-        'Deadsprocket',
-        'Greasebottom',
-        'Toptwister'
-      ];
-    }
   } else if (random21 >= 14 || random21 <= 16) {
     names2 = [
       'short hair',
@@ -1160,32 +931,6 @@ function generator$descriptions$charactersMale() {
       'round',
       'fat'
     ];
-    if (random21 == 14) {
-      names18 = [
-        'Bengahdar',
-        'Banbrek',
-        'Drumdus',
-        'Dulgarn',
-        'Galirg',
-        'Kharnur',
-        'Iromuador',
-        'Ragorhdrom',
-        'Urmbrek',
-        'Theledon'
-      ];
-      names19 = [
-        'Longmantle',
-        'Highbeard',
-        'Frostpike',
-        'Boulderstone',
-        'Bouldergem',
-        'Frostshaper',
-        'Bouldershout',
-        'Blackaxe',
-        'Goldstone',
-        'Battlefist'
-      ];
-    }
   }
 
   var random1 = parseInt(Math.floor(Math.random() * names1.length));
@@ -1262,7 +1007,7 @@ function generator$descriptions$charactersMale() {
       'just above the right side of his right eyebrow',
       'just above the left side of his left eyebrow'
     ];
-  } else if (random12 == 9) {
+  } else if (random12 === 9) {
     names13 = [
       'in the form of 2 stripes running from above the eyes to the bottom of the cheeks',
       'in the form of 2 stripes on each side of the face, running from just above the eyes to the bottom of the cheeks',
@@ -1302,7 +1047,7 @@ function generator$descriptions$charactersMale() {
       'marks his blood relation'
     ];
     names15 = ['but, more importantly'];
-  } else if (random12 == 10) {
+  } else if (random12 === 10) {
     names13 = ['are spread'];
     names14 = [
       'charmingly',
@@ -1370,7 +1115,7 @@ function generator$descriptions$charactersMale() {
       'his unadventurous love life',
       'his unfortunate adventures'
     ];
-  } else if (random12 == 11) {
+  } else if (random12 === 11) {
     names13 = ['are spread'];
     names14 = [
       'charmingly',
@@ -1486,15 +1231,13 @@ function generator$descriptions$charactersMale() {
   var random15 = parseInt(Math.floor(Math.random() * names15.length));
   var random16 = parseInt(Math.floor(Math.random() * names16.length));
   var random17 = parseInt(Math.floor(Math.random() * names17.length));
-  var random18 = parseInt(Math.floor(Math.random() * names18.length));
-  var random19 = parseInt(Math.floor(Math.random() * names19.length));
   var random20 = parseInt(Math.floor(Math.random() * names20.length));
   var random22 = parseInt(Math.floor(Math.random() * names22.length));
   var random23 = parseInt(Math.floor(Math.random() * names23.length));
   var random24 = parseInt(Math.floor(Math.random() * names24.length));
   var random25 = parseInt(Math.floor(Math.random() * names25.length));
   var random26 = parseInt(Math.floor(Math.random() * names26.length));
-  while (random26 == random25) {
+  while (random26 === random25) {
     random26 = parseInt(Math.floor(Math.random() * names26.length));
   }
   var random27 = parseInt(Math.floor(Math.random() * names27.length));
@@ -1538,14 +1281,9 @@ function generator$descriptions$charactersMale() {
     '.';
 
   var name3 =
-    'The is the face of ' +
-    names18[random18] +
-    ' ' +
-    names19[random19] +
-    ', a true ' +
+    'He is a true ' +
     names20[random20] +
-    ' among ' +
-    names21[random21] +
+    ' among his people' +
     '. He stands ' +
     names22[random22] +
     ' others, despite his ' +
@@ -1578,7 +1316,7 @@ function generator$descriptions$charactersMale() {
   return result;
 }
 
-function generator$descriptions$charactersFemale() {
+function generator___descriptions___charactersFemale() {
   var names1 = [
     'Black',
     'Gray',
@@ -1990,64 +1728,6 @@ function generator$descriptions$charactersFemale() {
     'unfortunate adventures'
   ];
 
-  var names18 = [
-    'Allyson',
-    'Allyssa',
-    'Camille',
-    'Camryn',
-    'Daphne',
-    'Elyse',
-    'Elyssa',
-    'Emily',
-    'Faith',
-    'Jayde',
-    'Julie',
-    'Juliet',
-    'Kylee',
-    'Melinda',
-    'Melissa',
-    'Sarina',
-    'Sasha'
-  ];
-  var names19 = [
-    'Adwell',
-    'Afton',
-    'Barnett',
-    'Barney',
-    'Barnfield',
-    'Chilson',
-    'Chilton',
-    'Cawthorn',
-    'Davenport',
-    'Davey',
-    'Dallin',
-    'Eustice',
-    'Eustis',
-    'Evatt',
-    'Falcon',
-    'Faley',
-    'Falkner',
-    'Geary',
-    'Gedman',
-    'Gedney',
-    'Hanshaw',
-    'Hansley',
-    'Hanson',
-    'Lamkin',
-    'Lamkins',
-    'Lamm',
-    'Lockridge',
-    'Locks',
-    'Lockwood',
-    'Masser',
-    'Massey',
-    'Massingale',
-    'Rosemond',
-    'Shepherd',
-    'Shepley',
-    'Wakeley',
-    'Wakelin'
-  ];
   var names20 = [
     'hero',
     'friend',
@@ -2439,31 +2119,7 @@ function generator$descriptions$charactersFemale() {
       'children',
       'spirits'
     ];
-    names18 = [
-      'Ylsysea',
-      'Nilerea',
-      'Lelselea',
-      'Lelarea',
-      'Nafareath',
-      'Felerai',
-      'Sillaesa',
-      'Leadrieth',
-      'Yneasia',
-      'Iyohara'
-    ];
-    names19 = [
-      'Moonwalker',
-      'Dawnwing',
-      'Dawnfury',
-      'Moonfall',
-      'Nightgaze',
-      'Dawnthorn',
-      'Stagrunner',
-      'Wildoak',
-      'Lunadancer',
-      'Dawnwhisper'
-    ];
-  } else if (random21 == 10) {
+  } else if (random21 === 10) {
     names1 = [
       'Purple',
       'Blue',
@@ -2509,30 +2165,6 @@ function generator$descriptions$charactersFemale() {
       'lean',
       'skinny',
       'fat'
-    ];
-    names18 = [
-      'Glinkeefonk',
-      'Binfink',
-      'Tolikink',
-      'Katbrick',
-      'Tiltinkle',
-      'Tinkeeflonk',
-      'Bonfinkle',
-      'Tyntinkle',
-      'Mittlefink',
-      'Talmink'
-    ];
-    names19 = [
-      'Steambonk',
-      'Berryspark',
-      'Spannerwhistle',
-      'Steamspanner',
-      'Tosslefuse',
-      'Draxlespanner',
-      'Finewizzle',
-      'Puddleblast',
-      'Stormgauge',
-      'Shinesprocket'
     ];
   } else if (random21 >= 11 || random21 < 14) {
     names2 = [
@@ -2595,82 +2227,6 @@ function generator$descriptions$charactersFemale() {
       'mines',
       'spirits'
     ];
-    if (random21 == 11) {
-      names18 = [
-        "Gir'Enji",
-        'Yahuja',
-        'Feyini',
-        'Ziruja',
-        'Zeyra',
-        'Zuladur',
-        'Zujula',
-        'Sonayo',
-        'Vulino',
-        'Yaonji'
-      ];
-      names19 = [
-        'Xueshi',
-        'Vintish',
-        'Zalaahoku',
-        'Valkeiki',
-        'Hakjel',
-        'Hanalaji',
-        'Zebnanji',
-        "Tesh'Rimon",
-        'Junbir',
-        'Zenunjo'
-      ];
-    } else if (random21 == 12) {
-      names18 = [
-        'Umoda',
-        'Zonkaja',
-        'Goredo',
-        'Umakuma',
-        'Groanu',
-        'Zunala',
-        'Gredula',
-        'Sheeda',
-        'Greras',
-        'Elgudo'
-      ];
-      names19 = [
-        'Wolfbasher',
-        'Burningfury',
-        'Firesong',
-        'Goreseeker',
-        'Hellsplitter',
-        'Deatheye',
-        'Burninghorn',
-        'Gorebasher',
-        'Wolfhammer',
-        'Boneslayer'
-      ];
-    } else if (random21 == 13) {
-      names18 = [
-        'Amizenee',
-        'Nexlee',
-        'Pybilope',
-        'Nalleex',
-        'Glelee',
-        'Glyxi',
-        'Linxie',
-        'Minzi',
-        'Glebizee',
-        'Fluxinky'
-      ];
-      names19 = [
-        'Greaseblast',
-        'Haggletooth',
-        'Deadnozzle',
-        'Fizfingers',
-        'Gearnozzle',
-        'Shadowgleam',
-        'Copperbuttons',
-        'Deadsprocket',
-        'Greasebottom',
-        'Toptwister'
-      ];
-    }
   } else if (random21 >= 14 || random21 <= 16) {
     names2 = [
       'short hair',
@@ -2696,32 +2252,6 @@ function generator$descriptions$charactersFemale() {
       'round',
       'fat'
     ];
-    if (random21 == 14) {
-      names18 = [
-        'Belianyss',
-        'Daerahniss',
-        'Dearirwyn',
-        'Brenunwyn',
-        'Gwenirnys',
-        'Bretianura',
-        'Einormyl',
-        'Breteodiel',
-        'Bellores',
-        'Brylilen'
-      ];
-      names19 = [
-        'Longmantle',
-        'Highbeard',
-        'Frostpike',
-        'Boulderstone',
-        'Bouldergem',
-        'Frostshaper',
-        'Bouldershout',
-        'Blackaxe',
-        'Goldstone',
-        'Battlefist'
-      ];
-    }
   }
 
   var random1 = parseInt(Math.floor(Math.random() * names1.length));
@@ -2801,7 +2331,7 @@ function generator$descriptions$charactersFemale() {
       'just above the right side of her right eyebrow',
       'just above the left side of her left eyebrow'
     ];
-  } else if (random12 == 9) {
+  } else if (random12 === 9) {
     names13 = [
       'in the form of 2 stripes running from above the eyes to the bottom of the cheeks',
       'in the form of 2 stripes on each side of the face, running from just above the eyes to the bottom of the cheeks',
@@ -2841,7 +2371,7 @@ function generator$descriptions$charactersFemale() {
       'marks her blood relation'
     ];
     names15 = ['but, more importantly'];
-  } else if (random12 == 10) {
+  } else if (random12 === 10) {
     names13 = ['are spread'];
     names14 = [
       'charmingly',
@@ -2909,7 +2439,7 @@ function generator$descriptions$charactersFemale() {
       'her unadventurous love life',
       'her unfortunate adventures'
     ];
-  } else if (random12 == 11) {
+  } else if (random12 === 11) {
     names13 = ['are spread'];
     names14 = [
       'charmingly',
@@ -3025,15 +2555,13 @@ function generator$descriptions$charactersFemale() {
   var random15 = parseInt(Math.floor(Math.random() * names15.length));
   var random16 = parseInt(Math.floor(Math.random() * names16.length));
   var random17 = parseInt(Math.floor(Math.random() * names17.length));
-  var random18 = parseInt(Math.floor(Math.random() * names18.length));
-  var random19 = parseInt(Math.floor(Math.random() * names19.length));
   var random20 = parseInt(Math.floor(Math.random() * names20.length));
   var random22 = parseInt(Math.floor(Math.random() * names22.length));
   var random23 = parseInt(Math.floor(Math.random() * names23.length));
   var random24 = parseInt(Math.floor(Math.random() * names24.length));
   var random25 = parseInt(Math.floor(Math.random() * names25.length));
   var random26 = parseInt(Math.floor(Math.random() * names26.length));
-  while (random26 == random25) {
+  while (random26 === random25) {
     random26 = parseInt(Math.floor(Math.random() * names26.length));
   }
   var random27 = parseInt(Math.floor(Math.random() * names27.length));
@@ -3077,14 +2605,9 @@ function generator$descriptions$charactersFemale() {
     '.';
 
   var name3 =
-    'The is the face of ' +
-    names18[random18] +
-    ' ' +
-    names19[random19] +
-    ', a true ' +
+    'She is a true ' +
     names20[random20] +
-    ' among ' +
-    names21[random21] +
+    ' among her people' +
     '. She stands ' +
     names22[random22] +
     ' others, despite her ' +
@@ -3115,4 +2638,10 @@ function generator$descriptions$charactersFemale() {
   result += '\n';
   result += name4;
   return result;
+}
+
+export default function generator___descriptions___characters(type) {
+  return type === 1
+    ? generator___descriptions___charactersFemale()
+    : generator___descriptions___charactersMale();
 }

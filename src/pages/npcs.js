@@ -12,7 +12,11 @@ import {
   Grid,
   Button
 } from 'react-bootstrap';
-import raceNameGenerator from '../vendor/fantasy-names/generators/races';
+import {
+  createRaceName,
+  createNpcBackstory,
+  createNpcDescription
+} from '../vendor/fantasy-names/generators/npcs';
 
 class NPCPage extends Component {
   constructor(props) {
@@ -149,6 +153,9 @@ class NPCPage extends Component {
             </Button>
           </Col>
         </Row>
+        <Row>{createRaceName('human', 'female')}</Row>
+        <Row>{createNpcBackstory('female')}</Row>
+        <Row>{createNpcDescription('female')}</Row>
         <Row>{this.renderNpcs()}</Row>
       </Grid>
     );
@@ -168,5 +175,3 @@ export default connect(
   mapStateToProps,
   null
 )(NPCPage);
-
-/*<Row>{raceNameGenerator('human', 'female')}</Row>*/

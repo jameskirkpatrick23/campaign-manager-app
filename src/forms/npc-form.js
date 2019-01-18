@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import {
   ControlLabel,
   FormControl,
+  InputGroup,
   FormGroup,
   Button,
   Row,
@@ -22,6 +23,11 @@ import { createOccupation } from '../redux/actions/occupations';
 import { createValue } from '../redux/actions/values';
 import { createQuirk } from '../redux/actions/quirks';
 import Spinner from '../reusable-components/spinner';
+import {
+  createNpcBackstory,
+  createRaceName,
+  createNpcDescription
+} from '../vendor/fantasy-names/generators/npcs/index';
 
 class NPCForm extends Component {
   constructor(props) {
@@ -275,6 +281,36 @@ class NPCForm extends Component {
     });
   };
 
+  tryGeneratingName = () => {
+    const { race, gender } = this.state;
+    const name = createRaceName(race.toLowerCase(), gender);
+    if (name) {
+      this.setState({ name });
+    } else {
+      toast.error(`Unable to generate a name for race: ${race}`);
+    }
+  };
+
+  tryGeneratingBackstory = () => {
+    const { gender } = this.state;
+    const backstory = createNpcBackstory(gender);
+    if (backstory) {
+      this.setState({ backstory });
+    } else {
+      toast.error(`Unable to generate a backstory for NPC`);
+    }
+  };
+
+  tryGeneratingDescription = () => {
+    const { gender } = this.state;
+    const physDescription = createNpcDescription(gender);
+    if (physDescription) {
+      this.setState({ physDescription });
+    } else {
+      toast.error('Unable to generate a backstory for NPC');
+    }
+  };
+
   render() {
     const {
       name,
@@ -310,222 +346,312 @@ class NPCForm extends Component {
           <Row>
             <Col xs={12} md={6}>
               <Fieldset label="General Information">
-                <FormGroup validationState={this.getValidationState('name')}>
-                  <ControlLabel htmlFor="#npc-name">Name</ControlLabel>
-                  <FormControl
-                    id="npc-name"
-                    type="text"
-                    value={name}
-                    required
-                    placeholder="Give this NPC a name"
-                    onChange={e => this.setState({ name: e.target.value })}
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup
-                  validationState={this.getValidationState('occupation')}
-                >
-                  <ControlLabel htmlFor="npc-occupation">
-                    Occupation
-                  </ControlLabel>
-                  <DropdownList
-                    id="npc-occupation"
-                    containerClassName="form-control padding-left-0 font-static"
-                    data={Object.keys(occupations).map(
-                      o => occupations[o].name
-                    )}
-                    value={occupation}
-                    placeholder="Noble, Urchin, Smithy, Artisan, etc."
-                    onChange={dataItem =>
-                      this.setState({ occupation: dataItem })
-                    }
-                    allowCreate={'onFilter'}
-                    onCreate={this.createOccupation}
-                    caseSensitive={false}
-                    minLength={1}
-                    filter="contains"
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup validationState={this.getValidationState('race')}>
-                  <ControlLabel htmlFor="npc-race">Race</ControlLabel>
-                  <DropdownList
-                    id="npc-race"
-                    data={Object.keys(races).map(r => races[r].name)}
-                    containerClassName="form-control padding-left-0 font-static"
-                    value={race}
-                    minLength={1}
-                    allowCreate={'onFilter'}
-                    onCreate={this.createRace}
-                    filter="contains"
-                    placeholder="Human, Elf, Tiefling, Orc, etc."
-                    caseSensitive={false}
-                    onChange={dataItem => this.setState({ race: dataItem })}
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup validationState={this.getValidationState('gender')}>
-                  <ControlLabel htmlFor="npc-gender">Gender</ControlLabel>
-                  <DropdownList
-                    id="npc-gender"
-                    containerClassName="form-control padding-left-0 font-static"
-                    data={Object.keys(genders).map(g => genders[g].name)}
-                    value={gender}
-                    minLength={1}
-                    filter="contains"
-                    placeholder="What gender is this NPC"
-                    caseSensitive={false}
-                    onChange={dataItem => this.setState({ gender: dataItem })}
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
+                <Row>
+                  <Col xs={12} sm={6} md={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('race')}
+                    >
+                      <ControlLabel htmlFor="npc-race">Race</ControlLabel>
+                      <DropdownList
+                        id="npc-race"
+                        data={Object.keys(races).map(r => races[r].name)}
+                        containerClassName="form-control padding-left-0 font-static"
+                        value={race}
+                        minLength={1}
+                        allowCreate={'onFilter'}
+                        onCreate={this.createRace}
+                        filter="contains"
+                        placeholder="Human, Elf, Tiefling, Orc, etc."
+                        caseSensitive={false}
+                        onChange={dataItem => this.setState({ race: dataItem })}
+                      />
+                      <FormControl.Feedback />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12} sm={6} md={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('gender')}
+                    >
+                      <ControlLabel htmlFor="npc-gender">Gender</ControlLabel>
+                      <DropdownList
+                        id="npc-gender"
+                        containerClassName="form-control padding-left-0 font-static"
+                        data={Object.keys(genders).map(g => genders[g].name)}
+                        value={gender}
+                        minLength={1}
+                        filter="contains"
+                        placeholder="What gender is this NPC"
+                        caseSensitive={false}
+                        onChange={dataItem =>
+                          this.setState({ gender: dataItem })
+                        }
+                      />
+                      <FormControl.Feedback />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12} sm={6} md={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('name')}
+                    >
+                      <ControlLabel htmlFor="#npc-name">Name</ControlLabel>
+                      <InputGroup>
+                        <InputGroup.Addon className="input-addon">
+                          <Glyphicon
+                            glyph="refresh"
+                            onClick={this.tryGeneratingName}
+                          />
+                        </InputGroup.Addon>
+                        <FormControl
+                          id="npc-name"
+                          type="text"
+                          value={name}
+                          required
+                          placeholder="Give this NPC a name"
+                          onChange={e =>
+                            this.setState({ name: e.target.value })
+                          }
+                        />
+                        <FormControl.Feedback />
+                      </InputGroup>
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12} sm={6} md={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('occupation')}
+                    >
+                      <ControlLabel htmlFor="npc-occupation">
+                        Occupation
+                      </ControlLabel>
+                      <DropdownList
+                        id="npc-occupation"
+                        containerClassName="form-control padding-left-0 font-static"
+                        data={Object.keys(occupations).map(
+                          o => occupations[o].name
+                        )}
+                        value={occupation}
+                        placeholder="Noble, Urchin, Smithy, Artisan, etc."
+                        onChange={dataItem =>
+                          this.setState({ occupation: dataItem })
+                        }
+                        allowCreate={'onFilter'}
+                        onCreate={this.createOccupation}
+                        caseSensitive={false}
+                        minLength={1}
+                        filter="contains"
+                      />
+                      <FormControl.Feedback />
+                    </FormGroup>
+                  </Col>
+                </Row>
               </Fieldset>
             </Col>
             <Col xs={12} md={6}>
               <Fieldset label="Physical Characteristics">
-                <FormGroup validationState={this.getValidationState('age')}>
-                  <ControlLabel htmlFor="#npc-age">Age</ControlLabel>
-                  <FormControl
-                    id="npc-age"
-                    type="text"
-                    value={age}
-                    placeholder="How old is this NPC"
-                    onChange={e => this.setState({ age: e.target.value })}
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup validationState={this.getValidationState('height')}>
-                  <ControlLabel htmlFor="#npc-height">Height</ControlLabel>
-                  <FormControl
-                    id="npc-height"
-                    type="text"
-                    value={height}
-                    placeholder="How tall is this NPC"
-                    onChange={e => this.setState({ height: e.target.value })}
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup validationState={this.getValidationState('weight')}>
-                  <ControlLabel htmlFor="#npc-weight">Weight</ControlLabel>
-                  <FormControl
-                    id="npc-weight"
-                    type="text"
-                    value={weight}
-                    placeholder="How heavy is this NPC"
-                    onChange={e => this.setState({ weight: e.target.value })}
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup
-                  validationState={this.getValidationState('physDescription')}
-                >
-                  <ControlLabel htmlFor="#npc-physDescription">
-                    Physical Appearance
-                  </ControlLabel>
-                  <FormControl
-                    id="npc-physDescription"
-                    type="text"
-                    componentClass="textarea"
-                    value={physDescription}
-                    placeholder="Describe how this NPC looks"
-                    onChange={e =>
-                      this.setState({ physDescription: e.target.value })
-                    }
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
+                <Row>
+                  <Col xs={12} sm={4} md={12}>
+                    <FormGroup validationState={this.getValidationState('age')}>
+                      <ControlLabel htmlFor="#npc-age">Age</ControlLabel>
+                      <FormControl
+                        id="npc-age"
+                        type="text"
+                        value={age}
+                        placeholder="How old is this NPC"
+                        onChange={e => this.setState({ age: e.target.value })}
+                      />
+                      <FormControl.Feedback />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12} sm={4} md={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('height')}
+                    >
+                      <ControlLabel htmlFor="#npc-height">Height</ControlLabel>
+                      <FormControl
+                        id="npc-height"
+                        type="text"
+                        value={height}
+                        placeholder="How tall is this NPC"
+                        onChange={e =>
+                          this.setState({ height: e.target.value })
+                        }
+                      />
+                      <FormControl.Feedback />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12} sm={4} md={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('weight')}
+                    >
+                      <ControlLabel htmlFor="#npc-weight">Weight</ControlLabel>
+                      <FormControl
+                        id="npc-weight"
+                        type="text"
+                        value={weight}
+                        placeholder="How heavy is this NPC"
+                        onChange={e =>
+                          this.setState({ weight: e.target.value })
+                        }
+                      />
+                      <FormControl.Feedback />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12}>
+                    <FormGroup
+                      validationState={this.getValidationState(
+                        'physDescription'
+                      )}
+                    >
+                      <ControlLabel htmlFor="#npc-physDescription">
+                        Physical Appearance
+                      </ControlLabel>
+                      <InputGroup>
+                        <InputGroup.Addon className="input-addon">
+                          <Glyphicon
+                            glyph="refresh"
+                            onClick={this.tryGeneratingDescription}
+                          />
+                        </InputGroup.Addon>
+                        <FormControl
+                          id="npc-physDescription"
+                          type="text"
+                          componentClass="textarea"
+                          value={physDescription}
+                          placeholder="Describe how this NPC looks"
+                          onChange={e =>
+                            this.setState({ physDescription: e.target.value })
+                          }
+                        />
+                        <FormControl.Feedback />
+                      </InputGroup>
+                    </FormGroup>
+                  </Col>
+                </Row>
               </Fieldset>
             </Col>
           </Row>
           <Row>
             <Col xs={12} md={6}>
               <Fieldset label="Personality Makeup">
-                <FormGroup
-                  validationState={this.getValidationState('alignment')}
-                >
-                  <ControlLabel htmlFor="npc-alignment">Alignment</ControlLabel>
-                  <DropdownList
-                    id="npc-alignment"
-                    data={Object.keys(alignments).map(a => alignments[a].name)}
-                    value={alignment}
-                    placeholder="Lawful, Chaotic, Good, Evil, Neutral"
-                    onChange={dataItem =>
-                      this.setState({ alignment: dataItem })
-                    }
-                  />
-                </FormGroup>
-                <FormGroup
-                  validationState={this.getValidationState(
-                    'relationshipToGroup'
-                  )}
-                >
-                  <ControlLabel htmlFor="npc-alignment">
-                    Relationship to Group
-                  </ControlLabel>
-                  <DropdownList
-                    id="npc-relationshipToGroup"
-                    data={['Ally', 'Enemy', 'Neutral']}
-                    value={relationshipToGroup}
-                    placeholder="Ally, Enemy, Neutral"
-                    onChange={dataItem =>
-                      this.setState({ relationshipToGroup: dataItem })
-                    }
-                  />
-                </FormGroup>
-                <FormGroup validationState={this.getValidationState('quirks')}>
-                  <ControlLabel htmlFor="#npc-quirks">Quirks</ControlLabel>
-                  <Multiselect
-                    id="npc-quirks"
-                    data={Object.keys(propQuirks).map(
-                      pq => propQuirks[pq].name
-                    )}
-                    containerClassName="form-control padding-left-0 font-static"
-                    value={quirks}
-                    allowCreate={'onFilter'}
-                    onCreate={this.createQuirk}
-                    caseSensitive={false}
-                    minLength={1}
-                    filter="contains"
-                    onChange={dataItems => this.setState({ quirks: dataItems })}
-                    placeholder="What quirks does this NPC have?"
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup validationState={this.getValidationState('values')}>
-                  <ControlLabel htmlFor="npc-values">Values</ControlLabel>
-                  <Multiselect
-                    id="npc-values"
-                    data={Object.keys(propValues).map(
-                      pv => propValues[pv].name
-                    )}
-                    containerClassName="form-control padding-left-0 font-static"
-                    value={values}
-                    allowCreate={'onFilter'}
-                    onCreate={this.createValue}
-                    placeholder="What values does this NPC hold?"
-                    onChange={dataItem => this.setState({ values: dataItem })}
-                    caseSensitive={false}
-                    minLength={1}
-                    filter="contains"
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup
-                  validationState={this.getValidationState('backstory')}
-                >
-                  <ControlLabel htmlFor="#npc-backstory">
-                    Backstory
-                  </ControlLabel>
-                  <FormControl
-                    id="npc-backstory"
-                    type="text"
-                    componentClass="textarea"
-                    value={backstory}
-                    placeholder="Describe the NPC's backstory"
-                    onChange={e => this.setState({ backstory: e.target.value })}
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
+                <Row>
+                  <Col xs={12} sm={6} md={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('alignment')}
+                    >
+                      <ControlLabel htmlFor="npc-alignment">
+                        Alignment
+                      </ControlLabel>
+                      <DropdownList
+                        id="npc-alignment"
+                        data={Object.keys(alignments).map(
+                          a => alignments[a].name
+                        )}
+                        value={alignment}
+                        placeholder="Lawful, Chaotic, Good, Evil, Neutral"
+                        onChange={dataItem =>
+                          this.setState({ alignment: dataItem })
+                        }
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12} sm={6} md={12}>
+                    <FormGroup
+                      validationState={this.getValidationState(
+                        'relationshipToGroup'
+                      )}
+                    >
+                      <ControlLabel htmlFor="npc-alignment">
+                        Relationship to Group
+                      </ControlLabel>
+                      <DropdownList
+                        id="npc-relationshipToGroup"
+                        data={['Ally', 'Enemy', 'Neutral']}
+                        value={relationshipToGroup}
+                        placeholder="Ally, Enemy, Neutral"
+                        onChange={dataItem =>
+                          this.setState({ relationshipToGroup: dataItem })
+                        }
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('quirks')}
+                    >
+                      <ControlLabel htmlFor="#npc-quirks">Quirks</ControlLabel>
+                      <Multiselect
+                        id="npc-quirks"
+                        data={Object.keys(propQuirks).map(
+                          pq => propQuirks[pq].name
+                        )}
+                        containerClassName="form-control padding-left-0 font-static"
+                        value={quirks}
+                        allowCreate={'onFilter'}
+                        onCreate={this.createQuirk}
+                        caseSensitive={false}
+                        minLength={1}
+                        filter="contains"
+                        onChange={dataItems =>
+                          this.setState({ quirks: dataItems })
+                        }
+                        placeholder="What quirks does this NPC have?"
+                      />
+                      <FormControl.Feedback />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('values')}
+                    >
+                      <ControlLabel htmlFor="npc-values">Values</ControlLabel>
+                      <Multiselect
+                        id="npc-values"
+                        data={Object.keys(propValues).map(
+                          pv => propValues[pv].name
+                        )}
+                        containerClassName="form-control padding-left-0 font-static"
+                        value={values}
+                        allowCreate={'onFilter'}
+                        onCreate={this.createValue}
+                        placeholder="What values does this NPC hold?"
+                        onChange={dataItem =>
+                          this.setState({ values: dataItem })
+                        }
+                        caseSensitive={false}
+                        minLength={1}
+                        filter="contains"
+                      />
+                      <FormControl.Feedback />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={12}>
+                    <FormGroup
+                      validationState={this.getValidationState('backstory')}
+                    >
+                      <ControlLabel htmlFor="#npc-backstory">
+                        Backstory
+                      </ControlLabel>
+                      <InputGroup>
+                        <InputGroup.Addon className="input-addon">
+                          <Glyphicon
+                            glyph="refresh"
+                            onClick={this.tryGeneratingBackstory}
+                          />
+                        </InputGroup.Addon>
+                        <FormControl
+                          id="npc-backstory"
+                          type="text"
+                          componentClass="textarea"
+                          value={backstory}
+                          placeholder="Describe the NPC's backstory"
+                          onChange={e =>
+                            this.setState({ backstory: e.target.value })
+                          }
+                        />
+                        <FormControl.Feedback />
+                      </InputGroup>
+                    </FormGroup>
+                  </Col>
+                </Row>
               </Fieldset>
             </Col>
             <Col xs={12} md={6}>

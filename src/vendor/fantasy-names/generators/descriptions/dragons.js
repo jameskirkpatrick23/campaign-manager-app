@@ -1,4 +1,4 @@
-function generator$descriptions$dragons() {
+export default function generator___descriptions___dragons() {
   var nm1 = [
     'Angry',
     'Bright',

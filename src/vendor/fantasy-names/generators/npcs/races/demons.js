@@ -161,7 +161,6 @@ export default function generator___fantasy___demons() {
     'zaem',
     'xan'
   ];
-  const nm2 = ['a', 'e', 'o', 'u'];
   const nm3 = [
     'ba',
     'bae',
