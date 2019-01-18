@@ -15,8 +15,8 @@ import gnollGenerator from './races/gnolls';
 import gnomeGenerator from './races/gnomes';
 import goblinGenerator from './races/goblins';
 import goliathGenerator from './races/goliaths';
-import half_elfGenerator from './races/half_elfs';
-import half_orcGenerator from './races/half_orcs';
+import halfelfGenerator from './races/half_elfs';
+import halforcGenerator from './races/half_orcs';
 import halflingGenerator from './races/halflings';
 import humanGenerator from './races/humans';
 import koboldGenerator from './races/kobolds';
@@ -34,6 +34,44 @@ import vampireGenerator from './races/vampires';
 import werewolfGenerator from './races/werewolfs';
 import backstoryGenerator from './backstorys';
 import physicalDescriptionGenerator from './characters';
+
+const canGenerateRaceName = function(raceName) {
+  const availableGenerators = {
+    aasimarGenerator,
+    angelGenerator,
+    centaurGenerator,
+    demonGenerator,
+    dragonbornGenerator,
+    dragonGenerator,
+    drowGenerator,
+    dwarfGenerator,
+    elfGenerator,
+    giantGenerator,
+    githGenerator,
+    gnollGenerator,
+    gnomeGenerator,
+    goblinGenerator,
+    goliathGenerator,
+    halfelfGenerator,
+    halforcGenerator,
+    halflingGenerator,
+    humanGenerator,
+    koboldGenerator,
+    lamiaGenerator,
+    lichGenerator,
+    minotaurGenerator,
+    nagaGenerator,
+    ogreGenerator,
+    orcGenerator,
+    shifterGenerator,
+    tabaxiGenerator,
+    tieflingGenerator,
+    trollsGenerator,
+    vampireGenerator,
+    werewolfGenerator
+  };
+  return availableGenerators[`${raceName}Generator`];
+};
 
 const createRaceName = function(raceName, gender) {
   const genderVariable = gender === 'male' ? 0 : 1;
@@ -53,8 +91,8 @@ const createRaceName = function(raceName, gender) {
     gnomeGenerator,
     goblinGenerator,
     goliathGenerator,
-    half_elfGenerator,
-    half_orcGenerator,
+    halfelfGenerator,
+    halforcGenerator,
     halflingGenerator,
     humanGenerator,
     koboldGenerator,
@@ -94,4 +132,9 @@ const createNpcDescription = function(raceName, gender) {
   return physicalDescriptionGenerator(genderVariable);
 };
 
-export { createRaceName, createNpcDescription, createNpcBackstory };
+export {
+  createRaceName,
+  canGenerateRaceName,
+  createNpcDescription,
+  createNpcBackstory
+};

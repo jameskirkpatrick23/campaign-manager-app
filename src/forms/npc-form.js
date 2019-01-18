@@ -26,6 +26,7 @@ import Spinner from '../reusable-components/spinner';
 import {
   createNpcBackstory,
   createRaceName,
+  canGenerateRaceName,
   createNpcDescription
 } from '../vendor/fantasy-names/generators/npcs/index';
 
@@ -62,6 +63,7 @@ class NPCForm extends Component {
       isSubmitting: false
     };
     this.onSubmit = this.onSubmit.bind(this);
+    this.canGenerateName = this.canGenerateName.bind(this);
     this.createTag = this.createTag.bind(this);
     this.createRace = this.createRace.bind(this);
     this.createOccupation = this.createOccupation.bind(this);
@@ -281,13 +283,25 @@ class NPCForm extends Component {
     });
   };
 
+  canGenerateName = () => {
+    const { race } = this.state;
+    const stripped = race
+      .replace(/-/g, '')
+      .replace(/\s/g, '')
+      .toLowerCase();
+    return canGenerateRaceName(stripped) ? stripped : false;
+  };
+
   tryGeneratingName = () => {
     const { race, gender } = this.state;
-    const name = createRaceName(race.toLowerCase(), gender);
-    if (name) {
-      this.setState({ name });
-    } else {
-      toast.error(`Unable to generate a name for race: ${race}`);
+    const canGenerate = this.canGenerateName();
+    if (canGenerate) {
+      const name = createRaceName(canGenerate, gender);
+      if (name) {
+        this.setState({ name });
+      } else {
+        toast.error(`Unable to generate a name for race: ${race}`);
+      }
     }
   };
 
@@ -395,7 +409,11 @@ class NPCForm extends Component {
                     >
                       <ControlLabel htmlFor="#npc-name">Name</ControlLabel>
                       <InputGroup>
-                        <InputGroup.Addon className="input-addon">
+                        <InputGroup.Addon
+                          className={`input-addon ${
+                            !this.canGenerateName() ? 'disabled' : ''
+                          }`}
+                        >
                           <Glyphicon
                             glyph="refresh"
                             onClick={this.tryGeneratingName}
