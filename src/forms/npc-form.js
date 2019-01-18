@@ -302,8 +302,8 @@ class NPCForm extends Component {
   };
 
   tryGeneratingDescription = () => {
-    const { gender } = this.state;
-    const physDescription = createNpcDescription(gender);
+    const { gender, race } = this.state;
+    const physDescription = createNpcDescription(race, gender);
     if (physDescription) {
       this.setState({ physDescription });
     } else {
