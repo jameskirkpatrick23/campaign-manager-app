@@ -74,7 +74,7 @@ const canGenerateRaceName = function(raceName) {
 };
 
 const createRaceName = function(raceName, gender) {
-  const genderVariable = gender === 'male' ? 0 : 1;
+  const genderVariable = gender.toLowerCase() === 'male' ? 0 : 1;
   const availableGenerators = {
     aasimarGenerator,
     angelGenerator,
@@ -120,12 +120,12 @@ const createRaceName = function(raceName, gender) {
 };
 
 const createNpcBackstory = function(gender) {
-  const genderVariable = gender === 'male' ? 0 : 1;
+  const genderVariable = gender.toLowerCase() === 'male' ? 0 : 1;
   return backstoryGenerator(genderVariable);
 };
 
 const createNpcDescription = function(raceName, gender) {
-  const genderVariable = gender === 'male' ? 0 : 1;
+  const genderVariable = gender.toLowerCase() === 'male' ? 0 : 1;
   if (raceName === 'dragon') {
     return generateDragonDescription();
   }
