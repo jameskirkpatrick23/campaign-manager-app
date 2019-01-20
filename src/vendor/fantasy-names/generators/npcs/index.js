@@ -126,7 +126,7 @@ const createNpcBackstory = function(gender) {
 
 const createNpcDescription = function(raceName, gender) {
   const genderVariable = gender.toLowerCase() === 'male' ? 0 : 1;
-  if (raceName === 'dragon') {
+  if (raceName.toLowerCase() === 'dragon') {
     return generateDragonDescription();
   }
   return physicalDescriptionGenerator(genderVariable);
