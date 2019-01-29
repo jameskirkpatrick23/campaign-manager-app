@@ -315,6 +315,16 @@ class Place extends Component {
             <span>Quests</span>
           </span>
         </NavItem>
+        <NavItem eventKey="events">
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="calendar"
+            />
+            <span>Events</span>
+          </span>
+        </NavItem>
         <NavItem eventKey="attachedFiles">
           <span>
             <Glyphicon
@@ -371,6 +381,7 @@ class Place extends Component {
                 {this.renderObject('places', 'placeIds', 'place', 'type')}
                 {this.renderObject('npcs', 'npcIds', 'npc', 'race')}
                 {this.renderObject('quests', 'questIds', 'quest', 'status')}
+                {this.renderObject('events', 'eventIds', 'event', 'status')}
               </Tab.Content>
             </Col>
           </Row>
@@ -385,6 +396,7 @@ Place.propTypes = {};
 const mapStateToProps = state => ({
   places: state.places.all,
   npcs: state.npcs.all,
+  events: state.events.all,
   quests: state.quests.all,
   currentCampaign: state.campaigns.currentCampaign
 });

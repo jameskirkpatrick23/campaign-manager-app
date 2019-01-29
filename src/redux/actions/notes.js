@@ -1,11 +1,11 @@
 import * as constants from '../constants';
 import database from '../../firebaseDB';
 import firebase from 'firebase';
-import _ from 'lodash';
 import ReactGA from 'react-ga';
 import { updateNpcsList } from './npcs';
 import { updateQuestsList } from './quests';
 import { updatePlacesList } from './places';
+import { updateEventsList } from './events';
 
 export const loadAllNotes = notes => (dispatch, getState) => {
   const updatedState = { ...getState().notes.all };
@@ -31,7 +31,7 @@ const removeNoteFromList = noteId => (dispatch, getState) => {
 };
 
 export const createNote = noteData => (dispatch, getState) => {
-  const { npcs, places, quests } = getState();
+  const { npcs, places, quests, events } = getState();
   ReactGA.event({
     category: 'Notes',
     action: 'Create Note'
@@ -71,6 +71,9 @@ export const createNote = noteData => (dispatch, getState) => {
             break;
           case 'quests':
             dispatch(updateQuestsList(used));
+            break;
+          case 'events':
+            dispatch(updateEventsList(used));
             break;
         }
         resolve(res);

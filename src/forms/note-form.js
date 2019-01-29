@@ -2,11 +2,9 @@ import React, { Component } from 'react';
 import {
   Row,
   Col,
-  Button,
   FormGroup,
   ControlLabel,
-  FormControl,
-  HelpBlock
+  FormControl
 } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';

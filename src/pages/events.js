@@ -13,25 +13,24 @@ import {
   Button
 } from 'react-bootstrap';
 
-class QuestPage extends Component {
+class EventPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       searchTerm: '',
-      formattedQuests: {}
+      formattedEvents: {}
     };
   }
 
-  filteredQuestKeys = () => {
+  filteredEventKeys = () => {
     const { searchTerm } = this.state;
-    const { quests, tags, notes } = this.props;
+    const { events, tags, notes } = this.props;
     const searchTerms = searchTerm.split(' ').map(st => st.toLowerCase());
     const doesInclude = (object, stateKey, term) => {
       return object && object[stateKey].toLowerCase().includes(term);
     };
     const includesRelated = (object, term) => {
       return (
-        object.objectives.map(x => x.name.toLowerCase()).includes(term) ||
         object.tagIds.find(tagId =>
           tags[tagId].name.toLowerCase().includes(term)
         ) ||
@@ -42,50 +41,50 @@ class QuestPage extends Component {
         )
       );
     };
-    return Object.keys(quests).filter(questId =>
+    return Object.keys(events).filter(eventId =>
       searchTerms.every(
         st =>
-          doesInclude(quests[questId], 'name', st) ||
-          doesInclude(quests[questId], 'description', st) ||
-          doesInclude(quests[questId], 'rewards', st) ||
-          doesInclude(quests[questId], 'status', st) ||
-          includesRelated(quests[questId], st)
+          doesInclude(events[eventId], 'name', st) ||
+          doesInclude(events[eventId], 'description', st) ||
+          doesInclude(events[eventId], 'time', st) ||
+          doesInclude(events[eventId], 'ramifications', st) ||
+          includesRelated(events[eventId], st)
       )
     );
   };
 
-  formatQuests = props => {
-    const { quests, currentCampaign } = props;
-    const questKeys = this.filteredQuestKeys();
-    const foundQuests = {};
-    questKeys.forEach(questKey => {
-      if (quests[questKey].campaignIds.includes(currentCampaign.id)) {
-        foundQuests[questKey] = quests[questKey];
+  formatEvents = props => {
+    const { events, currentCampaign } = props;
+    const eventKeys = this.filteredEventKeys();
+    const foundEvents = {};
+    eventKeys.forEach(eventKey => {
+      if (events[eventKey].campaignIds.includes(currentCampaign.id)) {
+        foundEvents[eventKey] = events[eventKey];
       }
     });
-    return foundQuests;
+    return foundEvents;
   };
 
   componentDidMount() {
-    this.setState({ formattedQuests: this.formatQuests(this.props) });
+    this.setState({ formattedEvents: this.formatEvents(this.props) });
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.quests !== this.props.quests) {
-      this.setState({ formattedQuests: this.formatQuests(nextProps) });
+    if (nextProps.events !== this.props.events) {
+      this.setState({ formattedEvents: this.formatEvents(nextProps) });
     }
   }
 
-  renderQuests() {
+  renderEvents() {
     const { currentCampaign } = this.props;
-    const { formattedQuests } = this.state;
-    return Object.keys(formattedQuests).map(key => {
-      const quest = formattedQuests[key];
-      let url = quest.images[0]
-        ? quest.images[0].downloadUrl
+    const { formattedEvents } = this.state;
+    return Object.keys(formattedEvents).map(key => {
+      const event = formattedEvents[key];
+      let url = event.images[0]
+        ? event.images[0].downloadUrl
         : require('../assets/placeholder.png');
-      const questRoute = `/campaigns/${currentCampaign.id}/home/quests/${
-        quest.id
+      const eventRoute = `/campaigns/${currentCampaign.id}/home/events/${
+        event.id
       }`;
       return (
         <Col key={key} xs={6} sm={4} md={3} className="margin-bottom-1">
@@ -93,9 +92,9 @@ class QuestPage extends Component {
           <Button
             className="collection-item-name"
             bsStyle="primary"
-            onClick={() => this.props.history.push(questRoute)}
+            onClick={() => this.props.history.push(eventRoute)}
           >
-            {quest.name}
+            {event.name}
           </Button>
         </Col>
       );
@@ -104,14 +103,14 @@ class QuestPage extends Component {
 
   onSearch = e => {
     this.setState({ searchTerm: e.target.value }, () => {
-      this.setState({ formattedQuests: this.formatQuests(this.props) });
+      this.setState({ formattedEvents: this.formatEvents(this.props) });
     });
   };
 
   render() {
     const { currentCampaign } = this.props;
     const { searchTerm } = this.state;
-    const createQuestRoute = `/campaigns/${currentCampaign.id}/home/quests/new`;
+    const createEventRoute = `/campaigns/${currentCampaign.id}/home/events/new`;
 
     return (
       <Grid>
@@ -134,21 +133,21 @@ class QuestPage extends Component {
             </FormGroup>
           </Col>
           <Col xs={2}>
-            <Button onClick={() => this.props.history.push(createQuestRoute)}>
+            <Button onClick={() => this.props.history.push(createEventRoute)}>
               Create
             </Button>
           </Col>
         </Row>
-        <Row>{this.renderQuests()}</Row>
+        <Row>{this.renderEvents()}</Row>
       </Grid>
     );
   }
 }
 
-QuestPage.defaultProps = {};
-QuestPage.propTypes = {};
+EventPage.defaultProps = {};
+EventPage.propTypes = {};
 const mapStateToProps = state => ({
-  quests: state.quests.all,
+  events: state.events.all,
   tags: state.tags.all,
   notes: state.notes.all,
   currentCampaign: state.campaigns.currentCampaign
@@ -157,4 +156,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   null
-)(QuestPage);
+)(EventPage);

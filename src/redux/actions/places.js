@@ -28,7 +28,7 @@ export const loadAllPlaceTypes = placeTypes => (dispatch, getState) => {
   });
   dispatch({
     type: constants.Place.UPDATE_PLACE_TYPES,
-    placeTypes: updatedState
+    types: updatedState
   });
 };
 

@@ -286,6 +286,16 @@ class Quest extends Component {
             <span>Quests</span>
           </span>
         </NavItem>
+        <NavItem eventKey="events">
+          <span>
+            <Glyphicon
+              bsSize="large"
+              className="margin-right-1"
+              glyph="calendar"
+            />
+            <span>Events</span>
+          </span>
+        </NavItem>
         <NavItem eventKey="attachedFiles">
           <span>
             <Glyphicon
@@ -341,6 +351,7 @@ class Quest extends Component {
                 {this.renderObject('places', 'placeIds', 'place', 'type')}
                 {this.renderObject('npcs', 'npcIds', 'npc', 'race')}
                 {this.renderObject('quests', 'questIds', 'quest', 'status')}
+                {this.renderObject('events', 'eventIds', 'event', 'status')}
               </Tab.Content>
             </Col>
           </Row>
@@ -355,6 +366,7 @@ Quest.propTypes = {};
 const mapStateToProps = state => ({
   quests: state.quests.all,
   npcs: state.npcs.all,
+  events: state.events.all,
   places: state.places.all,
   currentCampaign: state.campaigns.currentCampaign
 });

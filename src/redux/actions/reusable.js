@@ -97,9 +97,9 @@ export const conditionallyUpdateConnected = (currentItem, dataItem, batch) => {
   _.uniq([...currentItem.placeIds, ...dataItem.placeIds]).forEach(placeId => {
     const placeRef = database.collection('places').doc(placeId);
     if (!dataItem.placeIds.includes(placeId)) {
-      batch.update(placeRef, { npcIds: arrayRemove(currentItem.id) });
+      batch.update(placeRef, { placeIds: arrayRemove(currentItem.id) });
     } else {
-      batch.update(placeRef, { npcIds: arrayUnion(currentItem.id) });
+      batch.update(placeRef, { placeIds: arrayUnion(currentItem.id) });
     }
   });
 
@@ -115,9 +115,18 @@ export const conditionallyUpdateConnected = (currentItem, dataItem, batch) => {
   _.uniq([...currentItem.questIds, ...dataItem.questIds]).forEach(questId => {
     const questRef = database.collection('quests').doc(questId);
     if (!dataItem.questIds.includes(questId)) {
-      batch.update(questRef, { npcIds: arrayRemove(currentItem.id) });
+      batch.update(questRef, { questIds: arrayRemove(currentItem.id) });
     } else {
-      batch.update(questRef, { npcIds: arrayUnion(currentItem.id) });
+      batch.update(questRef, { questIds: arrayUnion(currentItem.id) });
+    }
+  });
+
+  _.uniq([...currentItem.eventIds, ...dataItem.eventIds]).forEach(eventId => {
+    const eventRef = database.collection('events').doc(eventId);
+    if (!dataItem.eventIds.includes(eventId)) {
+      batch.update(eventRef, { eventIds: arrayRemove(currentItem.id) });
+    } else {
+      batch.update(eventRef, { eventIds: arrayUnion(currentItem.id) });
     }
   });
 };
@@ -135,6 +144,10 @@ export const updateConnected = (item, itemState, batch) => {
   item.questIds.forEach(questId => {
     const questRef = database.collection('quests').doc(questId);
     batch.update(questRef, { [itemState]: arrayUnion(item.id) });
+  });
+  item.eventIds.forEach(eventId => {
+    const eventRef = database.collection('events').doc(eventId);
+    batch.update(eventRef, { [itemState]: arrayUnion(item.id) });
   });
 };
 
@@ -154,8 +167,12 @@ export const deleteConnected = (item, itemState, batch) => dispatch => {
     batch.update(npcRef, { [itemState]: arrayRemove(item.id) });
   });
   item.questIds.forEach(questId => {
-    const npcRef = database.collection('quests').doc(questId);
-    batch.update(npcRef, { [itemState]: arrayRemove(item.id) });
+    const questRef = database.collection('quests').doc(questId);
+    batch.update(questRef, { [itemState]: arrayRemove(item.id) });
+  });
+  item.eventIds.forEach(eventId => {
+    const eventRef = database.collection('events').doc(eventId);
+    batch.update(eventRef, { [itemState]: arrayRemove(item.id) });
   });
 };
 

@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import ColumnExpander from '../reusable-components/column-expansion';
 import NPCImage from '../assets/npcImages.png';
 import QuestsImage from '../assets/dnd-adventure-1.jpeg';
+import EventsImage from '../assets/dnd-adventure-2.jpeg';
 import TownsImage from '../assets/Neverwinter_cityscape.jpg';
 import { deleteCampaign } from '../redux/actions/campaigns';
 
@@ -26,6 +27,11 @@ class Home extends Component {
         backgroundImage: QuestsImage,
         description:
           'Manage the quests your heroes undertake within your universe.'
+      },
+      Events: {
+        route: `/campaigns/${props.currentCampaign.id}/home/events`,
+        backgroundImage: EventsImage,
+        description: 'Manage the events that happen in your universe.'
       }
     };
     this.deleteCurrentCampaign = this.deleteCurrentCampaign.bind(this);

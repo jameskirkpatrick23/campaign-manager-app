@@ -264,7 +264,7 @@ Notes.defaultProps = {
 
 Notes.propTypes = {
   noteIds: PropTypes.arrayOf(PropTypes.string),
-  type: PropTypes.oneOf(['places', 'npcs', 'quests']).isRequired,
+  type: PropTypes.oneOf(['places', 'npcs', 'quests', 'events']).isRequired,
   typeId: PropTypes.string.isRequired
 };
 

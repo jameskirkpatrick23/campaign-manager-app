@@ -1,30 +1,38 @@
 import React, { Component } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import 'react-widgets/dist/css/react-widgets.css';
+import { Multiselect, DropdownList } from 'react-widgets';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { toast } from 'react-toastify';
 import {
+  ControlLabel,
+  FormControl,
+  FormGroup,
   Button,
-  Glyphicon,
   Row,
   Col,
-  FormGroup,
-  FormControl,
-  ControlLabel
+  Glyphicon
 } from 'react-bootstrap';
-import * as PlaceActions from '../redux/actions/places';
 import Fieldset from '../reusable-components/fieldset';
-import * as TagActions from '../redux/actions/tags';
-import { Multiselect, DropdownList } from 'react-widgets';
+import { createEvent, editEvent } from '../redux/actions/events';
+import { createTag } from '../redux/actions/tags';
 import Spinner from '../reusable-components/spinner';
 
-class PlacesForm extends Component {
+class EventForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      images: {},
-      placeTypes: {},
+      name: '',
+      description: '',
+      ramifications: '',
+      tagIds: [],
       tags: {},
+      placeIds: [],
+      npcIds: [],
+      questIds: [],
+      eventIds: [],
+      images: {},
       attachedFiles: {},
       newImages: {},
       newAttachedFiles: {},
@@ -32,108 +40,79 @@ class PlacesForm extends Component {
       deletenewAttachedFilesKeys: [],
       deleteimagesKeys: [],
       deleteattachedFilesKeys: [],
-      npcIds: [],
-      placeIds: [],
-      eventIds: [],
-      id: '',
-      questIds: [],
-      tagIds: [],
-      history: '',
-      location: '',
-      name: '',
-      type: '',
-      insideDescription: '',
-      outsideDescription: '',
       isSubmitting: false
     };
-    this.handleCloseRequest = this.handleCloseRequest.bind(this);
-    this.handleExistingDelete = this.handleExistingDelete.bind(this);
-    this.getValidationState = this.getValidationState.bind(this);
-    this.generateFileList = this.generateFileList.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    this.createTag = this.createTag.bind(this);
-    this.createPlaceType = this.createPlaceType.bind(this);
+    this.updateObjective = this.updateObjective.bind(this);
+    this.addObjective = this.addObjective.bind(this);
+    this.handleCloseRequest = this.handleCloseRequest.bind(this);
   }
 
   componentWillMount() {
-    const { place, placeTypes } = this.props;
+    const { event, tags } = this.props;
     const images = {};
     const attachedFiles = {};
-    if (place.images.length) {
-      place.images.forEach((image, index) => {
+    if (event.images.length) {
+      event.images.forEach((image, index) => {
         images[index] = image;
       });
     }
-    if (place.attachedFiles.length) {
-      place.attachedFiles.forEach((attachedFile, index) => {
+    if (event.attachedFiles.length) {
+      event.attachedFiles.forEach((attachedFile, index) => {
         attachedFiles[index] = attachedFile;
       });
     }
     this.setState({
       images: images,
-      id: place.id || '',
+      id: event.id || '',
       attachedFiles: attachedFiles,
-      npcIds: [...place.npcIds] || [],
-      placeIds: [...place.placeIds] || [],
-      floorIds: [...place.floorIds] || [],
-      noteIds: [...place.noteIds] || [],
-      eventIds: [...place.eventIds] || [],
-      questIds: [...place.questIds] || [],
-      tagIds: [...place.tagIds] || [],
-      history: place.history || '',
-      location: place.location || '',
-      name: place.name || '',
-      type: place.type || '',
-      placeTypes,
-      insideDescription: place.insideDescription || '',
-      outsideDescription: place.outsideDescription || ''
+      objectives: event.objectives ? [...event.objectives] : [],
+      npcIds: [...event.npcIds] || [],
+      placeIds: [...event.placeIds] || [],
+      noteIds: [...event.noteIds] || [],
+      questIds: [...event.questIds] || [],
+      eventIds: [...event.eventIds] || [],
+      tagIds: [...event.tagIds] || [],
+      name: event.name || '',
+      tags,
+      description: event.description || '',
+      ramifications: event.ramifications || ''
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.tags !== this.props.tags ||
-      nextProps.placeTypes !== this.props.placeTypes
-    ) {
-      const { tags, placeTypes } = nextProps;
-      this.setState({ tags, placeTypes });
-    }
-  }
-
   onSubmit = e => {
-    const {
-      formAction,
-      createPlace,
-      history,
-      editPlace,
-      onSubmit
-    } = this.props;
     e.preventDefault();
+    const {
+      createEvent,
+      formAction,
+      history,
+      onSubmit,
+      editEvent
+    } = this.props;
     const formattedData = { ...this.state };
-    ['tagIds', 'placeIds', 'npcIds', 'questIds', 'eventIds'].forEach(
+    ['tagIds', 'placeIds', 'questIds', 'npcIds', 'eventIds'].forEach(
       stateKey => {
         formattedData[stateKey] = formattedData[stateKey].map(
           item => item.value || item
         );
       }
     );
-    delete formattedData.placeTypes;
     delete formattedData.tags;
     this.setState({ isSubmitting: true }, () => {
       if (formAction !== 'edit') {
-        createPlace(formattedData)
+        createEvent(formattedData)
           .then(res => {
             toast.success(
-              `Created the Place: ${formattedData.name} successfully!`
+              `Created the event: ${formattedData.name} successfully!`
             );
             history.goBack();
           })
           .catch(err => toast.error(`Something went wrong: ${err}`));
       } else {
-        editPlace(formattedData)
+        editEvent(formattedData)
           .then(res => {
             toast.success(
-              `Created the Place: ${formattedData.name} successfully!`
+              `Edited the event: ${formattedData.name} successfully!`
             );
             onSubmit(res);
             this.setState({ isSubmitting: false });
@@ -143,38 +122,9 @@ class PlacesForm extends Component {
     });
   };
 
-  handleCloseRequest = e => {
-    const { history, onCancel, formAction } = this.props;
-    e.preventDefault();
-    if (formAction !== 'edit') {
-      history.goBack();
-    } else {
-      onCancel();
-    }
-  };
-
-  createPlaceType = typeName => {
-    if (typeName.length) {
-      this.props.createPlaceType(typeName).then(res => {
-        toast.success(`Created the type: ${typeName} successfully!`);
-        this.setState({ type: typeName });
-      });
-    } else {
-      toast.error('Your type needs to be at least one character long');
-    }
-  };
-
-  createTag = tagName => {
-    if (tagName.length) {
-      this.props.createTag(tagName).then(res => {
-        toast.success(`Created the tag: ${tagName} successfully!`);
-        const currentTags = [...this.state.tagIds];
-        currentTags.push({ value: res.id, name: tagName });
-        this.setState({ tagIds: currentTags });
-      });
-    } else {
-      toast.error('Your tag needs to be at least one character long');
-    }
+  handleCloseRequest = () => {
+    const { formAction, history, onCancel } = this.props;
+    formAction === 'create' ? history.goBack() : onCancel();
   };
 
   getValidationState = formKey => {
@@ -194,6 +144,19 @@ class PlacesForm extends Component {
     return null;
   };
 
+  createTag = tagName => {
+    if (tagName.length) {
+      this.props.createTag(tagName).then(res => {
+        toast.success(`Created the tag: ${tagName} successfully!`);
+        const currentTags = [...this.state.tagIds];
+        currentTags.push({ value: res.id, name: tagName });
+        this.setState({ tagIds: currentTags });
+      });
+    } else {
+      toast.error('Your tag needs to be at least one character long');
+    }
+  };
+
   handleExistingDelete = (fileKey, type) => {
     const currentFiles = { ...this.state[type] };
     delete currentFiles[fileKey];
@@ -206,7 +169,7 @@ class PlacesForm extends Component {
     return Object.keys(this.state[stateName]).map(key => {
       const currentFile = this.state[stateName][key];
       return (
-        <div key={`place-${stateName}-${key}`}>
+        <div key={`event-${stateName}-${key}`}>
           <span>
             {currentFile.name || currentFile.fileName}
             <Button
@@ -223,24 +186,33 @@ class PlacesForm extends Component {
     });
   };
 
-  render = () => {
+  updateObjective = (index, state, value) => {
+    let objs = [...this.state.objectives];
+    objs[index][state] = value;
+    this.setState({ objectives: objs });
+  };
+
+  addObjective = () => {
+    let objs = [...this.state.objectives];
+    objs.push({ complete: false, name: '' });
+    this.setState({ objectives: objs });
+  };
+
+  render() {
     const {
-      isSubmitting,
       name,
-      type,
-      location,
-      insideDescription,
-      outsideDescription,
-      history,
+      description,
+      ramifications,
+      tagIds,
       placeIds,
       npcIds,
       questIds,
-      tagIds,
       eventIds,
-      placeTypes,
-      tags
+      time,
+      tags,
+      isSubmitting
     } = this.state;
-    const { places, npcs, quests, events } = this.props;
+    const { places, quests, npcs, events } = this.props;
     return (
       <div>
         <Spinner show={isSubmitting} />
@@ -249,116 +221,73 @@ class PlacesForm extends Component {
             <Col xs={12} md={6}>
               <Fieldset label="General Information">
                 <FormGroup validationState={this.getValidationState('name')}>
-                  <ControlLabel htmlFor="#place-name">Name</ControlLabel>
+                  <ControlLabel htmlFor="#event-name">Name</ControlLabel>
                   <FormControl
-                    id="place-name"
+                    id="event-name"
                     type="text"
                     value={name}
                     required
-                    placeholder="Give this place a name"
+                    placeholder="Give this Event a name"
                     onChange={e => this.setState({ name: e.target.value })}
                   />
                   <FormControl.Feedback />
                 </FormGroup>
-                <FormGroup validationState={this.getValidationState('type')}>
-                  <ControlLabel htmlFor="#place-type">Type</ControlLabel>
-                  <DropdownList
-                    id="place-type"
-                    data={Object.keys(placeTypes).map(
-                      key => placeTypes[key].name
-                    )}
-                    value={type}
-                    containerClassName="form-control padding-left-0 font-static"
-                    placeholder="Town, City, Underground Cavern, Castle Dungeon, etc."
-                    allowCreate={'onFilter'}
-                    onCreate={this.createPlaceType}
-                    onChange={dataItem => this.setState({ type: dataItem })}
-                    caseSensitive={false}
-                    minLength={3}
-                    filter="contains"
+                <FormGroup validationState={this.getValidationState('time')}>
+                  <ControlLabel htmlFor="#event-time">Time</ControlLabel>
+                  <FormControl
+                    id="event-time"
+                    type="text"
+                    value={time}
+                    required
+                    placeholder="When did this event happen?"
+                    onChange={e => this.setState({ time: e.target.value })}
                   />
                   <FormControl.Feedback />
                 </FormGroup>
                 <FormGroup
-                  validationState={this.getValidationState('location')}
+                  validationState={this.getValidationState('description')}
                 >
-                  <ControlLabel htmlFor="#place-location">
-                    Location
+                  <ControlLabel htmlFor="event-description">
+                    Description
                   </ControlLabel>
                   <FormControl
-                    id="place-location"
+                    id="event-description"
                     type="text"
                     componentClass="textarea"
-                    value={location}
-                    placeholder="Where is this place located?"
-                    onChange={e => this.setState({ location: e.target.value })}
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-              </Fieldset>
-            </Col>
-            <Col xs={12} md={6}>
-              <Fieldset label="Descriptive Information">
-                <FormGroup
-                  validationState={this.getValidationState('insideDescription')}
-                >
-                  <ControlLabel htmlFor="#place-inside-description">
-                    Inside Description
-                  </ControlLabel>
-                  <FormControl
-                    id="place-inside-description"
-                    type="text"
-                    componentClass="textarea"
-                    value={insideDescription}
-                    placeholder="What do the characters see, hear, smell, and even taste when they look inside this place..."
+                    value={description}
+                    placeholder="Describe the circumstances of this event"
                     onChange={e =>
-                      this.setState({ insideDescription: e.target.value })
+                      this.setState({ description: e.target.value })
                     }
                   />
                   <FormControl.Feedback />
                 </FormGroup>
                 <FormGroup
-                  validationState={this.getValidationState(
-                    'outsideDescription'
-                  )}
+                  validationState={this.getValidationState('ramifications')}
                 >
-                  <ControlLabel htmlFor="#place-outside-description">
-                    Outside Description
+                  <ControlLabel htmlFor="event-ramifications">
+                    Ramifications
                   </ControlLabel>
                   <FormControl
-                    id="place-outside-description"
+                    id="event-ramifications"
                     type="text"
+                    value={ramifications}
                     componentClass="textarea"
-                    value={outsideDescription}
-                    placeholder="What do the characters see, hear, smell, and even taste when they look at this place from the outside..."
+                    placeholder="What has happened because of this event?"
                     onChange={e =>
-                      this.setState({ outsideDescription: e.target.value })
+                      this.setState({ ramifications: e.target.value })
                     }
-                  />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <FormGroup validationState={this.getValidationState('history')}>
-                  <ControlLabel htmlFor="#place-history">History</ControlLabel>
-                  <FormControl
-                    id="place-history"
-                    type="text"
-                    componentClass="textarea"
-                    value={history}
-                    placeholder="How did this place come to be, what happened here in the past"
-                    onChange={e => this.setState({ history: e.target.value })}
                   />
                   <FormControl.Feedback />
                 </FormGroup>
               </Fieldset>
             </Col>
-          </Row>
-          <Row className="padding-bottom-1">
             <Col xs={12} md={6}>
               <Fieldset label="Related Info">
                 <FormGroup>
-                  <ControlLabel htmlFor="#place-tags">Tags</ControlLabel>
+                  <ControlLabel htmlFor="#event-tags">Tags</ControlLabel>
                   <Multiselect
-                    id="place-tags"
+                    id="event-tags"
                     data={Object.keys(tags).map(key => ({
                       name: tags[key].name,
                       value: key
@@ -376,9 +305,9 @@ class PlacesForm extends Component {
                   />
                 </FormGroup>
                 <FormGroup>
-                  <ControlLabel htmlFor="#place-places">Places</ControlLabel>
+                  <ControlLabel htmlFor="#event-places">Places</ControlLabel>
                   <Multiselect
-                    id="place-places"
+                    id="event-places"
                     data={Object.keys(places).map(key => ({
                       name: places[key].name,
                       value: key
@@ -386,7 +315,7 @@ class PlacesForm extends Component {
                     value={placeIds}
                     textField="name"
                     valueField="value"
-                    placeholder="What places are related to this place?"
+                    placeholder="What places does this event interact in?"
                     caseSensitive={false}
                     onChange={dataItems =>
                       this.setState({ placeIds: dataItems })
@@ -396,9 +325,9 @@ class PlacesForm extends Component {
                   />
                 </FormGroup>
                 <FormGroup>
-                  <ControlLabel htmlFor="#place-npcs">NPCs</ControlLabel>
+                  <ControlLabel htmlFor="#event-npcs">NPCs</ControlLabel>
                   <Multiselect
-                    id="place-npcs"
+                    id="event-npcs"
                     data={Object.keys(npcs).map(key => ({
                       name: npcs[key].name,
                       value: key
@@ -406,7 +335,7 @@ class PlacesForm extends Component {
                     value={npcIds}
                     textField="name"
                     valueField="value"
-                    placeholder="What npcs interact or live here?"
+                    placeholder="Which NPCs interact with this event?"
                     caseSensitive={false}
                     onChange={dataItems => this.setState({ npcIds: dataItems })}
                     minLength={1}
@@ -414,9 +343,9 @@ class PlacesForm extends Component {
                   />
                 </FormGroup>
                 <FormGroup>
-                  <ControlLabel htmlFor="#place-quests">Quests</ControlLabel>
+                  <ControlLabel htmlFor="#event-quests">Quests</ControlLabel>
                   <Multiselect
-                    id="place-quests"
+                    id="event-quests"
                     data={Object.keys(quests).map(key => ({
                       name: quests[key].name,
                       value: key
@@ -424,7 +353,7 @@ class PlacesForm extends Component {
                     value={questIds}
                     textField="name"
                     valueField="value"
-                    placeholder="What quests does this can be completed here?"
+                    placeholder="What other quests does this event have a role in?"
                     caseSensitive={false}
                     onChange={dataItems =>
                       this.setState({ questIds: dataItems })
@@ -434,9 +363,9 @@ class PlacesForm extends Component {
                   />
                 </FormGroup>
                 <FormGroup>
-                  <ControlLabel htmlFor="#place-events">Events</ControlLabel>
+                  <ControlLabel htmlFor="#event-events">Events</ControlLabel>
                   <Multiselect
-                    id="place-events"
+                    id="event-events"
                     data={Object.keys(events).map(key => ({
                       name: events[key].name,
                       value: key
@@ -444,7 +373,7 @@ class PlacesForm extends Component {
                     value={eventIds}
                     textField="name"
                     valueField="value"
-                    placeholder="What events have or will happen here?"
+                    placeholder="What events does this event have a role in?"
                     caseSensitive={false}
                     onChange={dataItems =>
                       this.setState({ eventIds: dataItems })
@@ -455,12 +384,14 @@ class PlacesForm extends Component {
                 </FormGroup>
               </Fieldset>
             </Col>
+          </Row>
+          <Row>
             <Col xs={12} md={6}>
               <Fieldset label="Images and Files">
                 <FormGroup>
-                  <ControlLabel htmlFor="#npc-image">Image</ControlLabel>
-                  <input
-                    id="npc-image"
+                  <ControlLabel htmlFor="#event-image">Image</ControlLabel>
+                  <FormControl
+                    id="event-image"
                     type="file"
                     multiple
                     accept="image/png, image/jpeg, image/gif"
@@ -473,11 +404,11 @@ class PlacesForm extends Component {
                   {this.generateFileList('images')}
                 </FormGroup>
                 <FormGroup>
-                  <ControlLabel htmlFor="#npc-attachedFiles">
+                  <ControlLabel htmlFor="#event-attachedFiles">
                     Other Files
                   </ControlLabel>
-                  <input
-                    id="npc-attachedFiles"
+                  <FormControl
+                    id="event-attachedFiles"
                     type="file"
                     multiple
                     accept="image/png, image/jpeg, image/svg, image/gif, application/xhtml+xml, application/xml, application/pdf"
@@ -514,54 +445,52 @@ class PlacesForm extends Component {
         </form>
       </div>
     );
-  };
+  }
 }
 
-PlacesForm.defaultProps = {
-  place: {
+EventForm.defaultProps = {
+  event: {
+    objectives: [],
     images: [],
     npcIds: [],
     placeIds: [],
-    floorIds: [],
     noteIds: [],
-    eventIds: [],
     questIds: [],
+    eventIds: [],
     tagIds: [],
     attachedFiles: []
   },
-  formAction: 'create',
-  onSubmit: () => {},
-  onCancel: () => {}
+  onCancel: () => {},
+  formAction: 'create'
 };
-PlacesForm.propTypes = {
-  formAction: PropTypes.string,
-  place: PropTypes.shape({}),
-  onSubmit: PropTypes.func,
-  onCancel: PropTypes.func
+EventForm.propTypes = {
+  event: PropTypes.shape({}),
+  onCancel: PropTypes.func,
+  createEvent: PropTypes.func.isRequired,
+  formAction: PropTypes.oneOf(['edit', 'create'])
 };
 
 const mapStateToProps = state => ({
-  events: state.events.all,
-  quests: state.quests.all,
+  tags: state.tags.all,
   npcs: state.npcs.all,
   places: state.places.all,
-  placeTypes: state.places.types,
-  currentCampaignId: state.campaigns.currentCampaign.id,
-  tags: state.tags.all
+  quests: state.quests.all,
+  events: state.events.all
 });
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      createPlaceType: PlaceActions.createPlaceType,
-      createTag: TagActions.createTag,
-      createPlace: PlaceActions.createPlace,
-      editPlace: PlaceActions.editPlace
+      createEvent: createEvent,
+      editEvent: editEvent,
+      createTag: createTag
     },
     dispatch
   );
 
-export default connect(
+const FormContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(PlacesForm);
+)(EventForm);
+
+export default FormContainer;

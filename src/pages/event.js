@@ -15,177 +15,99 @@ import {
   Modal,
   Button
 } from 'react-bootstrap';
-import NPCForm from '../forms/npc-form';
+import EventForm from '../forms/event-form';
 import Notes from './notes';
-import * as NPCActions from '../redux/actions/npcs';
-import Fieldset from '../reusable-components/fieldset';
 import ListSlidein from '../reusable-components/list-slidein';
+import Fieldset from '../reusable-components/fieldset';
+import * as EventActions from '../redux/actions/events';
 
-class NPC extends Component {
+class Event extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      npc: {},
-      npcFormOpen: false,
-      loading: false
+      event: {},
+      eventFormOpen: false
     };
     this.renderDetails = this.renderDetails.bind(this);
-    this.handleNPCDelete = this.handleNPCDelete.bind(this);
+    this.handleEventDelete = this.handleEventDelete.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderObject = this.renderObject.bind(this);
     this.getImage = this.getImage.bind(this);
-    this.renderNPCForm = this.renderNPCForm.bind(this);
+    this.renderEventForm = this.renderEventForm.bind(this);
   }
 
   componentWillMount = () => {
-    const npcId = this.props.match.params.npc_id;
-    this.setState({ npc: this.props.npcs[npcId] });
+    const eventId = this.props.match.params.event_id;
+    this.setState({ event: this.props.events[eventId] });
   };
 
   componentWillReceiveProps = nextProps => {
-    const npcId = nextProps.match.params.npc_id;
-    const oldNpcId = this.props.match.params.npc_id;
-    if (!_.isEqual(this.props.npcs, nextProps.npcs) || npcId !== oldNpcId) {
-      this.setState({ npc: nextProps.npcs[npcId] });
+    const eventId = nextProps.match.params.event_id;
+    const oldEventId = this.props.match.params.event_id;
+    if (
+      !_.isEqual(this.props.events, nextProps.events) ||
+      eventId !== oldEventId
+    ) {
+      this.setState({ event: nextProps.events[eventId] });
     }
   };
 
-  handleNPCDelete = npc => {
-    const { deleteNPC, history } = this.props;
-    deleteNPC(npc);
+  handleEventDelete = event => {
+    const { deleteEvent, history } = this.props;
+    deleteEvent(event);
     history.goBack();
   };
 
   renderDetails = () => {
-    const { npc } = this.state;
-
+    const { event } = this.state;
     return (
       <Tab.Pane eventKey="info">
-        <Col xs={12}>
-          <Fieldset label="Physical Description">
-            <Row>
-              <Col xs={12} sm={4}>
-                <div>
-                  <strong>Gender: </strong>
-                  <p>{npc.gender}</p>
-                </div>
-              </Col>
-              <Col xs={12} sm={4}>
-                <div>
-                  <strong>Age: </strong>
-                  <p>{npc.age}</p>
-                </div>
-              </Col>
-              <Col xs={12} sm={4}>
-                <div>
-                  <strong>Height: </strong>
-                  <p>{npc.height}</p>
-                </div>
-              </Col>
-              <Col xs={12} sm={4}>
-                <div>
-                  <strong>Weight: </strong>
-                  <p>{npc.weight}</p>
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={12} sm={4}>
-                <div>
-                  <strong>Race: </strong>
-                  <p>{npc.race}</p>
-                </div>
-              </Col>
-              <Col xs={12} sm={4}>
-                <div>
-                  <strong>Occupation: </strong>
-                  <p>{npc.occupation}</p>
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={12}>
-                <div>
-                  <strong>Description: </strong>
-                  <p>{npc.physDescription}</p>
-                </div>
-              </Col>
-            </Row>
-          </Fieldset>
-        </Col>
-        <Col xs={12}>
-          <Fieldset label="Personality">
-            <Row>
-              <Col xs={12} sm={4}>
-                <div>
-                  <strong>Alignment: </strong>
-                  <p>{npc.alignment}</p>
-                </div>
-              </Col>
-              <Col xs={12} sm={4}>
-                <div>
-                  <strong>Relationship to Group: </strong>
-                  <p>
-                    {npc.relationshipToGroup ? npc.relationshipToGroup : 'N/A'}
-                  </p>
-                </div>
-              </Col>
-              <Col xs={12}>
-                <div>
-                  <strong>Values: </strong>
-                  <br />
-                  {npc.values.map(v => (
-                    <span key={v} className="margin-right-1">
-                      {v}
-                    </span>
-                  ))}
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={12}>
-                <div>
-                  <strong>Quirks: </strong>
-                  {npc.quirks.map(q => (
-                    <p key={q}>{q}</p>
-                  ))}
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={12}>
-                <div>
-                  <strong>Backstory: </strong>
-                  <p>{npc.backstory}</p>
-                </div>
-              </Col>
-            </Row>
-          </Fieldset>
-        </Col>
+        <Fieldset label="Details">
+          <Row>
+            <Col xs={12} sm={4}>
+              <div>
+                <strong>Time: </strong>
+                <p>{event.time}</p>
+              </div>
+            </Col>
+            <Col xs={12} sm={8}>
+              <div>
+                <strong>Description: </strong>
+                <p>{event.description}</p>
+              </div>
+            </Col>
+            <Col xs={12}>
+              <div>
+                <strong>Ramifications: </strong>
+                <p>{event.ramifications}</p>
+              </div>
+            </Col>
+          </Row>
+        </Fieldset>
       </Tab.Pane>
     );
   };
 
   renderImages = () => {
-    const { npc } = this.state;
+    const { event } = this.state;
     return (
       <Tab.Pane eventKey="images">
-        {npc.images.length === 1 && (
-          <Image src={npc.images[0].downloadUrl} responsive />
+        {event.images.length === 1 && (
+          <Image src={event.images[0].downloadUrl} responsive />
         )}
-        {npc.images.length > 1 && (
+        {event.images.length > 1 && (
           <Carousel interval={null}>
-            {npc.images &&
-              npc.images.map(image => {
+            {event.images &&
+              event.images.map(image => {
                 return (
-                  <Carousel.Item key={`npc-image-${image.fileName}`}>
+                  <Carousel.Item key={`event-image-${image.fileName}`}>
                     <Image src={image.downloadUrl} responsive />
                   </Carousel.Item>
                 );
               })}
           </Carousel>
         )}
-        {!npc.images.length && (
+        {!event.images.length && (
           <Image src={require('../assets/placeholder.png')} responsive />
         )}
       </Tab.Pane>
@@ -193,11 +115,11 @@ class NPC extends Component {
   };
 
   renderAttachedFiles = () => {
-    const { npc } = this.state;
+    const { event } = this.state;
     return (
       <Tab.Pane eventKey="attachedFiles">
-        {npc.attachedFiles &&
-          npc.attachedFiles.map(file => {
+        {event.attachedFiles &&
+          event.attachedFiles.map(file => {
             return (
               <div key={`${file.fileName}-${file.downloadUrl}`}>
                 <a href="#" onClick={() => window.open(file.downloadUrl)}>
@@ -218,15 +140,15 @@ class NPC extends Component {
   };
 
   renderObject = (type, stateIds, name, secondaryField) => {
-    const { npc } = this.state;
+    const { event } = this.state;
     const { currentCampaign, history } = this.props;
     const items = [];
-    npc[stateIds].forEach(collectionKey => {
+    event[stateIds].forEach(collectionKey => {
       const foundObject = this.props[type][collectionKey];
       const foundRoute = `/campaigns/${
         currentCampaign.id
       }/home/${type}/${collectionKey}`;
-      if (foundRoute && foundObject) {
+      if (foundObject && foundRoute) {
         items.push({
           route: foundRoute,
           descriptor: foundObject[secondaryField],
@@ -238,12 +160,12 @@ class NPC extends Component {
     return (
       <Tab.Pane eventKey={type}>
         <Row>
-          {!npc[stateIds].length && (
+          {!event[stateIds].length && (
             <div>
               You have no related {type}. Please add some to see them here.
             </div>
           )}
-          {!!npc[stateIds].length && (
+          {!!event[stateIds].length && (
             <Col xs={12}>
               <ListSlidein items={items} history={history} />
             </Col>
@@ -254,31 +176,31 @@ class NPC extends Component {
   };
 
   renderNotes = () => {
-    const { npc } = this.state;
+    const { event } = this.state;
     return (
       <Tab.Pane eventKey="notes">
-        <Notes noteIds={npc.noteIds} typeId={npc.id} type="npcs" />
+        <Notes noteIds={event.noteIds} typeId={event.id} type="events" />
       </Tab.Pane>
     );
   };
 
-  renderNPCForm = () => {
-    const { npc, npcFormOpen } = this.state;
+  renderEventForm = () => {
+    const { event, eventFormOpen } = this.state;
     return (
       <Modal
-        show={npcFormOpen}
-        onHide={this.hideNPCForm}
+        show={eventFormOpen}
+        onHide={this.hideEventForm}
         bsSize="lg"
-        aria-labelledby="npc-modal-title-lg"
+        aria-labelledby="event-modal-title-lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="npc-modal-title-lg">Edit {npc.name}</Modal.Title>
+          <Modal.Title id="event-modal-title-lg">Edit {event.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <NPCForm
-            npc={npc}
-            onCancel={this.hideNPCForm}
-            onSubmit={this.hideNPCForm}
+          <EventForm
+            event={event}
+            onCancel={this.hideEventForm}
+            onSubmit={this.hideEventForm}
             formAction={'edit'}
           />
         </Modal.Body>
@@ -286,13 +208,13 @@ class NPC extends Component {
     );
   };
 
-  showNPCForm = e => {
+  showEventForm = e => {
     e.preventDefault();
-    this.setState({ npcFormOpen: true });
+    this.setState({ eventFormOpen: true });
   };
 
-  hideNPCForm = () => {
-    this.setState({ npcFormOpen: false });
+  hideEventForm = () => {
+    this.setState({ eventFormOpen: false });
   };
 
   renderPills = () => {
@@ -375,21 +297,21 @@ class NPC extends Component {
   };
 
   render() {
-    const { npc } = this.state;
-    if (!npc) return null;
+    const { event } = this.state;
+    if (!event) return null;
     return (
       <Grid className="app-container">
-        {this.renderNPCForm()}
+        {this.renderEventForm()}
         <Row className="margin-bottom-1">
           <Col xs={9}>
-            <h3>{npc.name}</h3>
+            <h3>{event.name}</h3>
           </Col>
-          <Col xs={3}>
+          <Col xs={2}>
             <Button
               className="margin-left-1 vert-text-top"
               bsSize="small"
               bsStyle="warning"
-              onClick={this.showNPCForm}
+              onClick={this.showEventForm}
             >
               <Glyphicon glyph="pencil" />
             </Button>
@@ -397,13 +319,13 @@ class NPC extends Component {
               className="margin-left-1 vert-text-top"
               bsSize="small"
               bsStyle="danger"
-              onClick={() => this.handleNPCDelete(npc)}
+              onClick={() => this.handleEventDelete(event)}
             >
               <Glyphicon glyph="trash" />
             </Button>
           </Col>
         </Row>
-        <Tab.Container id="npc-tabs" defaultActiveKey="images">
+        <Tab.Container id="event-tabs" defaultActiveKey="images">
           <Row>
             <Col xs={2}>{this.renderPills()}</Col>
             <Col xs={9} className="object-content">
@@ -415,7 +337,7 @@ class NPC extends Component {
                 {this.renderObject('places', 'placeIds', 'place', 'type')}
                 {this.renderObject('npcs', 'npcIds', 'npc', 'race')}
                 {this.renderObject('quests', 'questIds', 'quest', 'status')}
-                {this.renderObject('events', 'eventIds', 'event', 'status')}
+                {this.renderObject('events', 'eventIds', 'event', 'name')}
               </Tab.Content>
             </Col>
           </Row>
@@ -425,21 +347,19 @@ class NPC extends Component {
   }
 }
 
-NPC.defaultProps = {};
-NPC.propTypes = {};
+Event.defaultProps = {};
+Event.propTypes = {};
 const mapStateToProps = state => ({
-  npcs: state.npcs.all,
-  updating: state.npcs.updating,
-  notes: state.notes.all,
-  quests: state.quests.all,
   events: state.events.all,
+  quests: state.quests.all,
+  npcs: state.npcs.all,
   places: state.places.all,
   currentCampaign: state.campaigns.currentCampaign
 });
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      deleteNPC: NPCActions.deleteNPC
+      deleteEvent: EventActions.deleteEvent
     },
     dispatch
   );
@@ -447,4 +367,4 @@ const mapDispatchToProps = dispatch =>
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(NPC);
+)(Event);

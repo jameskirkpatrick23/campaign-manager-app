@@ -15,6 +15,9 @@ import NPCDetails from './pages/npc';
 import QuestsPage from './pages/quests';
 import QuestForm from './forms/quest-form';
 import QuestDetails from './pages/quest';
+import EventsPage from './pages/events';
+import EventForm from './forms/event-form';
+import EventDetails from './pages/event';
 
 export default {
   '/': {
@@ -145,5 +148,28 @@ export default {
     path: '/campaigns/:campaign_id/home/quests/:quest_id',
     exact: true,
     component: QuestDetails
+  },
+  '/campaigns/:campaign_id/home/events': {
+    key: 'Events',
+    name: 'Events',
+    path: '/campaigns/:campaign_id/home/events',
+    exact: true,
+    component: EventsPage
+  },
+  '/campaigns/:campaign_id/home/events/new': {
+    key: 'Event Form',
+    name: 'New Event',
+    path: '/campaigns/:campaign_id/home/events/new',
+    exact: true,
+    component: EventForm
+  },
+  '/campaigns/:campaign_id/home/events/:quest_id': {
+    key: 'Event Show',
+    name: 'Event Show',
+    hasCustomName: true,
+    customName: { collection: 'events', pathIdentifier: 'event_id' },
+    path: '/campaigns/:campaign_id/home/events/:event_id',
+    exact: true,
+    component: EventDetails
   }
 };
