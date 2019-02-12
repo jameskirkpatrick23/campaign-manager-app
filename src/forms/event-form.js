@@ -25,6 +25,7 @@ class EventForm extends Component {
     this.state = {
       name: '',
       description: '',
+      time: '',
       ramifications: '',
       tagIds: [],
       tags: {},
@@ -454,6 +455,7 @@ EventForm.defaultProps = {
     images: [],
     npcIds: [],
     placeIds: [],
+    time: '',
     noteIds: [],
     questIds: [],
     eventIds: [],
